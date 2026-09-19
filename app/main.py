@@ -196,8 +196,19 @@ def request_payment(order_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Order not found")
     if order.state == OrderStatus.PENDING_PAYMENT:
         return {"id": order.id, "state": order.state}
-    transition_order(order, OrderStatus.PENDING_PAYMENT)
+    result = db.execute(
+        update(OrderModel)
+        .where(OrderModel.id == order_id, OrderModel.state == OrderStatus.DRAFT)
+        .values(state=OrderStatus.PENDING_PAYMENT)
+    )
+    if result.rowcount != 1:
+        db.rollback()
+        current = db.query(OrderModel).get(order_id)
+        if current and current.state == OrderStatus.PENDING_PAYMENT:
+            return {"id": current.id, "state": current.state}
+        raise HTTPException(status_code=409, detail="Order tidak lagi berstatus DRAFT")
     db.commit()
+    db.refresh(order)
     return {"id": order.id, "state": order.state}
 
 
@@ -244,10 +255,23 @@ def simulate_payment_failed(order_id: int, db: Session = Depends(get_db)):
         return {"message": "Payment already failed", "payment_state": order.payment_state}
     if order.payment_state == PaymentStatus.SIMULATED_CONFIRMED:
         raise HTTPException(status_code=400, detail="Payment sudah dikonfirmasi")
-    if order.state != OrderStatus.PENDING_PAYMENT:
-        raise HTTPException(status_code=400, detail=f"Order must be PENDING_PAYMENT, current: {order.state}")
-    order.payment_state = PaymentStatus.FAILED
+    result = db.execute(
+        update(OrderModel)
+        .where(
+            OrderModel.id == order_id,
+            OrderModel.state == OrderStatus.PENDING_PAYMENT,
+            OrderModel.payment_state == PaymentStatus.PENDING,
+        )
+        .values(payment_state=PaymentStatus.FAILED)
+    )
+    if result.rowcount != 1:
+        db.rollback()
+        current = db.query(OrderModel).get(order_id)
+        if current and current.payment_state == PaymentStatus.FAILED:
+            return {"message": "Payment already failed", "payment_state": current.payment_state}
+        raise HTTPException(status_code=409, detail="Order berubah; kegagalan pembayaran tidak diproses")
     db.commit()
+    db.refresh(order)
     return {"id": order.id, "state": order.state, "payment_state": order.payment_state}
 
 
@@ -286,6 +310,20 @@ def deduct_order_stock(db: Session, order: OrderModel) -> None:
             raise HTTPException(status_code=409, detail="Order sudah dikirim ke dapur")
         if order.state != OrderStatus.PAID or order.payment_state != PaymentStatus.SIMULATED_CONFIRMED:
             raise HTTPException(status_code=409, detail=f"Order tidak siap dikirim: {order.state}")
+        claim = db.execute(
+            update(OrderModel)
+            .where(
+                OrderModel.id == order.id,
+                OrderModel.state == OrderStatus.PAID,
+                OrderModel.payment_state == PaymentStatus.SIMULATED_CONFIRMED,
+                OrderModel.stock_consumed.is_(False),
+            )
+            .values(stock_consumed=True)
+        )
+        if claim.rowcount != 1:
+            db.rollback()
+            raise HTTPException(status_code=409, detail="Order sedang/ sudah diproses ke dapur")
+        db.refresh(order)
         requirements = {}
         items = order.items_json.get("items", [])
         for item in items:
@@ -314,7 +352,6 @@ def deduct_order_stock(db: Session, order: OrderModel) -> None:
                         detail=f"Insufficient or changed stock for {ingredient}",
                     )
             transition_order(order, OrderStatus.SENT_TO_KITCHEN)
-            order.stock_consumed = True
             db.commit()
         except Exception:
             db.rollback()
