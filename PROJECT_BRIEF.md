@@ -16,9 +16,10 @@ Build a small, testable backend for the previously designed WhatsApp-first resto
 7. sales, finance, and stock reports are queryable.
 
 ## Architecture boundary
-- AI conversation layer is not connected yet; expose deterministic service/API contracts for a future WhatsApp adapter.
-- Database is the source of truth for prices, order totals, payment state, stock, and reports.
-- No real payment verification, refunds, discounts, publishing, or external messaging.
+- AI/LLM conversation layer is not connected yet; the current WhatsApp adapter is deterministic and command-based.
+- A Meta WhatsApp Cloud API webhook adapter is implemented for staging; outbound delivery is dry-run by default and requires explicit credentials to enable.
+- Database is the source of truth for prices, order totals, payment state, stock, customer phone ownership, and reports.
+- No real payment verification, refunds, discounts, publishing, or production customer-data workflow.
 - Use FastAPI, SQLAlchemy, SQLite, and pytest unless a strong reason requires an alternative.
 
 ## Required lifecycle states

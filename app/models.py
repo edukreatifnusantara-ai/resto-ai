@@ -69,6 +69,7 @@ class Order(Base):
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     completed_at = Column(DateTime, nullable=True)
     stock_consumed = Column(Boolean, nullable=False, default=False)
+    customer_phone = Column(String(32), nullable=True, index=True)
 
     @property
     def item_details(self):
@@ -102,3 +103,16 @@ class Order(Base):
         if new_state == OrderStatus.PAID:
             return self.payment_state == PaymentStatus.SIMULATED_CONFIRMED
         return True
+
+
+class WhatsAppEvent(Base):
+    __tablename__ = "whatsapp_events"
+
+    id = Column(Integer, primary_key=True)
+    message_id = Column(String(160), unique=True, nullable=False)
+    sender_phone = Column(String(32), nullable=False)
+    message_type = Column(String(32), nullable=False)
+    body = Column(String(4096), nullable=False, default="")
+    claimed_at = Column(DateTime, nullable=True)
+    processed_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)

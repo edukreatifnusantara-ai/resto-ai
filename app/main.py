@@ -1,23 +1,32 @@
 import os
 import secrets
-from datetime import datetime
+from datetime import datetime, timedelta
 from math import isfinite
 from threading import Lock
 
-from fastapi import FastAPI, HTTPException, Depends, Request
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, HTTPException, Depends, Request, Query
+from fastapi.responses import JSONResponse, PlainTextResponse
 from pydantic import BaseModel, Field, field_validator
-from sqlalchemy import update
+from sqlalchemy import or_, update
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from typing import List
 
 from app.database import init_db, SessionLocal
 from app.models import (
     Base, MenuItem, Recipe, Stock, Order,
-    OrderStatus, PaymentStatus,
+    OrderStatus, PaymentStatus, WhatsAppEvent,
     Order as OrderModel,
 )
 from app.database import engine
+from app.whatsapp import (
+    MetaWhatsAppClient,
+    WhatsAppConfigurationError,
+    WhatsAppDeliveryError,
+    extract_messages,
+    verify_signature,
+    verify_subscription,
+)
 
 
 app = FastAPI(title="Resto AI MVP", version="0.1.0")
@@ -28,7 +37,9 @@ _stock_lock = Lock()
 async def require_runtime_token(request: Request, call_next):
     # Health is intentionally public for local process supervision. All data
     # and mutation endpoints require the staging token.
-    if request.url.path == "/":
+    # Meta calls the webhook without the internal API token. It is protected
+    # independently by the verify token and X-Hub-Signature-256.
+    if request.url.path in {"/", "/webhooks/whatsapp"}:
         return await call_next(request)
     expected = os.getenv("RESTO_API_TOKEN")
     supplied = request.headers.get("X-RESTO-API-TOKEN", "")
@@ -125,6 +136,7 @@ class OrderCreate(BaseModel):
     items: List[OrderItem] = Field(
         ..., min_length=1, max_length=50, description="Order items with menu_item_id and quantity"
     )
+    customer_phone: str | None = Field(default=None, min_length=1, max_length=32)
 
 
 # --- Order endpoints ---
@@ -157,6 +169,7 @@ def create_order(order_create: OrderCreate, db: Session = Depends(get_db)):
         total=round(total, 2),
         state=OrderStatus.DRAFT,
         payment_state=PaymentStatus.PENDING,
+        customer_phone=order_create.customer_phone,
     )
     db.add(order)
     db.commit()
@@ -185,6 +198,208 @@ def get_order(order_id: int, db: Session = Depends(get_db)):
         "created_at": order.created_at,
         "completed_at": order.completed_at,
     }
+
+
+def _chatbot_help() -> str:
+    return (
+        "Perintah Resto-AI (SIMULASI):\\n"
+        "MENU — lihat menu\\n"
+        "PESAN <id_menu> <jumlah> — buat order\\n"
+        "BAYAR <id_order> — konfirmasi pembayaran simulasi\\n"
+        "STATUS <id_order> — lihat status order\\n"
+        "BATAL <id_order> — batalkan order"
+    )
+
+
+def _chatbot_menu(db: Session) -> str:
+    items = db.query(MenuItem).order_by(MenuItem.id).all()
+    if not items:
+        return "Menu belum tersedia."
+    lines = ["Menu Resto-AI (DATA DUMMY / SIMULASI):"]
+    for item in items:
+        lines.append(f"{item.id}. {item.name} — Rp{item.price:,.0f}".replace(",", "."))
+    lines.append("\\nPesan dengan format: PESAN <id_menu> <jumlah>")
+    return "\\n".join(lines)
+
+
+def _owned_order(db: Session, sender: str, order_id: int) -> OrderModel | None:
+    return (
+        db.query(OrderModel)
+        .filter(OrderModel.id == order_id, OrderModel.customer_phone == sender)
+        .one_or_none()
+    )
+
+
+def handle_whatsapp_text(db: Session, sender: str, body: str) -> str:
+    """Handle the bounded, deterministic customer chatbot workflow."""
+    text = " ".join(body.strip().split())
+    upper = text.upper()
+    if not text or upper in {"HALO", "HI", "HAI", "HELP", "BANTUAN", "MULAI"}:
+        return "Halo, ini Resto-AI.\\n\\n" + _chatbot_help()
+    if upper in {"MENU", "DAFTAR MENU"}:
+        return _chatbot_menu(db)
+
+    parts = text.split()
+    command = parts[0].upper()
+    if command in {"PESAN", "ORDER"}:
+        if len(parts) not in {2, 3} or not parts[1].isdigit() or (len(parts) == 3 and not parts[2].isdigit()):
+            return "Format salah. Gunakan: PESAN <id_menu> <jumlah>"
+        menu_id = int(parts[1])
+        quantity = int(parts[2]) if len(parts) == 3 else 1
+        if quantity < 1 or quantity > 1000:
+            return "Jumlah harus antara 1 sampai 1000."
+        try:
+            result = create_order(
+                OrderCreate(
+                    items=[OrderItem(menu_item_id=menu_id, quantity=quantity)],
+                    customer_phone=sender,
+                ),
+                db,
+            )
+        except HTTPException as exc:
+            return f"Order belum dapat dibuat: {exc.detail}"
+        return (
+            f"Order #{result['id']} dibuat dengan status DRAFT.\\n"
+            f"Total: Rp{result['total']:,.0f}".replace(",", ".")
+            + f"\\nBalas BAYAR {result['id']} untuk pembayaran SIMULASI."
+        )
+
+    if command in {"STATUS", "CEK"} and len(parts) == 2 and parts[1].isdigit():
+        order = _owned_order(db, sender, int(parts[1]))
+        if order is None:
+            return "Order tidak ditemukan."
+        return (
+            f"Order #{order.id}\\n"
+            f"Status: {order.state}\\n"
+            f"Pembayaran: {order.payment_state}\\n"
+            f"Total: Rp{order.total:,.0f}".replace(",", ".")
+        )
+
+    if command == "BATAL" and len(parts) == 2 and parts[1].isdigit():
+        order_id = int(parts[1])
+        order = _owned_order(db, sender, order_id)
+        if order is None:
+            return "Order tidak ditemukan."
+        try:
+            cancel_order(order_id, db)
+        except HTTPException as exc:
+            return f"Order tidak dapat dibatalkan: {exc.detail}"
+        return f"Order #{order_id} berhasil dibatalkan."
+
+    if command == "BAYAR" and len(parts) == 2 and parts[1].isdigit():
+        order_id = int(parts[1])
+        order = _owned_order(db, sender, order_id)
+        if order is None:
+            return "Order tidak ditemukan."
+        try:
+            if order.state == OrderStatus.DRAFT:
+                request_payment(order_id, db)
+            result = simulate_payment(order_id, db)
+        except HTTPException as exc:
+            return f"Pembayaran tidak dapat diproses: {exc.detail}"
+        return (
+            f"Order #{order_id} berstatus PAID.\\n"
+            "Pembayaran ini SIMULASI dan bukan settlement nyata."
+            if result.get("payment_state") == PaymentStatus.SIMULATED_CONFIRMED
+            else f"Order #{order_id}: {result}"
+        )
+
+    return "Perintah belum dikenali.\\n\\n" + _chatbot_help()
+
+
+def _claim_whatsapp_event(db: Session, message: dict[str, str]) -> tuple[WhatsAppEvent, bool]:
+    """Claim one webhook event exactly once, with stale-claim recovery."""
+    now = datetime.utcnow()
+    event = db.query(WhatsAppEvent).filter(
+        WhatsAppEvent.message_id == message["message_id"]
+    ).one_or_none()
+    if event is None:
+        event = WhatsAppEvent(
+            message_id=message["message_id"],
+            sender_phone=message["sender"],
+            message_type=message["message_type"],
+            body=message["body"],
+            claimed_at=now,
+        )
+        db.add(event)
+        try:
+            db.commit()
+            return event, True
+        except IntegrityError:
+            db.rollback()
+            event = db.query(WhatsAppEvent).filter(
+                WhatsAppEvent.message_id == message["message_id"]
+            ).one()
+
+    if event.processed_at is not None:
+        return event, False
+    stale_before = now - timedelta(minutes=5)
+    claim = db.execute(
+        update(WhatsAppEvent)
+        .where(
+            WhatsAppEvent.id == event.id,
+            WhatsAppEvent.processed_at.is_(None),
+            or_(WhatsAppEvent.claimed_at.is_(None), WhatsAppEvent.claimed_at < stale_before),
+        )
+        .values(claimed_at=now)
+    )
+    db.commit()
+    if claim.rowcount != 1:
+        return event, False
+    db.refresh(event)
+    return event, True
+
+
+# Meta WhatsApp webhook verification is protected by Meta's verify token.
+@app.get("/webhooks/whatsapp")
+def verify_whatsapp_webhook(
+    mode: str | None = Query(default=None, alias="hub.mode"),
+    verify_token: str | None = Query(default=None, alias="hub.verify_token"),
+    challenge: str | None = Query(default=None, alias="hub.challenge"),
+):
+    if not os.getenv("WHATSAPP_VERIFY_TOKEN"):
+        raise HTTPException(status_code=503, detail="WHATSAPP_VERIFY_TOKEN belum dikonfigurasi")
+    if not challenge or not verify_subscription(mode, verify_token):
+        raise HTTPException(status_code=403, detail="Verifikasi webhook WhatsApp gagal")
+    return PlainTextResponse(challenge)
+
+
+@app.post("/webhooks/whatsapp")
+async def receive_whatsapp_webhook(request: Request, db: Session = Depends(get_db)):
+    raw_body = await request.body()
+    if not verify_signature(raw_body, request.headers.get("X-Hub-Signature-256")):
+        raise HTTPException(status_code=401, detail="Signature webhook WhatsApp tidak valid")
+    try:
+        payload = await request.json()
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail="Payload webhook bukan JSON valid") from exc
+
+    processed = 0
+    duplicates = 0
+    ignored = 0
+    client = MetaWhatsAppClient()
+    for message in extract_messages(payload):
+        event, claimed = _claim_whatsapp_event(db, message)
+        if not claimed:
+            duplicates += 1
+            continue
+
+        if message["message_type"] == "text":
+            reply = handle_whatsapp_text(db, message["sender"], message["body"])
+        else:
+            reply = "Saat ini Resto-AI hanya menerima pesan teks. Balas MENU untuk mulai."
+            ignored += 1
+        try:
+            client.send_text(message["sender"], reply)
+        except WhatsAppConfigurationError as exc:
+            raise HTTPException(status_code=503, detail=str(exc)) from exc
+        except WhatsAppDeliveryError as exc:
+            raise HTTPException(status_code=502, detail=str(exc)) from exc
+        event.processed_at = datetime.utcnow()
+        db.commit()
+        processed += 1
+
+    return {"status": "ok", "processed": processed, "duplicates": duplicates, "ignored": ignored}
 
 
 # Payment state transitions

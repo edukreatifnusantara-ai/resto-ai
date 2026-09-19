@@ -49,11 +49,22 @@ def ensure_schema():
     """Apply the small additive migration needed by the staging MVP."""
     Base.metadata.create_all(bind=engine)
     columns = {column["name"] for column in inspect(engine).get_columns("orders")}
-    if "stock_consumed" not in columns:
+    migrations = {
+        "stock_consumed": "ALTER TABLE orders ADD COLUMN stock_consumed BOOLEAN NOT NULL DEFAULT 0",
+        "customer_phone": "ALTER TABLE orders ADD COLUMN customer_phone VARCHAR(32)",
+    }
+    missing = [name for name in migrations if name not in columns]
+    event_columns = {column["name"] for column in inspect(engine).get_columns("whatsapp_events")}
+    event_migrations = {
+        "claimed_at": "ALTER TABLE whatsapp_events ADD COLUMN claimed_at DATETIME",
+    }
+    missing_event = [name for name in event_migrations if name not in event_columns]
+    if missing or missing_event:
         with engine.begin() as connection:
-            connection.execute(
-                text("ALTER TABLE orders ADD COLUMN stock_consumed BOOLEAN NOT NULL DEFAULT 0")
-            )
+            for name in missing:
+                connection.execute(text(migrations[name]))
+            for name in missing_event:
+                connection.execute(text(event_migrations[name]))
 
 
 def init_db():
