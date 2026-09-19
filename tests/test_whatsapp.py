@@ -172,3 +172,48 @@ def test_meta_client_builds_signed_api_request(monkeypatch):
     assert captured["headers"]["Authorization"] == "Bearer access-token"
     assert captured["body"]["to"] == "628120000000"
     assert captured["body"]["text"]["body"] == "Halo"
+
+
+def test_webhook_delivery_retry_does_not_duplicate_order(monkeypatch):
+    import app.whatsapp as whatsapp
+
+    sender = "628144444444"
+    body, headers = signed_payload(
+        message_id="wamid.retry-order", sender=sender, text="PESAN 1"
+    )
+
+    def fail_delivery(self, recipient, reply):
+        raise whatsapp.WhatsAppDeliveryError("temporary failure")
+
+    monkeypatch.setattr(whatsapp.MetaWhatsAppClient, "send_text", fail_delivery)
+    first = client.post("/webhooks/whatsapp", content=body, headers=headers)
+    assert first.status_code == 502
+
+    db = SessionLocal()
+    try:
+        event = db.query(WhatsAppEvent).filter_by(message_id="wamid.retry-order").one()
+        order_count = db.query(Order).filter_by(source_message_id="wamid.retry-order").count()
+        db.commit()
+    finally:
+        db.close()
+    assert order_count == 1
+
+    monkeypatch.setattr(whatsapp.MetaWhatsAppClient, "send_text", lambda self, recipient, reply: {"dry_run": True})
+    second = client.post("/webhooks/whatsapp", content=body, headers=headers)
+    assert second.status_code == 200
+    assert second.json()["processed"] == 1
+
+    db = SessionLocal()
+    try:
+        assert db.query(Order).filter_by(source_message_id="wamid.retry-order").count() == 1
+        assert db.query(WhatsAppEvent).filter_by(message_id="wamid.retry-order").one().processed_at is not None
+    finally:
+        db.close()
+
+
+def test_unsigned_webhook_is_rejected_without_app_secret(monkeypatch):
+    import app.whatsapp as whatsapp
+
+    monkeypatch.delenv("WHATSAPP_APP_SECRET", raising=False)
+    monkeypatch.setenv("WHATSAPP_ALLOW_UNSIGNED_WEBHOOKS", "true")
+    assert whatsapp.verify_signature(b"{}", None) is False

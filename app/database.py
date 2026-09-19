@@ -52,11 +52,13 @@ def ensure_schema():
     migrations = {
         "stock_consumed": "ALTER TABLE orders ADD COLUMN stock_consumed BOOLEAN NOT NULL DEFAULT 0",
         "customer_phone": "ALTER TABLE orders ADD COLUMN customer_phone VARCHAR(32)",
+        "source_message_id": "ALTER TABLE orders ADD COLUMN source_message_id VARCHAR(160)",
     }
     missing = [name for name in migrations if name not in columns]
     event_columns = {column["name"] for column in inspect(engine).get_columns("whatsapp_events")}
     event_migrations = {
         "claimed_at": "ALTER TABLE whatsapp_events ADD COLUMN claimed_at DATETIME",
+        "response_body": "ALTER TABLE whatsapp_events ADD COLUMN response_body VARCHAR(4096)",
     }
     missing_event = [name for name in event_migrations if name not in event_columns]
     if missing or missing_event:
@@ -65,6 +67,10 @@ def ensure_schema():
                 connection.execute(text(migrations[name]))
             for name in missing_event:
                 connection.execute(text(event_migrations[name]))
+            connection.execute(text(
+                "CREATE UNIQUE INDEX IF NOT EXISTS uq_orders_source_message_id "
+                "ON orders(source_message_id)"
+            ))
 
 
 def init_db():

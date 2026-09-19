@@ -137,6 +137,7 @@ class OrderCreate(BaseModel):
         ..., min_length=1, max_length=50, description="Order items with menu_item_id and quantity"
     )
     customer_phone: str | None = Field(default=None, min_length=1, max_length=32)
+    source_message_id: str | None = Field(default=None, min_length=1, max_length=160)
 
 
 # --- Order endpoints ---
@@ -170,6 +171,7 @@ def create_order(order_create: OrderCreate, db: Session = Depends(get_db)):
         state=OrderStatus.DRAFT,
         payment_state=PaymentStatus.PENDING,
         customer_phone=order_create.customer_phone,
+        source_message_id=order_create.source_message_id,
     )
     db.add(order)
     db.commit()
@@ -230,7 +232,12 @@ def _owned_order(db: Session, sender: str, order_id: int) -> OrderModel | None:
     )
 
 
-def handle_whatsapp_text(db: Session, sender: str, body: str) -> str:
+def handle_whatsapp_text(
+    db: Session,
+    sender: str,
+    body: str,
+    source_message_id: str | None = None,
+) -> str:
     """Handle the bounded, deterministic customer chatbot workflow."""
     text = " ".join(body.strip().split())
     upper = text.upper()
@@ -248,11 +255,23 @@ def handle_whatsapp_text(db: Session, sender: str, body: str) -> str:
         quantity = int(parts[2]) if len(parts) == 3 else 1
         if quantity < 1 or quantity > 1000:
             return "Jumlah harus antara 1 sampai 1000."
+        if source_message_id:
+            existing = db.query(OrderModel).filter(
+                OrderModel.source_message_id == source_message_id,
+                OrderModel.customer_phone == sender,
+            ).one_or_none()
+            if existing is not None:
+                return (
+                    f"Order #{existing.id} dibuat dengan status {existing.state}.\\n"
+                    f"Total: Rp{existing.total:,.0f}".replace(",", ".")
+                    + f"\\nBalas BAYAR {existing.id} untuk pembayaran SIMULASI."
+                )
         try:
             result = create_order(
                 OrderCreate(
                     items=[OrderItem(menu_item_id=menu_id, quantity=quantity)],
                     customer_phone=sender,
+                    source_message_id=source_message_id,
                 ),
                 db,
             )
@@ -384,16 +403,31 @@ async def receive_whatsapp_webhook(request: Request, db: Session = Depends(get_d
             duplicates += 1
             continue
 
-        if message["message_type"] == "text":
-            reply = handle_whatsapp_text(db, message["sender"], message["body"])
+        if event.response_body:
+            reply = event.response_body
+        elif message["message_type"] == "text":
+            reply = handle_whatsapp_text(
+                db,
+                message["sender"],
+                message["body"],
+                source_message_id=message["message_id"],
+            )
+            event.response_body = reply
+            db.commit()
         else:
             reply = "Saat ini Resto-AI hanya menerima pesan teks. Balas MENU untuk mulai."
+            event.response_body = reply
+            db.commit()
             ignored += 1
         try:
             client.send_text(message["sender"], reply)
         except WhatsAppConfigurationError as exc:
+            event.claimed_at = datetime.utcnow() - timedelta(minutes=6)
+            db.commit()
             raise HTTPException(status_code=503, detail=str(exc)) from exc
         except WhatsAppDeliveryError as exc:
+            event.claimed_at = datetime.utcnow() - timedelta(minutes=6)
+            db.commit()
             raise HTTPException(status_code=502, detail=str(exc)) from exc
         event.processed_at = datetime.utcnow()
         db.commit()

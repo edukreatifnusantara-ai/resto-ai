@@ -70,6 +70,7 @@ class Order(Base):
     completed_at = Column(DateTime, nullable=True)
     stock_consumed = Column(Boolean, nullable=False, default=False)
     customer_phone = Column(String(32), nullable=True, index=True)
+    source_message_id = Column(String(160), nullable=True, unique=True, index=True)
 
     @property
     def item_details(self):
@@ -114,5 +115,6 @@ class WhatsAppEvent(Base):
     message_type = Column(String(32), nullable=False)
     body = Column(String(4096), nullable=False, default="")
     claimed_at = Column(DateTime, nullable=True)
+    response_body = Column(String(4096), nullable=True)
     processed_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)

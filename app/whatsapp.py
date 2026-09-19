@@ -26,12 +26,12 @@ def _truthy(name: str) -> bool:
 def verify_signature(raw_body: bytes, signature_header: str | None) -> bool:
     """Verify Meta's X-Hub-Signature-256 header.
 
-    Unsigned webhooks are accepted only when explicitly enabled for local
-    staging. Production must set WHATSAPP_APP_SECRET.
+    A configured app secret is mandatory. This prevents an accidental
+    publicly reachable deployment from accepting unsigned commands.
     """
     app_secret = os.getenv("WHATSAPP_APP_SECRET")
     if not app_secret:
-        return _truthy("WHATSAPP_ALLOW_UNSIGNED_WEBHOOKS")
+        return False
     if not signature_header or not signature_header.startswith("sha256="):
         return False
     supplied = signature_header.removeprefix("sha256=")
