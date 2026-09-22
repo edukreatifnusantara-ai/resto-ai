@@ -61,12 +61,22 @@ def ensure_schema():
         "response_body": "ALTER TABLE whatsapp_events ADD COLUMN response_body VARCHAR(4096)",
     }
     missing_event = [name for name in event_migrations if name not in event_columns]
-    if missing or missing_event:
+    
+    menu_columns = {column["name"] for column in inspect(engine).get_columns("menu_items")}
+    menu_migrations = {
+        "discount_percent": "ALTER TABLE menu_items ADD COLUMN discount_percent FLOAT NOT NULL DEFAULT 0.0",
+        "is_active": "ALTER TABLE menu_items ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT 1",
+    }
+    missing_menu = [name for name in menu_migrations if name not in menu_columns]
+
+    if missing or missing_event or missing_menu:
         with engine.begin() as connection:
             for name in missing:
                 connection.execute(text(migrations[name]))
             for name in missing_event:
                 connection.execute(text(event_migrations[name]))
+            for name in missing_menu:
+                connection.execute(text(menu_migrations[name]))
             connection.execute(text(
                 "CREATE UNIQUE INDEX IF NOT EXISTS uq_orders_source_message_id "
                 "ON orders(source_message_id)"

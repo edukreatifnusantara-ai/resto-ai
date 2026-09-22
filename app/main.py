@@ -3,6 +3,10 @@ import secrets
 from datetime import datetime, timedelta
 from math import isfinite
 from threading import Lock
+from dotenv import load_dotenv
+
+load_dotenv("/home/edukreativ-vps/resto-ai/.env.runtime")
+load_dotenv()
 
 from fastapi import FastAPI, HTTPException, Depends, Request, Query
 from fastapi.responses import JSONResponse, PlainTextResponse
@@ -13,6 +17,7 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from app.database import init_db, SessionLocal
+from app.agent import run_ai_agent, is_owner
 from app.models import (
     Base, MenuItem, Recipe, Stock, Order,
     OrderStatus, PaymentStatus, WhatsAppEvent,
@@ -39,7 +44,7 @@ async def require_runtime_token(request: Request, call_next):
     # and mutation endpoints require the staging token.
     # Meta calls the webhook without the internal API token. It is protected
     # independently by the verify token and X-Hub-Signature-256.
-    if request.url.path in {"/", "/webhooks/whatsapp"}:
+    if request.url.path in {"/", "/webhooks/whatsapp", "/api/chat"}:
         return await call_next(request)
     expected = os.getenv("RESTO_API_TOKEN")
     supplied = request.headers.get("X-RESTO-API-TOKEN", "")
@@ -238,19 +243,24 @@ def handle_whatsapp_text(
     body: str,
     source_message_id: str | None = None,
 ) -> str:
-    """Handle the bounded, deterministic customer chatbot workflow."""
+    """Handle incoming WhatsApp messages with two-way AI agent and deterministic fallbacks."""
     text = " ".join(body.strip().split())
-    upper = text.upper()
-    if not text or upper in {"HALO", "HI", "HAI", "HELP", "BANTUAN", "MULAI"}:
+    if not text:
         return "Halo, ini Resto-AI.\\n\\n" + _chatbot_help()
+
+    # If sender is Owner, prioritize AI Agent controller
+    if is_owner(sender):
+        ai_reply = run_ai_agent(db, sender, text)
+        if ai_reply:
+            return ai_reply
+
+    upper = text.upper()
     if upper in {"MENU", "DAFTAR MENU"}:
         return _chatbot_menu(db)
 
     parts = text.split()
     command = parts[0].upper()
-    if command in {"PESAN", "ORDER"}:
-        if len(parts) not in {2, 3} or not parts[1].isdigit() or (len(parts) == 3 and not parts[2].isdigit()):
-            return "Format salah. Gunakan: PESAN <id_menu> <jumlah>"
+    if command in {"PESAN", "ORDER"} and len(parts) in {2, 3} and parts[1].isdigit() and (len(parts) == 2 or parts[2].isdigit()):
         menu_id = int(parts[1])
         quantity = int(parts[2]) if len(parts) == 3 else 1
         if quantity < 1 or quantity > 1000:
@@ -322,6 +332,14 @@ def handle_whatsapp_text(
             if result.get("payment_state") == PaymentStatus.SIMULATED_CONFIRMED
             else f"Order #{order_id}: {result}"
         )
+
+    # For any conversational customer messages, run AI Agent
+    ai_reply = run_ai_agent(db, sender, text)
+    if ai_reply:
+        return ai_reply
+
+    if upper in {"HALO", "HI", "HAI", "HELP", "BANTUAN", "MULAI"}:
+        return "Halo, ini Resto-AI.\\n\\n" + _chatbot_help()
 
     return "Perintah belum dikenali.\\n\\n" + _chatbot_help()
 
@@ -434,6 +452,23 @@ async def receive_whatsapp_webhook(request: Request, db: Session = Depends(get_d
         processed += 1
 
     return {"status": "ok", "processed": processed, "duplicates": duplicates, "ignored": ignored}
+
+
+class DirectChatMessage(BaseModel):
+    sender: str
+    body: str
+    message_id: str | None = None
+
+
+@app.post("/api/chat", response_description="Direct customer chatbot message")
+def direct_chat(payload: DirectChatMessage, db: Session = Depends(get_db)):
+    reply = handle_whatsapp_text(
+        db,
+        sender=payload.sender,
+        body=payload.body,
+        source_message_id=payload.message_id,
+    )
+    return {"reply": reply}
 
 
 # Payment state transitions

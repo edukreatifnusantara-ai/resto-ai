@@ -13,6 +13,8 @@ class MenuItem(Base):
     name = Column(String(120), unique=True, nullable=False)
     price = Column(Float, nullable=False)
     description = Column(String(255))
+    discount_percent = Column(Float, nullable=False, default=0.0)
+    is_active = Column(Boolean, nullable=False, default=True)
     recipes = relationship("Recipe", back_populates="menu_item", cascade="all, delete-orphan")
 
 
