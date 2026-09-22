@@ -84,9 +84,12 @@ def owner_add_menu(db: Session, name: str, price: float, description: str = "") 
     existing = db.query(MenuItem).filter(MenuItem.name.ilike(name.strip())).first()
     if existing:
         return {"error": f"Menu '{name}' sudah ada di database."}
+    price_val = float(price)
+    cost_val = round(price_val * 0.70, 2)
     item = MenuItem(
         name=name.strip(),
-        price=float(price),
+        price=price_val,
+        cost_price=cost_val,
         description=description.strip(),
         discount_percent=0.0,
         is_active=True,
@@ -96,11 +99,12 @@ def owner_add_menu(db: Session, name: str, price: float, description: str = "") 
     db.refresh(item)
     return {
         "status": "success",
-        "message": f"Menu '{item.name}' berhasil ditambahkan dengan harga Rp{float(item.price):,.0f}.".replace(",", "."),
+        "message": f"Menu '{item.name}' berhasil ditambahkan dengan harga Rp{float(item.price):,.0f} (Modal HPP: Rp{cost_val:,.0f}, Margin 30%: Rp{price_val - cost_val:,.0f}).".replace(",", "."),
         "item": {
             "id": item.id,
             "name": item.name,
             "price": float(item.price),
+            "cost_price": cost_val,
             "description": item.description,
         },
     }
@@ -111,14 +115,18 @@ def owner_update_price(db: Session, name_or_id: str, new_price: float) -> dict[s
     if not item:
         return {"error": f"Menu '{name_or_id}' tidak ditemukan."}
     old_price = float(item.price)
-    setattr(item, "price", float(new_price))
+    new_price_val = float(new_price)
+    cost_val = round(new_price_val * 0.70, 2)
+    setattr(item, "price", new_price_val)
+    setattr(item, "cost_price", cost_val)
     db.commit()
     return {
         "status": "success",
-        "message": f"Harga '{item.name}' diubah dari Rp{old_price:,.0f} menjadi Rp{float(new_price):,.0f}.".replace(",", "."),
+        "message": f"Harga '{item.name}' diubah dari Rp{old_price:,.0f} menjadi Rp{new_price_val:,.0f} (Modal HPP 70%: Rp{cost_val:,.0f}, Margin 30%: Rp{new_price_val - cost_val:,.0f}).".replace(",", "."),
         "item_id": item.id,
         "name": item.name,
-        "new_price": float(new_price),
+        "new_price": new_price_val,
+        "cost_price": cost_val,
     }
 
 
@@ -165,11 +173,29 @@ def owner_set_menu_status(db: Session, name_or_id: str, is_active: bool) -> dict
 def owner_get_report(db: Session) -> dict[str, Any]:
     today_start = datetime.combine(date.today(), datetime.min.time())
     today_orders = db.query(Order).filter(Order.created_at >= today_start).all()
+    all_orders = db.query(Order).all()
 
     total_sales = sum(float(getattr(o, "total", 0.0)) for o in today_orders if getattr(o, "payment_state", "") == PaymentStatus.SIMULATED_CONFIRMED)
     paid_count = sum(1 for o in today_orders if getattr(o, "payment_state", "") == PaymentStatus.SIMULATED_CONFIRMED)
     draft_count = sum(1 for o in today_orders if getattr(o, "state", "") == OrderStatus.DRAFT)
     kitchen_count = sum(1 for o in today_orders if getattr(o, "state", "") in {OrderStatus.SENT_TO_KITCHEN, OrderStatus.PREPARING})
+
+    cogs_70 = total_sales * 0.70
+    profit_30 = total_sales * 0.30
+
+    all_sales = sum(float(getattr(o, "total", 0.0)) for o in all_orders if getattr(o, "payment_state", "") == PaymentStatus.SIMULATED_CONFIRMED)
+    all_cogs_70 = all_sales * 0.70
+    all_profit_30 = all_sales * 0.30
+
+    sold_items_map: dict[str, int] = {}
+    for o in today_orders:
+        if getattr(o, "payment_state", "") == PaymentStatus.SIMULATED_CONFIRMED:
+            items_list = o.items_json.get("items", []) if isinstance(o.items_json, dict) else []
+            for itm in items_list:
+                name = str(itm.get("name", "Unknown"))
+                qty = int(itm.get("quantity", 1))
+                sold_items_map[name] = sold_items_map.get(name, 0) + qty
+    top_items = [f"{k} ({v} porsi)" for k, v in sorted(sold_items_map.items(), key=lambda x: x[1], reverse=True)[:5]]
 
     # Stock alert
     low_stocks = db.query(Stock).filter(Stock.quantity <= Stock.min_threshold).all()
@@ -182,6 +208,13 @@ def owner_get_report(db: Session) -> dict[str, Any]:
         "draft_orders": draft_count,
         "orders_in_kitchen": kitchen_count,
         "total_revenue_today": f"Rp{total_sales:,.0f}".replace(",", "."),
+        "cost_of_goods_sold_70pct": f"Rp{cogs_70:,.0f}".replace(",", "."),
+        "estimated_net_profit_30pct": f"Rp{profit_30:,.0f}".replace(",", "."),
+        "cost_percent": 70.0,
+        "profit_margin_percent": 30.0,
+        "top_selling_items_today": top_items if top_items else "Belum ada pesanan terjual hari ini.",
+        "all_time_revenue": f"Rp{all_sales:,.0f}".replace(",", "."),
+        "all_time_estimated_net_profit_30pct": f"Rp{all_profit_30:,.0f}".replace(",", "."),
         "low_stock_warnings": stock_alerts if stock_alerts else "Semua stok bahan aman.",
     }
 
@@ -209,10 +242,14 @@ def owner_list_menu(db: Session) -> list[dict[str, Any]]:
     for it in items:
         disc = float(getattr(it, "discount_percent", 0.0))
         eff_price = float(it.price) * (1.0 - disc / 100.0)
+        cost_val = float(getattr(it, "cost_price", round(float(it.price) * 0.70, 2)))
+        margin = eff_price - cost_val
         res.append({
             "id": it.id,
             "name": it.name,
             "original_price": float(it.price),
+            "cost_price": cost_val,
+            "margin_profit": round(margin, 2),
             "discount_percent": disc,
             "effective_price": eff_price,
             "is_active": bool(getattr(it, "is_active", True)),
@@ -568,12 +605,17 @@ def run_ai_agent(db: Session, sender: str, user_message: str) -> str:
     if is_owner_user:
         system_prompt = (
             "Kamu adalah AI Agent Asisten Resto-AI yang bertindak sebagai pengendali resto internal untuk Owner (Bapak/Bos).\n"
+            "Restoran: Warung Ndelik.\n"
+            "Aturan Keuangan Resto:\n"
+            "- Harga modal (HPP) seluruh menu dipukul rata 70% dari harga jual.\n"
+            "- Margin keuntungan bersih dipukul rata 30% dari harga jual.\n"
+            "- Saat Owner meminta laporan penjualan / keuangan, selalu sampaikan secara transparan: Total Omset (Penjualan), Estimasi Modal HPP (70%), dan Estimasi Keuntungan Bersih (30%).\n\n"
             "Tugasmu membantu Owner mengelola restoran melalui WhatsApp:\n"
             "- Menambah menu baru (owner_add_menu)\n"
             "- Mengubah harga menu (owner_update_price)\n"
             "- Mengatur diskon/promo (owner_set_discount)\n"
             "- Mengubah status menu habis/tersedia (owner_set_menu_status)\n"
-            "- Melihat laporan penjualan harian & peringatan stok menipis (owner_get_report)\n"
+            "- Melihat laporan penjualan harian, omset, modal HPP, margin laba & peringatan stok menipis (owner_get_report)\n"
             "- Menambah stok bahan mentah (owner_update_stock)\n"
             "- Melihat seluruh daftar menu & harga (owner_list_menu)\n\n"
             "Gaya bicara: Hormat, sopan, natural, panggil 'Bos' atau 'Bapak'. Berikan konfirmasi jelas setiap ada perubahan data."
@@ -581,14 +623,15 @@ def run_ai_agent(db: Session, sender: str, user_message: str) -> str:
         tools = OWNER_TOOLS_SCHEMA
     else:
         system_prompt = (
-            "Kamu adalah AI Agent pelayan restoran Resto-AI yang ramah, sopan, dan hangat melayani pelanggan via WhatsApp.\n"
+            "Kamu adalah AI Agent pelayan restoran Warung Ndelik yang ramah, sopan, dan hangat melayani pelanggan via WhatsApp.\n"
             "Tugasmu:\n"
-            "- Menjawab pertanyaan seputar menu makanan dan minuman secara ramah dan menggugah selera.\n"
+            "- Menjawab pertanyaan seputar menu makanan dan minuman khas Warung Ndelik secara ramah dan menggugah selera.\n"
             "- Jika pelanggan menanyakan menu atau ingin tahu apa saja yang dijual, gunakan fungsi customer_get_menu.\n"
+            "- Menu favorit / best seller kami antara lain: Nasi Bebek Ndelik 1/2 (Bumbu Hitam), Nasi Goreng Ceplok, Kwetiau Ndelik, dan Nasi Garang Asem.\n"
             "- Membantu pelanggan memesan makanan & minuman. Jika pelanggan ingin memesan, pastikan rincian pesanan jelas lalu panggil fungsi customer_create_order.\n"
             "- Berikan nomor ID pesanan, rincian menu, dan total harga setelah pesanan berhasil dibuat.\n"
             "- Pandu pelanggan cara konfirmasi bayar (kirim BAYAR <id> atau minta tolong bayar di chat).\n"
-            "- Jangan pernah membuka informasi rahasia omset resto atau mengubah harga/menu untuk pelanggan umum.\n\n"
+            "- Jangan pernah membuka informasi rahasia omset resto, modal HPP, atau mengubah harga/menu untuk pelanggan umum.\n\n"
             "Gaya bicara: Ramah, santun, panggil pelanggan 'kak' atau 'kakak', gunakan bahasa Indonesia santai tapi sopan layaknya pelayan restoran profesional."
         )
         tools = CUSTOMER_TOOLS_SCHEMA

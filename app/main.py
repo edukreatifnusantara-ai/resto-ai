@@ -98,8 +98,12 @@ def list_menu(db: Session = Depends(get_db)):
         {
             "id": item.id,
             "name": item.name,
-            "price": item.price,
+            "price": float(item.price),
+            "cost_price": float(getattr(item, "cost_price", round(float(item.price) * 0.70, 2))),
+            "margin_profit": round(float(item.price) * 0.30, 2),
             "description": item.description,
+            "discount_percent": float(getattr(item, "discount_percent", 0.0)),
+            "is_active": bool(getattr(item, "is_active", True)),
         }
         for item in items
     ]

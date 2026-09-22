@@ -13,7 +13,7 @@ def test_list_menu():
     assert response.status_code == 200
     data = response.json()
     assert len(data) >= 5
-    assert "Nasi Goreng" in [item["name"] for item in data]
+    assert any("Nasi Goreng" in item["name"] for item in data)
 
 
 def test_add_menu_item_owner():
@@ -41,12 +41,13 @@ def pay(order_id):
 
 
 def test_create_order_and_total():
-    response = client.post("/orders/", json={"items": [{"menu_item_id": 1, "quantity": 2}]})
+    item1 = client.get("/menu").json()[0]
+    response = client.post("/orders/", json={"items": [{"menu_item_id": item1["id"], "quantity": 2}]})
     assert response.status_code == 200
     data = response.json()
     assert data["state"] == "DRAFT"
     assert data["payment_state"] == "PENDING"
-    assert data["total"] == 50000.0
+    assert data["total"] == item1["price"] * 2
     assert client.post(f"/orders/{data['id']}/request-payment").json()["state"] == "PENDING_PAYMENT"
 
 

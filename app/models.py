@@ -12,6 +12,7 @@ class MenuItem(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(120), unique=True, nullable=False)
     price = Column(Float, nullable=False)
+    cost_price = Column(Float, nullable=False, default=0.0)
     description = Column(String(255))
     discount_percent = Column(Float, nullable=False, default=0.0)
     is_active = Column(Boolean, nullable=False, default=True)
