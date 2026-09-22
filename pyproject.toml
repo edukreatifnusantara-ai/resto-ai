@@ -9,6 +9,9 @@ dependencies = [
     "fastapi>=0.109.0",
     "uvicorn[standard]>=0.27.0",
     "sqlalchemy>=2.0.0",
+    "qrcode>=8.0",
+    "pillow>=10.0",
+    "requests>=2.31.0",
     "pytest>=7.4.0",
     "pytest-asyncio>=0.23.0",
 ]

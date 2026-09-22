@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import or_, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Any
 
 from app.database import init_db, SessionLocal
 from app.agent import run_ai_agent, is_owner
@@ -44,7 +44,7 @@ async def require_runtime_token(request: Request, call_next):
     # and mutation endpoints require the staging token.
     # Meta calls the webhook without the internal API token. It is protected
     # independently by the verify token and X-Hub-Signature-256.
-    if request.url.path in {"/", "/webhooks/whatsapp", "/api/chat"}:
+    if request.url.path in {"/", "/webhooks/whatsapp", "/api/chat", "/webhooks/midtrans"}:
         return await call_next(request)
     expected = os.getenv("RESTO_API_TOKEN")
     supplied = request.headers.get("X-RESTO-API-TOKEN", "")
@@ -246,7 +246,7 @@ def handle_whatsapp_text(
     sender: str,
     body: str,
     source_message_id: str | None = None,
-) -> str:
+) -> str | dict[str, Any]:
     """Handle incoming WhatsApp messages with two-way AI agent and deterministic fallbacks."""
     text = " ".join(body.strip().split())
     if not text:
@@ -255,7 +255,9 @@ def handle_whatsapp_text(
     # If sender is Owner, prioritize AI Agent controller
     if is_owner(sender):
         ai_reply = run_ai_agent(db, sender, text)
-        if ai_reply:
+        if isinstance(ai_reply, dict) and ai_reply.get("reply"):
+            return ai_reply
+        elif isinstance(ai_reply, str) and ai_reply:
             return ai_reply
 
     upper = text.upper()
@@ -339,7 +341,9 @@ def handle_whatsapp_text(
 
     # For any conversational customer messages, run AI Agent
     ai_reply = run_ai_agent(db, sender, text)
-    if ai_reply:
+    if isinstance(ai_reply, dict) and ai_reply.get("reply"):
+        return ai_reply
+    elif isinstance(ai_reply, str) and ai_reply:
         return ai_reply
 
     if upper in {"HALO", "HI", "HAI", "HELP", "BANTUAN", "MULAI"}:
@@ -426,23 +430,24 @@ async def receive_whatsapp_webhook(request: Request, db: Session = Depends(get_d
             continue
 
         if event.response_body:
-            reply = event.response_body
+            reply_text = str(event.response_body)
         elif message["message_type"] == "text":
-            reply = handle_whatsapp_text(
+            reply_res = handle_whatsapp_text(
                 db,
                 message["sender"],
                 message["body"],
                 source_message_id=message["message_id"],
             )
-            event.response_body = reply
+            reply_text = reply_res.get("reply", "") if isinstance(reply_res, dict) else str(reply_res)
+            event.response_body = reply_text
             db.commit()
         else:
-            reply = "Saat ini Resto-AI hanya menerima pesan teks. Balas MENU untuk mulai."
-            event.response_body = reply
+            reply_text = "Saat ini Resto-AI hanya menerima pesan teks. Balas MENU untuk mulai."
+            event.response_body = reply_text
             db.commit()
             ignored += 1
         try:
-            client.send_text(message["sender"], reply)
+            client.send_text(message["sender"], reply_text)
         except WhatsAppConfigurationError as exc:
             event.claimed_at = datetime.utcnow() - timedelta(minutes=6)
             db.commit()
@@ -456,6 +461,85 @@ async def receive_whatsapp_webhook(request: Request, db: Session = Depends(get_d
         processed += 1
 
     return {"status": "ok", "processed": processed, "duplicates": duplicates, "ignored": ignored}
+
+
+@app.post("/webhooks/midtrans", response_description="Midtrans payment notification webhook")
+async def midtrans_webhook(request: Request, db: Session = Depends(get_db)):
+    try:
+        payload = await request.json()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid JSON payload")
+
+    order_midtrans_id = str(payload.get("order_id", ""))
+    status_code = str(payload.get("status_code", ""))
+    gross_amount = str(payload.get("gross_amount", ""))
+    signature_key = str(payload.get("signature_key", ""))
+    transaction_status = str(payload.get("transaction_status", ""))
+    fraud_status = str(payload.get("fraud_status", ""))
+
+    from app.midtrans import verify_midtrans_signature, send_whatsapp_bridge_message
+    if not verify_midtrans_signature(order_midtrans_id, status_code, gross_amount, signature_key):
+        raise HTTPException(status_code=403, detail="Invalid Midtrans signature")
+
+    parts = order_midtrans_id.split("-")
+    if len(parts) >= 2 and parts[1].isdigit():
+        internal_order_id = int(parts[1])
+    else:
+        try:
+            internal_order_id = int(order_midtrans_id)
+        except ValueError:
+            return {"status": "ignored", "reason": "Unrecognized order_id format"}
+
+    order = db.query(OrderModel).get(internal_order_id)
+    if not order:
+        return {"status": "ignored", "reason": f"Order #{internal_order_id} not found"}
+
+    is_paid = False
+    if transaction_status in {"capture", "settlement"}:
+        if fraud_status in {"accept", ""} or not fraud_status:
+            is_paid = True
+
+    if is_paid:
+        curr_pay_state = str(getattr(order, "payment_state", ""))
+        curr_state = str(getattr(order, "state", ""))
+        if curr_pay_state != PaymentStatus.SIMULATED_CONFIRMED:
+            setattr(order, "payment_state", PaymentStatus.SIMULATED_CONFIRMED)
+            if curr_state in {OrderStatus.DRAFT, OrderStatus.PENDING_PAYMENT}:
+                setattr(order, "state", OrderStatus.PAID)
+            db.commit()
+
+            cust_phone = str(getattr(order, "customer_phone", ""))
+            total_val = float(getattr(order, "total", 0.0))
+
+            # 1. Notify Customer via WhatsApp Bridge
+            cust_msg = (
+                f"Halo kak! Pembayaran untuk Pesanan #{order.id} sebesar "
+                f"Rp{total_val:,.0f} telah BERHASIL kami terima melalui QRIS.\n"
+                f"Pesanan sekarang sedang disiapkan di dapur. Terima kasih telah memesan di Warung Ndelik!"
+            ).replace(",", ".")
+            send_whatsapp_bridge_message(cust_phone, cust_msg)
+
+            # 2. Notify Owner via WhatsApp Bridge
+            owner_msg = (
+                f"🔔 *NOTIFIKASI PEMBAYARAN QRIS MASUK*\n"
+                f"Pesanan #{order.id} senilai Rp{total_val:,.0f} dari {cust_phone} "
+                f"telah LUNAS melalui QRIS Midtrans (Settlement)."
+            ).replace(",", ".")
+            for op in os.getenv("OWNER_PHONE_NUMBERS", "").split(","):
+                if op.strip():
+                    send_whatsapp_bridge_message(op.strip(), owner_msg)
+    elif transaction_status in {"cancel", "deny", "expire"}:
+        setattr(order, "payment_state", PaymentStatus.FAILED)
+        db.commit()
+
+    return {
+        "status": "ok",
+        "order_id": internal_order_id,
+        "transaction_status": transaction_status,
+        "payment_state": order.payment_state,
+        "order_state": order.state,
+    }
+
 
 
 class DirectChatMessage(BaseModel):
@@ -472,7 +556,9 @@ def direct_chat(payload: DirectChatMessage, db: Session = Depends(get_db)):
         body=payload.body,
         source_message_id=payload.message_id,
     )
-    return {"reply": reply}
+    if isinstance(reply, dict):
+        return reply
+    return {"reply": str(reply)}
 
 
 # Payment state transitions

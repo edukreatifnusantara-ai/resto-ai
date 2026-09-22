@@ -10,4 +10,5 @@ build/
 bridge/session/
 bridge/qr.*
 bridge/status.json
+qris_cache/
 

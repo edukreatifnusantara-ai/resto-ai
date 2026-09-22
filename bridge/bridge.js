@@ -7,7 +7,9 @@ const {
 const pino = require('pino');
 const path = require('path');
 const fs = require('fs');
+const http = require('http');
 const { execSync } = require('child_process');
+
 const { Boom } = require('@hapi/boom');
 
 const SESSION_DIR = path.join(__dirname, 'session');
@@ -137,7 +139,14 @@ async function startBridge() {
 
         if (response.ok) {
           const data = await response.json();
-          if (data.reply) {
+          const hasImage = data.image_path && fs.existsSync(data.image_path);
+          if (hasImage) {
+            console.log(`[Resto-AI] Sending QRIS image ${data.image_path} to ${senderNumber}`);
+            await sock.sendMessage(remoteJid, {
+              image: fs.readFileSync(data.image_path),
+              caption: data.reply || ''
+            }, { quoted: m });
+          } else if (data.reply) {
             console.log(`[Resto-AI] Replying to ${senderNumber}: "${data.reply.slice(0, 40)}..."`);
             await sock.sendMessage(remoteJid, { text: data.reply }, { quoted: m });
           }
@@ -150,5 +159,59 @@ async function startBridge() {
     }
   });
 }
+
+const BRIDGE_PORT = parseInt(process.env.BRIDGE_PORT || '18082', 10);
+const bridgeServer = http.createServer(async (req, res) => {
+  if (req.method === 'POST' && req.url === '/send') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const to = payload.to;
+        const text = payload.message || payload.text || '';
+        const imagePath = payload.image_path;
+
+        if (!sock || !to) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ error: 'Socket not connected or missing recipient' }));
+        }
+
+        let jid = to;
+        if (!jid.includes('@')) {
+          jid = `${jid.replace(/[^0-9]/g, '')}@s.whatsapp.net`;
+        }
+
+        if (imagePath && fs.existsSync(imagePath)) {
+          console.log(`[Bridge Server] Sending outbound image ${imagePath} to ${jid}`);
+          await sock.sendMessage(jid, {
+            image: fs.readFileSync(imagePath),
+            caption: text
+          });
+        } else if (text) {
+          console.log(`[Bridge Server] Sending outbound text to ${jid}: "${text.slice(0, 40)}..."`);
+          await sock.sendMessage(jid, { text });
+        }
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ status: 'ok', jid }));
+      } catch (err) {
+        console.error('Error handling outbound /send request:', err);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+  } else if (req.method === 'GET' && req.url === '/health') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: 'ok', connected: !!sock }));
+  } else {
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Not found' }));
+  }
+});
+
+bridgeServer.listen(BRIDGE_PORT, '127.0.0.1', () => {
+  console.log(`[Bridge Server] Outbound HTTP listener active on http://127.0.0.1:${BRIDGE_PORT}`);
+});
 
 startBridge().catch(console.error);

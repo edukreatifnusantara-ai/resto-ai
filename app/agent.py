@@ -342,15 +342,51 @@ def customer_create_order(
     db.commit()
     db.refresh(order)
 
+    # Generate dynamic QRIS charge via Midtrans
+    from app.midtrans import create_qris_charge
+    qris_info = create_qris_charge(
+        order_id=order.id,
+        gross_amount=float(order.total),
+        customer_name="Pelanggan",
+        customer_phone=customer_phone,
+    )
+
     return {
         "status": "success",
         "order_id": order.id,
         "total": float(order.total),
         "formatted_total": f"Rp{float(order.total):,.0f}".replace(",", "."),
         "items": order_items,
+        "qr_image_path": qris_info.get("qr_image_path", ""),
+        "qris_mode": qris_info.get("mode", "simulation"),
         "message": f"Pesanan #{order.id} berhasil dibuat dengan total Rp{float(order.total):,.0f}.".replace(",", "."),
-        "next_step": f"Kirim 'BAYAR {order.id}' untuk konfirmasi pembayaran simulasi.",
+        "next_step": "Gambar kode QRIS pembayaran otomatis telah dikirimkan ke chat. Pelanggan cukup scan/screenshot QRIS tersebut di aplikasi mobile banking / e-wallet.",
     }
+
+
+def customer_request_qris(db: Session, customer_phone: str, order_id: int) -> dict[str, Any]:
+    order = db.query(Order).filter(Order.id == order_id, Order.customer_phone == customer_phone).first()
+    if not order:
+        return {"error": f"Pesanan #{order_id} tidak ditemukan untuk nomor ini."}
+    if order.payment_state == PaymentStatus.SIMULATED_CONFIRMED:
+        return {"status": "already_paid", "message": f"Pesanan #{order_id} sudah lunas terbayar."}
+
+    from app.midtrans import create_qris_charge
+    qris_info = create_qris_charge(
+        order_id=order.id,
+        gross_amount=float(order.total),
+        customer_name="Pelanggan",
+        customer_phone=customer_phone,
+    )
+    return {
+        "status": "success",
+        "order_id": order.id,
+        "total": float(order.total),
+        "formatted_total": f"Rp{float(order.total):,.0f}".replace(",", "."),
+        "qr_image_path": qris_info.get("qr_image_path", ""),
+        "message": f"Berikut gambar barcode QRIS untuk Pesanan #{order.id} sebesar Rp{float(order.total):,.0f}.".replace(",", "."),
+    }
+
 
 
 def customer_check_order(db: Session, customer_phone: str, order_id: int) -> dict[str, Any]:
@@ -562,6 +598,20 @@ CUSTOMER_TOOLS_SCHEMA = [
     {
         "type": "function",
         "function": {
+            "name": "customer_request_qris",
+            "description": "Mengirimkan gambar kode QRIS dinamis untuk pembayaran pesanan pelanggan.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "order_id": {"type": "integer", "description": "Nomor ID pesanan yang ingin dibayar via QRIS"},
+                },
+                "required": ["order_id"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
             "name": "customer_cancel_order",
             "description": "Membatalkan pesanan yang belum diproses dapur.",
             "parameters": {
@@ -601,20 +651,23 @@ def _execute_tool_call(db: Session, sender: str, is_owner_role: bool, func_name:
         return customer_create_order(db, sender, args.get("items", []), args.get("notes", ""))
     elif func_name == "customer_check_order":
         return customer_check_order(db, sender, int(args.get("order_id", 0)))
+    elif func_name == "customer_request_qris":
+        return customer_request_qris(db, sender, int(args.get("order_id", 0)))
     elif func_name == "customer_confirm_payment":
         return customer_confirm_payment(db, sender, int(args.get("order_id", 0)))
     elif func_name == "customer_cancel_order":
         return customer_cancel_order(db, sender, int(args.get("order_id", 0)))
 
+
     return {"error": f"Fungsi '{func_name}' tidak diizinkan atau tidak ditemukan."}
 
 
-def run_ai_agent(db: Session, sender: str, user_message: str) -> str:
+def run_ai_agent(db: Session, sender: str, user_message: str) -> dict[str, Any]:
     """Main entry point for two-way AI agent processing."""
     api_key = os.getenv("OPENAI_API_KEY", "").strip()
     if not api_key:
         logger.warning("OPENAI_API_KEY not found; cannot invoke AI agent.")
-        return ""
+        return {"reply": "", "image_path": ""}
 
     is_owner_user = is_owner(sender)
     model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
@@ -647,7 +700,9 @@ def run_ai_agent(db: Session, sender: str, user_message: str) -> str:
             "- Menu favorit / best seller kami antara lain: Nasi Bebek Ndelik 1/2 (Bumbu Hitam), Nasi Goreng Ceplok, Kwetiau Ndelik, dan Nasi Garang Asem.\n"
             "- Membantu pelanggan memesan makanan & minuman. Jika pelanggan ingin memesan, pastikan rincian pesanan jelas lalu panggil fungsi customer_create_order.\n"
             "- Berikan nomor ID pesanan, rincian menu, dan total harga setelah pesanan berhasil dibuat.\n"
-            "- Pandu pelanggan cara konfirmasi bayar (kirim BAYAR <id> atau minta tolong bayar di chat).\n"
+            "- Beri tahu pelanggan bahwa gambar kode QRIS otomatis telah dikirimkan ke chat WhatsApp ini. Pelanggan cukup scan atau screenshot QRIS tersebut di aplikasi mobile banking / e-wallet (BCA, Mandiri, BRImo, GoPay, OVO, ShopeePay, DANA).\n"
+            "- Jika pelanggan meminta gambar QRIS lagi, gunakan customer_request_qris.\n"
+            "- Begitu pelanggan membayar via QRIS, pembayaran akan otomatis terverifikasi dan pesanan langsung diproses dapur.\n"
             "- Jangan pernah membuka informasi rahasia omset resto, modal HPP, atau mengubah harga/menu untuk pelanggan umum.\n\n"
             "Gaya bicara: Ramah, santun, panggil pelanggan 'kak' atau 'kakak', gunakan bahasa Indonesia santai tapi sopan layaknya pelayan restoran profesional."
         )
@@ -663,6 +718,7 @@ def run_ai_agent(db: Session, sender: str, user_message: str) -> str:
     # Call OpenAI Chat Completion with tools
     max_tool_loops = 3
     final_reply = ""
+    last_image_path = ""
 
     for _ in range(max_tool_loops):
         payload = {
@@ -687,7 +743,7 @@ def run_ai_agent(db: Session, sender: str, user_message: str) -> str:
                 result = json.loads(resp.read().decode("utf-8"))
         except Exception as exc:
             logger.error("Error communicating with OpenAI API: %s", exc)
-            return ""
+            return {"reply": "", "image_path": ""}
 
         choice = result["choices"][0]
         msg = choice.get("message", {})
@@ -708,6 +764,9 @@ def run_ai_agent(db: Session, sender: str, user_message: str) -> str:
                 f_args = {}
 
             tool_output = _execute_tool_call(db, sender, is_owner_user, f_name, f_args)
+            if isinstance(tool_output, dict) and tool_output.get("qr_image_path"):
+                last_image_path = tool_output.get("qr_image_path")
+
             messages.append({
                 "role": "tool",
                 "tool_call_id": call_id,
@@ -718,4 +777,8 @@ def run_ai_agent(db: Session, sender: str, user_message: str) -> str:
         history.append({"role": "user", "content": user_message})
         history.append({"role": "assistant", "content": final_reply})
 
-    return final_reply
+    return {
+        "reply": final_reply,
+        "image_path": last_image_path,
+    }
+
