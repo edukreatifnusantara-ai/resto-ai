@@ -7,3 +7,7 @@ dist/
 build/
 *.egg-info/
 .env.runtime
+bridge/session/
+bridge/qr.*
+bridge/status.json
+
