@@ -61,19 +61,36 @@ def _find_menu_item(db: Session, identifier: Any) -> MenuItem | None:
         if item:
             return item
 
-    name_clean = raw_str.lower()
-    # Exact match first
-    item = db.query(MenuItem).filter(MenuItem.name.ilike(name_clean)).first()
+    clean_q = raw_str.lower()
+    # 1. Exact match first
+    item = db.query(MenuItem).filter(MenuItem.name.ilike(clean_q)).first()
     if item:
         return item
 
-    # Partial match
+    # 2. Substring match
     items = db.query(MenuItem).all()
     for it in items:
         it_name = str(getattr(it, "name", "")).lower()
-        if name_clean in it_name or it_name in name_clean:
+        if clean_q in it_name or it_name in clean_q:
             return it
-    return None
+
+    # 3. Smart token overlap matching
+    q_tokens = set(re.findall(r"\w+", clean_q))
+    q_meaningful = q_tokens - {"porsi", "satu", "dua", "tiga", "bungkus", "pesan", "mau", "dong", "ya", "kak"}
+    if not q_meaningful:
+        q_meaningful = q_tokens
+
+    best_item = None
+    best_score = 0
+    for it in items:
+        it_tokens = set(re.findall(r"\w+", str(getattr(it, "name", "")).lower()))
+        common = q_meaningful.intersection(it_tokens)
+        score = len(common)
+        if score > best_score and len(common) >= max(1, len(q_meaningful) * 0.4):
+            best_score = score
+            best_item = it
+
+    return best_item
 
 
 # =====================================================================
