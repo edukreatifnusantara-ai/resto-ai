@@ -26,6 +26,8 @@ from app.models import (
     OrderStatus,
     PaymentStatus,
     Stock,
+    DiningTable,
+    Reservation,
 )
 
 logger = logging.getLogger(__name__)
@@ -300,6 +302,9 @@ def customer_create_order(
     db: Session,
     customer_phone: str,
     items: list[dict[str, Any]],
+    table_number: str = "Bawa Pulang / Takeaway",
+    payment_method: str = "QRIS",
+    order_type: str = "DINE_IN",
     notes: str = "",
 ) -> dict[str, Any]:
     if not items:
@@ -331,9 +336,17 @@ def customer_create_order(
             "subtotal": subtotal,
         })
 
+    clean_table = table_number.strip() if table_number else "Bawa Pulang / Takeaway"
+    pay_method = payment_method.strip().upper() if payment_method else "QRIS"
+    if pay_method not in {"CASH", "QRIS"}:
+        pay_method = "QRIS"
+
     order = Order(
         items_json={"items": order_items, "notes": notes},
         total=round(float(total_amount), 2),
+        table_number=clean_table,
+        order_type=order_type,
+        payment_method=pay_method,
         state=OrderStatus.DRAFT,
         payment_state=PaymentStatus.PENDING,
         customer_phone=customer_phone,
@@ -342,7 +355,38 @@ def customer_create_order(
     db.commit()
     db.refresh(order)
 
-    # Generate dynamic QRIS charge via Midtrans
+    from app.midtrans import send_whatsapp_bridge_message
+
+    if pay_method == "CASH":
+        # Alert owner/cashier via WhatsApp
+        owner_alert = (
+            f"🔔 *PESANAN BARU (BAYAR TUNAI / CASH)*\n"
+            f"• ID Pesanan: #{order.id}\n"
+            f"• Lokasi/Meja: {clean_table}\n"
+            f"• Pelanggan: {customer_phone}\n"
+            f"• Total Tagihan: Rp{float(order.total):,.0f}\n"
+            f"• Menu: {', '.join(it['name'] + ' x' + str(it['quantity']) for it in order_items)}\n"
+            f"Mohon tagih tunai di kasir dan konfirmasi dengan ketik: 'LUNAS {order.id}'"
+        ).replace(",", ".")
+        for op in os.getenv("OWNER_PHONE_NUMBERS", "").split(","):
+            if op.strip():
+                send_whatsapp_bridge_message(op.strip(), owner_alert)
+
+        return {
+            "status": "success",
+            "order_id": order.id,
+            "table_number": clean_table,
+            "payment_method": "CASH",
+            "total": float(order.total),
+            "formatted_total": f"Rp{float(order.total):,.0f}".replace(",", "."),
+            "items": order_items,
+            "qr_image_path": "",
+            "queue_number": None,
+            "message": f"Pesanan #{order.id} untuk {clean_table} berhasil dicatat dengan metode Bayar Tunai (Cash). Total: Rp{float(order.total):,.0f}.".replace(",", "."),
+            "next_step": f"Silakan lakukan pembayaran tunai sebesar Rp{float(order.total):,.0f} di kasir Warung Ndelik dengan menunjukkan ID Pesanan #{order.id}. Nomor antrean pesanan akan otomatis terbit begitu kasir mengonfirmasi pembayaran.".replace(",", "."),
+        }
+
+    # Otherwise QRIS
     from app.midtrans import create_qris_charge
     qris_info = create_qris_charge(
         order_id=order.id,
@@ -354,13 +398,16 @@ def customer_create_order(
     return {
         "status": "success",
         "order_id": order.id,
+        "table_number": clean_table,
+        "payment_method": "QRIS",
         "total": float(order.total),
         "formatted_total": f"Rp{float(order.total):,.0f}".replace(",", "."),
         "items": order_items,
         "qr_image_path": qris_info.get("qr_image_path", ""),
         "qris_mode": qris_info.get("mode", "simulation"),
-        "message": f"Pesanan #{order.id} berhasil dibuat dengan total Rp{float(order.total):,.0f}.".replace(",", "."),
-        "next_step": "Gambar kode QRIS pembayaran otomatis telah dikirimkan ke chat. Pelanggan cukup scan/screenshot QRIS tersebut di aplikasi mobile banking / e-wallet.",
+        "queue_number": None,
+        "message": f"Pesanan #{order.id} untuk {clean_table} berhasil dibuat dengan total Rp{float(order.total):,.0f}.".replace(",", "."),
+        "next_step": "Gambar kode QRIS pembayaran otomatis telah dikirimkan ke chat. Pelanggan cukup scan/screenshot QRIS tersebut di aplikasi mobile banking / e-wallet. Nomor antrean akan otomatis terbit begitu pembayaran QRIS berhasil.",
     }
 
 
@@ -395,6 +442,9 @@ def customer_check_order(db: Session, customer_phone: str, order_id: int) -> dic
         return {"error": f"Pesanan #{order_id} tidak ditemukan untuk nomor ini."}
     return {
         "order_id": order.id,
+        "table_number": getattr(order, "table_number", "Bawa Pulang / Takeaway"),
+        "payment_method": getattr(order, "payment_method", "QRIS"),
+        "queue_number": getattr(order, "queue_number", "Belum terbit (menunggu pembayaran lunas)"),
         "state": order.state,
         "payment_state": order.payment_state,
         "total": f"Rp{float(order.total):,.0f}".replace(",", "."),
@@ -407,15 +457,183 @@ def customer_confirm_payment(db: Session, customer_phone: str, order_id: int) ->
     if not order:
         return {"error": f"Pesanan #{order_id} tidak ditemukan."}
     if getattr(order, "payment_state", "") == PaymentStatus.SIMULATED_CONFIRMED:
-        return {"status": "already_paid", "message": f"Pesanan #{order_id} sudah terbayar sebelumnya."}
+        return {"status": "already_paid", "message": f"Pesanan #{order_id} sudah terbayar sebelumnya dengan Nomor Antrean: {getattr(order, 'queue_number', '-')}"}
 
+    from app.database import assign_order_queue
     setattr(order, "state", OrderStatus.PAID)
     setattr(order, "payment_state", PaymentStatus.SIMULATED_CONFIRMED)
+    q_num = assign_order_queue(db, order)
     db.commit()
     return {
         "status": "success",
         "order_id": order.id,
-        "message": f"Pembayaran untuk Pesanan #{order_id} berhasil dikonfirmasi (SIMULASI). Pesanan siap diproses dapur!",
+        "queue_number": q_num,
+        "message": f"Pembayaran untuk Pesanan #{order_id} berhasil dikonfirmasi. Nomor Antrean Anda: {q_num}. Pesanan siap diproses dapur!",
+    }
+
+
+def customer_check_available_tables(
+    db: Session,
+    reservation_date: str = "",
+    reservation_time: str = "",
+) -> dict[str, Any]:
+    """Check table availability for dining or reservation."""
+    from datetime import datetime, timedelta
+    if not reservation_date:
+        reservation_date = (datetime.utcnow() + timedelta(hours=7)).strftime("%Y-%m-%d")
+
+    all_tables = db.query(DiningTable).filter(DiningTable.is_active == True).all()
+    reservations = db.query(Reservation).filter(
+        Reservation.reservation_date == reservation_date,
+        Reservation.status.in_(["CONFIRMED", "PENDING"]),
+    ).all()
+
+    booked_tables = {r.table_number: r for r in reservations}
+
+    available = []
+    occupied = []
+    for tbl in all_tables:
+        t_info = {
+            "table_number": tbl.table_number,
+            "capacity": f"{tbl.capacity} orang",
+            "area": tbl.area,
+        }
+        if tbl.table_number in booked_tables:
+            res_info = booked_tables[tbl.table_number]
+            t_info["booked_by"] = res_info.customer_name
+            t_info["booked_time"] = res_info.reservation_time
+            occupied.append(t_info)
+        else:
+            available.append(t_info)
+
+    return {
+        "status": "success",
+        "date": reservation_date,
+        "available_tables": available,
+        "booked_tables": occupied,
+        "available_count": len(available),
+        "total_count": len(all_tables),
+        "message": f"Tersedia {len(available)} meja kosong dari total {len(all_tables)} meja pada tanggal {reservation_date}.",
+    }
+
+
+def customer_create_reservation(
+    db: Session,
+    customer_phone: str,
+    customer_name: str,
+    table_number: str,
+    reservation_date: str,
+    reservation_time: str,
+    guest_count: int = 2,
+    notes: str = "",
+) -> dict[str, Any]:
+    """Create table reservation and notify customer and owner."""
+    from datetime import datetime, timedelta
+    if not reservation_date:
+        reservation_date = (datetime.utcnow() + timedelta(hours=7)).strftime("%Y-%m-%d")
+
+    tbl = db.query(DiningTable).filter(DiningTable.table_number.ilike(table_number.strip())).first()
+    if not tbl:
+        return {"error": f"Meja '{table_number}' tidak ditemukan di Warung Ndelik. Silakan cek meja yang tersedia."}
+
+    matched_tbl_number = tbl.table_number
+
+    existing = db.query(Reservation).filter(
+        Reservation.table_number == matched_tbl_number,
+        Reservation.reservation_date == reservation_date,
+        Reservation.status.in_(["CONFIRMED", "PENDING"]),
+    ).first()
+
+    if existing:
+        return {
+            "error": f"{matched_tbl_number} sudah direservasi oleh pelanggan lain pada tanggal {reservation_date} pukul {existing.reservation_time} WIB. Silakan pilih meja lain yang masih kosong."
+        }
+
+    resv = Reservation(
+        customer_name=customer_name or "Pelanggan",
+        customer_phone=customer_phone,
+        table_number=matched_tbl_number,
+        guest_count=guest_count,
+        reservation_date=reservation_date,
+        reservation_time=reservation_time,
+        status="CONFIRMED",
+        notes=notes or "",
+    )
+    db.add(resv)
+    db.commit()
+    db.refresh(resv)
+
+    from app.midtrans import send_whatsapp_bridge_message
+    owner_msg = (
+        f"🔔 *RESERVASI MEJA BARU DI WARUNG NDELIK*\n"
+        f"• Nama: {customer_name}\n"
+        f"• No HP: {customer_phone}\n"
+        f"• Meja: {matched_tbl_number} ({tbl.area}, Kapasitas {tbl.capacity} orang)\n"
+        f"• Tanggal: {reservation_date}\n"
+        f"• Jam: {reservation_time} WIB\n"
+        f"• Jumlah Tamu: {guest_count} orang\n"
+        f"• Catatan: {notes or '-'}"
+    )
+    for op in os.getenv("OWNER_PHONE_NUMBERS", "").split(","):
+        if op.strip():
+            send_whatsapp_bridge_message(op.strip(), owner_msg)
+
+    return {
+        "status": "success",
+        "reservation_id": resv.id,
+        "customer_name": customer_name,
+        "table_number": matched_tbl_number,
+        "reservation_date": reservation_date,
+        "reservation_time": reservation_time,
+        "guest_count": guest_count,
+        "area": tbl.area,
+        "message": f"Reservasi meja {matched_tbl_number} ({tbl.area}) untuk {customer_name} pada tanggal {reservation_date} pukul {reservation_time} WIB berhasil dikonfirmasi.",
+    }
+
+
+def owner_confirm_cash_payment(
+    db: Session,
+    order_id: int,
+) -> dict[str, Any]:
+    """Owner/cashier confirms cash payment for an order, assigning queue number and notifying customer."""
+    order = db.query(Order).get(order_id)
+    if not order:
+        return {"error": f"Pesanan #{order_id} tidak ditemukan."}
+
+    curr_pay_state = str(getattr(order, "payment_state", ""))
+    if curr_pay_state == PaymentStatus.SIMULATED_CONFIRMED:
+        curr_q = getattr(order, "queue_number", "-")
+        return {"status": "already_paid", "message": f"Pesanan #{order_id} sudah lunas sebelumnya dengan Nomor Antrean: {curr_q}."}
+
+    from app.database import assign_order_queue
+    from app.midtrans import send_whatsapp_bridge_message
+
+    setattr(order, "payment_state", PaymentStatus.SIMULATED_CONFIRMED)
+    setattr(order, "state", OrderStatus.PAID)
+    queue_number = assign_order_queue(db, order)
+    db.commit()
+
+    tbl_num = getattr(order, "table_number", "Bawa Pulang / Takeaway")
+    cust_phone = getattr(order, "customer_phone", "")
+
+    if cust_phone:
+        cust_msg = (
+            f"Halo kak! Pembayaran TUNAI di kasir untuk Pesanan #{order.id} ({tbl_num}) "
+            f"sebesar Rp{float(order.total):,.0f} telah BERHASIL kami terima.\n"
+            f"🎟️ *Nomor Antrean Anda: {queue_number}*\n"
+            f"Pesanan sekarang sedang disiapkan di dapur dan akan segera diantarkan ke {tbl_num}. "
+            f"Selamat menikmati hidangan Warung Ndelik!"
+        ).replace(",", ".")
+        send_whatsapp_bridge_message(cust_phone, cust_msg)
+
+    return {
+        "status": "success",
+        "order_id": order.id,
+        "table_number": tbl_num,
+        "queue_number": queue_number,
+        "total": float(order.total),
+        "formatted_total": f"Rp{float(order.total):,.0f}".replace(",", "."),
+        "message": f"Pesanan #{order.id} ({tbl_num}) berhasil dikonfirmasi LUNAS (CASH). Nomor Antrean: {queue_number}. Notifikasi telah dikirim ke pelanggan via WhatsApp.",
     }
 
 
@@ -530,6 +748,20 @@ OWNER_TOOLS_SCHEMA = [
             "parameters": {"type": "object", "properties": {}},
         },
     },
+    {
+        "type": "function",
+        "function": {
+            "name": "owner_confirm_cash_payment",
+            "description": "Mengonfirmasi bahwa pelanggan telah membayar tunai (CASH) di kasir untuk pesanan tertentu. Otomatis menerbitkan nomor antrean pesanan dan memberi tahu pelanggan via WhatsApp.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "order_id": {"type": "integer", "description": "Nomor ID pesanan yang dibayar cash di kasir"},
+                },
+                "required": ["order_id"],
+            },
+        },
+    },
 ]
 
 CUSTOMER_TOOLS_SCHEMA = [
@@ -561,9 +793,51 @@ CUSTOMER_TOOLS_SCHEMA = [
                             "required": ["menu_name", "quantity"],
                         },
                     },
+                    "table_number": {
+                        "type": "string",
+                        "description": "Nomor meja makan (misal: Meja 1, Meja 5, Lesehan 2) atau 'Bawa Pulang / Takeaway' jika pesanan dibungkus",
+                    },
+                    "payment_method": {
+                        "type": "string",
+                        "enum": ["QRIS", "CASH"],
+                        "description": "Metode pembayaran: 'QRIS' untuk bayar otomatis via barcode QRIS, atau 'CASH' untuk bayar tunai di kasir",
+                    },
                     "notes": {"type": "string", "description": "Catatan khusus pesanan, misal: pedas sedang, es sedikit"},
                 },
                 "required": ["items"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "customer_check_available_tables",
+            "description": "Mengecek daftar meja di Warung Ndelik yang masih kosong dan tersedia untuk ditempati atau direservasi.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "reservation_date": {"type": "string", "description": "Tanggal yang dicek format YYYY-MM-DD (kosongkan jika untuk hari ini)"},
+                    "reservation_time": {"type": "string", "description": "Jam yang dicek format HH:MM (misal: 19:00)"},
+                },
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "customer_create_reservation",
+            "description": "Membuat booking / reservasi meja di Warung Ndelik untuk pelanggan.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "customer_name": {"type": "string", "description": "Nama pelanggan yang memesan reservasi"},
+                    "table_number": {"type": "string", "description": "Nomor meja yang dipilih (misal: Meja 3, Lesehan 1, Ruang VIP)"},
+                    "reservation_date": {"type": "string", "description": "Tanggal reservasi format YYYY-MM-DD (misal: 2026-09-22)"},
+                    "reservation_time": {"type": "string", "description": "Jam reservasi format HH:MM (misal: 19:00)"},
+                    "guest_count": {"type": "integer", "description": "Jumlah tamu/orang"},
+                    "notes": {"type": "string", "description": "Catatan tambahan untuk resto"},
+                },
+                "required": ["customer_name", "table_number", "reservation_date", "reservation_time"],
             },
         },
     },
@@ -643,12 +917,21 @@ def _execute_tool_call(db: Session, sender: str, is_owner_role: bool, func_name:
             return owner_update_stock(db, args.get("ingredient", ""), args.get("add_quantity", 0))
         elif func_name == "owner_list_menu":
             return owner_list_menu(db)
+        elif func_name == "owner_confirm_cash_payment":
+            return owner_confirm_cash_payment(db, int(args.get("order_id", 0)))
 
     # Customer accessible tools (available to customer and owner)
     if func_name == "customer_get_menu":
         return customer_get_menu(db)
     elif func_name == "customer_create_order":
-        return customer_create_order(db, sender, args.get("items", []), args.get("notes", ""))
+        return customer_create_order(
+            db,
+            sender,
+            args.get("items", []),
+            table_number=args.get("table_number", "Bawa Pulang / Takeaway"),
+            payment_method=args.get("payment_method", "QRIS"),
+            notes=args.get("notes", ""),
+        )
     elif func_name == "customer_check_order":
         return customer_check_order(db, sender, int(args.get("order_id", 0)))
     elif func_name == "customer_request_qris":
@@ -657,6 +940,19 @@ def _execute_tool_call(db: Session, sender: str, is_owner_role: bool, func_name:
         return customer_confirm_payment(db, sender, int(args.get("order_id", 0)))
     elif func_name == "customer_cancel_order":
         return customer_cancel_order(db, sender, int(args.get("order_id", 0)))
+    elif func_name == "customer_check_available_tables":
+        return customer_check_available_tables(db, args.get("reservation_date", ""), args.get("reservation_time", ""))
+    elif func_name == "customer_create_reservation":
+        return customer_create_reservation(
+            db,
+            sender,
+            customer_name=args.get("customer_name", "Pelanggan"),
+            table_number=args.get("table_number", ""),
+            reservation_date=args.get("reservation_date", ""),
+            reservation_time=args.get("reservation_time", ""),
+            guest_count=int(args.get("guest_count", 2)),
+            notes=args.get("notes", ""),
+        )
 
 
     return {"error": f"Fungsi '{func_name}' tidak diizinkan atau tidak ditemukan."}
@@ -687,7 +983,8 @@ def run_ai_agent(db: Session, sender: str, user_message: str) -> dict[str, Any]:
             "- Mengubah status menu habis/tersedia (owner_set_menu_status)\n"
             "- Melihat laporan penjualan harian, omset, modal HPP, margin laba & peringatan stok menipis (owner_get_report)\n"
             "- Menambah stok bahan mentah (owner_update_stock)\n"
-            "- Melihat seluruh daftar menu & harga (owner_list_menu)\n\n"
+            "- Melihat seluruh daftar menu & harga (owner_list_menu)\n"
+            "- Mengonfirmasi pembayaran tunai / cash dari kasir (owner_confirm_cash_payment), yang otomatis menerbitkan nomor antrean pesanan dan mengabari pelanggan.\n\n"
             "Gaya bicara: Hormat, sopan, natural, panggil 'Bos' atau 'Bapak'. Berikan konfirmasi jelas setiap ada perubahan data."
         )
         tools = OWNER_TOOLS_SCHEMA
@@ -698,11 +995,16 @@ def run_ai_agent(db: Session, sender: str, user_message: str) -> dict[str, Any]:
             "- Menjawab pertanyaan seputar menu makanan dan minuman khas Warung Ndelik secara ramah dan menggugah selera.\n"
             "- Jika pelanggan menanyakan menu atau ingin tahu apa saja yang dijual, gunakan fungsi customer_get_menu.\n"
             "- Menu favorit / best seller kami antara lain: Nasi Bebek Ndelik 1/2 (Bumbu Hitam), Nasi Goreng Ceplok, Kwetiau Ndelik, dan Nasi Garang Asem.\n"
-            "- Membantu pelanggan memesan makanan & minuman. Jika pelanggan ingin memesan, pastikan rincian pesanan jelas lalu panggil fungsi customer_create_order.\n"
-            "- Berikan nomor ID pesanan, rincian menu, dan total harga setelah pesanan berhasil dibuat.\n"
-            "- Beri tahu pelanggan bahwa gambar kode QRIS otomatis telah dikirimkan ke chat WhatsApp ini. Pelanggan cukup scan atau screenshot QRIS tersebut di aplikasi mobile banking / e-wallet (BCA, Mandiri, BRImo, GoPay, OVO, ShopeePay, DANA).\n"
-            "- Jika pelanggan meminta gambar QRIS lagi, gunakan customer_request_qris.\n"
-            "- Begitu pelanggan membayar via QRIS, pembayaran akan otomatis terverifikasi dan pesanan langsung diproses dapur.\n"
+            "- Saat pelanggan memesan:\n"
+            "  * Tanyakan atau pastikan apakah makan di tempat (makan di meja berapa) atau dibawa pulang / dibungkus.\n"
+            "  * Tanyakan atau pastikan metode pembayaran: QRIS otomatis (scan barcode) atau Bayar Tunai (Cash di kasir).\n"
+            "  * Panggil customer_create_order dengan mengisi table_number dan payment_method ('QRIS' atau 'CASH').\n"
+            "- Nomor Antrean (Queue Number) hanya diterbitkan otomatis SETELAH pembayaran lunas (setelah scan QRIS berhasil, atau setelah bayar cash diterima di kasir).\n"
+            "- Jika pelanggan memilih QRIS, beri tahu bahwa barcode QRIS otomatis dikirimkan ke chat dan nomor antrean terbit saat pembayaran terverifikasi.\n"
+            "- Jika pelanggan memilih CASH, beri tahu ID pesanan dan arahkan untuk membayar tunai di kasir. Nomor antrean terbit setelah kasir mengonfirmasi.\n"
+            "- Reservasi Meja & Info Meja Kosong:\n"
+            "  * Jika pelanggan ingin reservasi meja atau bertanya meja mana saja yang kosong/tersedia, gunakan fungsi customer_check_available_tables untuk memberikan daftar meja yang kosong beserta kapasitas dan lokasinya (Area Utama, Semi Outdoor, Lesehan Gazebo, atau Ruang VIP).\n"
+            "  * Jika pelanggan ingin memesan/booking meja tertentu, gunakan customer_create_reservation.\n"
             "- Jangan pernah membuka informasi rahasia omset resto, modal HPP, atau mengubah harga/menu untuk pelanggan umum.\n\n"
             "Gaya bicara: Ramah, santun, panggil pelanggan 'kak' atau 'kakak', gunakan bahasa Indonesia santai tapi sopan layaknya pelayan restoran profesional."
         )

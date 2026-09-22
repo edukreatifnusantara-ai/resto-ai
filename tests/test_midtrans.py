@@ -113,3 +113,91 @@ def test_customer_request_qris_tool():
         assert "45.000" in res["formatted_total"]
     finally:
         db.close()
+
+
+def test_cash_order_creation_and_owner_confirmation():
+    db = SessionLocal()
+    try:
+        from app.agent import owner_confirm_cash_payment
+        # 1. Customer creates CASH order on Meja 3
+        items = [{"menu_name": "Nasi Goreng Telur", "quantity": 2}]
+        order_res = customer_create_order(
+            db,
+            customer_phone="628129999000",
+            items=items,
+            table_number="Meja 3",
+            payment_method="CASH",
+        )
+        assert order_res["status"] == "success"
+        assert order_res["payment_method"] == "CASH"
+        assert order_res["table_number"] == "Meja 3"
+        assert order_res["queue_number"] is None
+        assert order_res["qr_image_path"] == ""
+        oid = int(order_res["order_id"])
+
+        # 2. Check Order state before payment
+        order = db.query(Order).get(oid)
+        assert order is not None
+        assert str(order.payment_state) == PaymentStatus.PENDING
+        assert order.queue_number is None
+
+        # 3. Owner confirms CASH payment
+        confirm_res = owner_confirm_cash_payment(db, oid)
+        assert confirm_res["status"] == "success"
+        assert confirm_res["queue_number"] is not None
+        assert "A-" in confirm_res["queue_number"]
+
+        # 4. Check Order state after payment
+        db.refresh(order)
+        assert order is not None
+        assert str(order.payment_state) == PaymentStatus.SIMULATED_CONFIRMED
+        assert str(order.state) == OrderStatus.PAID
+        assert order.queue_number == confirm_res["queue_number"]
+    finally:
+        db.close()
+
+
+def test_table_availability_and_reservation_flow():
+    db = SessionLocal()
+    try:
+        from app.agent import customer_check_available_tables, customer_create_reservation
+        # 1. Check available tables
+        avail_res = customer_check_available_tables(db, reservation_date="2026-09-25")
+        assert avail_res["status"] == "success"
+        assert avail_res["available_count"] >= 10
+        assert any(t["table_number"] == "Meja 1" for t in avail_res["available_tables"])
+
+        # 2. Create reservation for Meja 1
+        resv_res = customer_create_reservation(
+            db,
+            customer_phone="628133344455",
+            customer_name="Pak Ahmad",
+            table_number="Meja 1",
+            reservation_date="2026-09-25",
+            reservation_time="19:00",
+            guest_count=4,
+            notes="Dekat jendela jika bisa",
+        )
+        assert resv_res["status"] == "success"
+        assert resv_res["table_number"] == "Meja 1"
+        assert resv_res["customer_name"] == "Pak Ahmad"
+
+        # 3. Try to book Meja 1 again on the same date -> should return error
+        resv_conflict = customer_create_reservation(
+            db,
+            customer_phone="628188899900",
+            customer_name="Ibu Siti",
+            table_number="Meja 1",
+            reservation_date="2026-09-25",
+            reservation_time="19:00",
+            guest_count=2,
+        )
+        assert "error" in resv_conflict
+        assert "sudah direservasi" in resv_conflict["error"]
+
+        # 4. Check available tables again -> Meja 1 should now be booked
+        avail_res_after = customer_check_available_tables(db, reservation_date="2026-09-25")
+        assert any(t["table_number"] == "Meja 1" for t in avail_res_after["booked_tables"])
+    finally:
+        db.close()
+

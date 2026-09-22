@@ -1,8 +1,9 @@
 import os
+from datetime import datetime, timedelta
 from sqlalchemy import create_engine, inspect, text
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
-from app.models import Base, MenuItem, Recipe, Stock
+from app.models import Base, MenuItem, Recipe, Stock, Order, DiningTable, Reservation
 
 
 DATABASE_URL = os.getenv("RESTO_DATABASE_URL", "sqlite:///./resto.db")
@@ -172,6 +173,10 @@ def ensure_schema():
         "stock_consumed": "ALTER TABLE orders ADD COLUMN stock_consumed BOOLEAN NOT NULL DEFAULT 0",
         "customer_phone": "ALTER TABLE orders ADD COLUMN customer_phone VARCHAR(32)",
         "source_message_id": "ALTER TABLE orders ADD COLUMN source_message_id VARCHAR(160)",
+        "table_number": "ALTER TABLE orders ADD COLUMN table_number VARCHAR(50) DEFAULT 'Bawa Pulang / Takeaway'",
+        "order_type": "ALTER TABLE orders ADD COLUMN order_type VARCHAR(30) NOT NULL DEFAULT 'DINE_IN'",
+        "payment_method": "ALTER TABLE orders ADD COLUMN payment_method VARCHAR(30) NOT NULL DEFAULT 'QRIS'",
+        "queue_number": "ALTER TABLE orders ADD COLUMN queue_number VARCHAR(20)",
     }
     missing = [name for name in migrations if name not in columns]
     event_columns = {column["name"] for column in inspect(engine).get_columns("whatsapp_events")}
@@ -203,16 +208,66 @@ def ensure_schema():
             ))
 
 
+DEFAULT_TABLES = [
+    ("Meja 1", 4, "Area Utama"),
+    ("Meja 2", 4, "Area Utama"),
+    ("Meja 3", 4, "Area Utama"),
+    ("Meja 4", 6, "Area Utama"),
+    ("Meja 5", 6, "Area Utama"),
+    ("Meja 6", 2, "Area Semi Outdoor"),
+    ("Meja 7", 2, "Area Semi Outdoor"),
+    ("Lesehan 1", 8, "Area Gazebo Lesehan"),
+    ("Lesehan 2", 8, "Area Gazebo Lesehan"),
+    ("Ruang VIP", 12, "Area VIP / AC"),
+]
+
+
+def seed_tables(session: Session):
+    """Seed default dining tables for Warung Ndelik."""
+    for tbl_num, cap, area in DEFAULT_TABLES:
+        exists = session.query(DiningTable).filter(DiningTable.table_number == tbl_num).one_or_none()
+        if exists is None:
+            session.add(DiningTable(
+                table_number=tbl_num,
+                capacity=cap,
+                area=area,
+                is_active=True,
+            ))
+    session.flush()
+
+
+def get_next_queue_number(session: Session) -> str:
+    """Generate sequential queue number for today, formatted as A-01, A-02, etc."""
+    today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    count = session.query(Order).filter(
+        Order.queue_number.isnot(None),
+        Order.created_at >= today_start,
+    ).count()
+    return f"A-{count + 1:02d}"
+
+
+def assign_order_queue(session: Session, order: Order) -> str:
+    """Assign a queue number if not already assigned."""
+    existing_q = getattr(order, "queue_number", None)
+    if existing_q:
+        return str(existing_q)
+    q_num = get_next_queue_number(session)
+    setattr(order, "queue_number", q_num)
+    session.commit()
+    return q_num
+
+
 def init_db():
-    """Create tables, apply additive migrations, and seed Warung Ndelik menu."""
+    """Create tables, apply additive migrations, and seed Warung Ndelik menu & tables."""
     ensure_schema()
     seed_db()
 
 
 def seed_db():
-    """Idempotently upsert Warung Ndelik menu items, recipes, and stocks."""
+    """Idempotently upsert Warung Ndelik menu items, recipes, stocks, and tables."""
     session = SessionLocal()
     try:
+        seed_tables(session)
         ingredients_needed = set()
         menu_map = {}
 

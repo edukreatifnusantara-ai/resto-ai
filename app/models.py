@@ -67,6 +67,10 @@ class Order(Base):
     id = Column(Integer, primary_key=True)
     items_json = Column(JSON, nullable=False, default=dict)
     total = Column(Float, nullable=False)
+    table_number = Column(String(50), nullable=True, default="Bawa Pulang / Takeaway")
+    order_type = Column(String(30), nullable=False, default="DINE_IN")
+    payment_method = Column(String(30), nullable=False, default="QRIS")
+    queue_number = Column(String(20), nullable=True, default=None)
     state = Column(String(30), nullable=False, default=OrderStatus.DRAFT)
     payment_state = Column(String(30), nullable=False, default=PaymentStatus.PENDING)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
@@ -121,3 +125,29 @@ class WhatsAppEvent(Base):
     response_body = Column(String(4096), nullable=True)
     processed_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+
+
+class DiningTable(Base):
+    __tablename__ = "dining_tables"
+
+    id = Column(Integer, primary_key=True)
+    table_number = Column(String(50), unique=True, nullable=False)
+    capacity = Column(Integer, nullable=False, default=4)
+    area = Column(String(100), nullable=False, default="Area Utama")
+    is_active = Column(Boolean, nullable=False, default=True)
+
+
+class Reservation(Base):
+    __tablename__ = "reservations"
+
+    id = Column(Integer, primary_key=True)
+    customer_name = Column(String(100), nullable=False)
+    customer_phone = Column(String(32), nullable=False)
+    table_number = Column(String(50), nullable=False)
+    guest_count = Column(Integer, nullable=False, default=2)
+    reservation_date = Column(String(20), nullable=False)  # YYYY-MM-DD
+    reservation_time = Column(String(20), nullable=False)  # HH:MM
+    status = Column(String(30), nullable=False, default="CONFIRMED")  # CONFIRMED, COMPLETED, CANCELLED
+    notes = Column(String(255), nullable=True, default="")
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+

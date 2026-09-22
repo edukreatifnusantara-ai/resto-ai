@@ -1,3 +1,4 @@
+# pyright: reportAttributeAccessIssue=false, reportArgumentType=false, reportGeneralTypeIssues=false, reportCallIssue=false
 import os
 import secrets
 from datetime import datetime, timedelta
@@ -506,24 +507,33 @@ async def midtrans_webhook(request: Request, db: Session = Depends(get_db)):
             setattr(order, "payment_state", PaymentStatus.SIMULATED_CONFIRMED)
             if curr_state in {OrderStatus.DRAFT, OrderStatus.PENDING_PAYMENT}:
                 setattr(order, "state", OrderStatus.PAID)
+            
+            from app.database import assign_order_queue
+            q_num = assign_order_queue(db, order)
             db.commit()
 
             cust_phone = str(getattr(order, "customer_phone", ""))
             total_val = float(getattr(order, "total", 0.0))
+            tbl_num = str(getattr(order, "table_number", "Bawa Pulang / Takeaway"))
 
             # 1. Notify Customer via WhatsApp Bridge
             cust_msg = (
-                f"Halo kak! Pembayaran untuk Pesanan #{order.id} sebesar "
+                f"Halo kak! Pembayaran untuk Pesanan #{order.id} ({tbl_num}) sebesar "
                 f"Rp{total_val:,.0f} telah BERHASIL kami terima melalui QRIS.\n"
-                f"Pesanan sekarang sedang disiapkan di dapur. Terima kasih telah memesan di Warung Ndelik!"
+                f"🎟️ *Nomor Antrean Anda: {q_num}*\n"
+                f"Pesanan sekarang sedang disiapkan di dapur dan akan diantar ke {tbl_num}. Terima kasih telah memesan di Warung Ndelik!"
             ).replace(",", ".")
             send_whatsapp_bridge_message(cust_phone, cust_msg)
 
             # 2. Notify Owner via WhatsApp Bridge
             owner_msg = (
-                f"🔔 *NOTIFIKASI PEMBAYARAN QRIS MASUK*\n"
-                f"Pesanan #{order.id} senilai Rp{total_val:,.0f} dari {cust_phone} "
-                f"telah LUNAS melalui QRIS Midtrans (Settlement)."
+                f"🔔 *NOTIFIKASI PEMBAYARAN QRIS MASUK (LUNAS)*\n"
+                f"• ID Pesanan: #{order.id}\n"
+                f"• Lokasi/Meja: {tbl_num}\n"
+                f"• 🎟️ Nomor Antrean: *{q_num}*\n"
+                f"• Total: Rp{total_val:,.0f}\n"
+                f"• Pelanggan: {cust_phone}\n"
+                f"Pesanan diteruskan ke antrean dapur."
             ).replace(",", ".")
             for op in os.getenv("OWNER_PHONE_NUMBERS", "").split(","):
                 if op.strip():
