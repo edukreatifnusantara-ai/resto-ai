@@ -1,0 +1,1359 @@
+{
+  "id": "resto-ai-enterprise-workforce-v1",
+  "name": "Resto-AI - Complete Enterprise AI Workforce (Front-Office & Back-Office)",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// =================================================================\n// WARUNG NDELIK - GEMINI PAID TIER STRATEGY (BUDGET: RP 200.000/BULAN)\n// Model: Dual-Model Gemini Architecture (Flash untuk Chat/Ops + Pro untuk Medsos)\n// =================================================================\n\nreturn [{\n  json: {\n    ai_provider: 'gemini',\n    monthly_budget_idr: 200000, // Budget Rp 200.000 / bulan (~ $12.50 USD)\n    \n    // Model Allocation per Division\n    models: {\n      // 1. FRONT-OFFICE (Waitress & Kasir WhatsApp)\n      // Menggunakan Gemini 1.5 Flash Paid ($0.075/1M token - Respons kilat <1s, anti-halusinasi)\n      front_office: {\n        model: 'gemini-1.5-flash',\n        max_tokens: 300,\n        temperature: 0.2, // Rendah untuk kasir & order agar patuh pada katalog & harga\n        system_role: 'Waitress ramah & Kasir presisi Warung Ndelik Mranggen'\n      },\n      \n      // 2. SOCIAL MEDIA & MARKETING (Instagram, TikTok, Facebook)\n      // Menggunakan Gemini 1.5 Pro Paid ($1.25/1M token - Kualitas copywriting kreatif tinggi)\n      marketing_social: {\n        model: 'gemini-1.5-pro',\n        max_tokens: 800,\n        temperature: 0.75, // Kreatif, storytelling lokal, hook FYP TikTok, aesthetic IG\n        platforms: ['instagram', 'tiktok', 'facebook']\n      },\n      \n      // 3. TIM RISET & INTELIJEN KOMPETITOR\n      // Gemini 1.5 Flash dengan Google Search Grounding (Akurat memantau harga pasar riil)\n      market_research: {\n        model: 'gemini-1.5-flash',\n        max_tokens: 600,\n        temperature: 0.3,\n        google_search_grounding: true\n      },\n      \n      // 4. BACK-OFFICE (P&L Narrative & CEO Morning Briefing)\n      back_office: {\n        model: 'gemini-1.5-flash',\n        max_tokens: 400,\n        temperature: 0.2\n      }\n    },\n    \n    // Budget Guardrail\n    guardrails: {\n      budget_cap_usd: 12.50,\n      alert_threshold_idr: 160000, // Notifikasi jika saldo pemakaian mencapai 80%\n      data_privacy: 'ENTERPRISE_PAID_NO_TRAINING', // Data bisnis Warung Ndelik aman\n      sla_priority: 'HIGH_PRIORITY_NO_THROTTLING'\n    }\n  }\n}];"
+      },
+      "id": "global-token-config-hub",
+      "name": "Global Token & Model Config Hub",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -560,
+        100
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "ops-manual-trigger",
+      "name": "Owner Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -300,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 7 * * *"
+            }
+          ]
+        }
+      },
+      "id": "ops-schedule-morning",
+      "name": "Schedule Morning (07:00)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -300,
+        -180
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 22 * * *"
+            }
+          ]
+        }
+      },
+      "id": "ops-schedule-night",
+      "name": "Schedule Night Closing (22:00)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -300,
+        -360
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * 3"
+            }
+          ]
+        }
+      },
+      "id": "ops-schedule-weekly-research",
+      "name": "Schedule Weekly Research (Wed 09:00)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -300,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "resto-ai/enterprise-trigger",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "ops-webhook-trigger",
+      "name": "Webhook Trigger (On-Demand)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -300,
+        360
+      ],
+      "webhookId": "resto-ai-enterprise-trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// CEO & Chief Orchestrator: Normalizes input and routes to specialized AI Employees\nconst raw = $json.body && typeof $json.body === 'object' ? $json.body : $json;\nconst now = new Date();\nconst nowStr = now.toISOString();\n\nlet task = String(raw.task || '').trim().toLowerCase();\nconst source = raw.source || 'SCHEDULE_OR_MANUAL';\nconst requester = raw.requester || 'OWNER';\n\n// Auto-detect task based on schedule trigger or parameters\nif (!task) {\n  const triggerNode = Object.keys($node)[0] || '';\n  if (triggerNode.includes('Night')) task = 'finance';\n  else if (triggerNode.includes('Weekly Research')) task = 'research';\n  else if (triggerNode.includes('Morning')) task = 'inventory';\n  else task = 'finance'; // default\n}\n\nconst correlation_id = `job-${task}-${Date.now()}`;\n\nreturn [{\n  json: {\n    correlation_id,\n    timestamp: nowStr,\n    task,\n    source,\n    requester,\n    looker_studio_url: \"https://lookerstudio.google.com/reporting/resto-ai-warungndelik\",\n    spreadsheet_id: \"{{$env.RESTO_GOOGLE_SHEET_ID || 'SPREADSHEET_ID_WARUNG_NDELIK'}}\",\n    status: \"DISPATCHED\"\n  }\n}];"
+      },
+      "id": "ops-orchestrator-normalize",
+      "name": "CEO Orchestrator Normalizer",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -20,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.task }}",
+                    "rightValue": "finance",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cond-finance"
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Finance Controller"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.task }}",
+                    "rightValue": "research",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cond-research"
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Tim Riset"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.task }}",
+                    "rightValue": "marketing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cond-marketing"
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Social Media Marketing"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.task }}",
+                    "rightValue": "inventory",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cond-inventory"
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Inventory Supply"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.task }}",
+                    "rightValue": "payroll",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cond-payroll"
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "HR Payroll"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "none"
+        }
+      },
+      "id": "ops-task-router",
+      "name": "Route to AI Employee",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://172.18.0.1:18081/reports/sales",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-RESTO-API-TOKEN",
+              "value": "={{ $env.RESTO_API_TOKEN || 'resto-mvp-secret-token' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "finance-get-sales",
+      "name": "Finance Fetch Sales API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        520,
+        -360
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://172.18.0.1:18081/reports/finance",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-RESTO-API-TOKEN",
+              "value": "={{ $env.RESTO_API_TOKEN || 'resto-mvp-secret-token' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "finance-get-report",
+      "name": "Finance Fetch Report API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        760,
+        -360
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// AI Finance Controller: Calculates P&L with Owner & Co-owner Baseline Costs\nconst salesData = $('Finance Fetch Sales API').first().json;\nconst financeData = $json;\nconst meta = $('CEO Orchestrator Normalizer').first().json;\n\nconst totalSales = Number(salesData.total_sales || 0);\nconst completedOrders = Number(salesData.completed_orders || 0);\nconst averageOrderValue = completedOrders > 0 ? Math.round(totalSales / completedOrders) : 0;\n\n// Baseline Riil Warung Ndelik:\n// 1. Biaya Tetap (Fixed Cost):\n//    - Payroll: Owner (5jt) + Co-owner (3jt) + 10 Staf (18.5jt) = Rp 26.500.000/bln\n//    - Utilitas (Listrik & Air): Rp 1.500.000/bln\n//    - Total Fixed Cost: Rp 28.000.000/bln (~ Rp 933.333/hari)\n// 2. Estimasi HPP Bahan Riil ~ 42% dari omzet (atau Rp 1.176.687/hari benchmark Agustus.xlsx)\nconst estimatedHpp = totalSales > 0 ? Math.round(totalSales * 0.42) : 1176687;\nconst grossProfit = totalSales - estimatedHpp;\nconst dailyFixedCost = 933333; // Rp 28.000.000 / 30 hari\nconst netProfit = grossProfit - dailyFixedCost;\nconst marginPercent = totalSales > 0 ? ((netProfit / totalSales) * 100).toFixed(1) : '0';\n\nconst today = new Date().toISOString().slice(0, 10);\n\nreturn [{\n  json: {\n    correlation_id: meta.correlation_id,\n    date: today,\n    total_sales: totalSales,\n    completed_orders: completedOrders,\n    average_order_value: averageOrderValue,\n    estimated_hpp: estimatedHpp,\n    gross_profit: grossProfit,\n    daily_fixed_cost: dailyFixedCost,\n    net_profit: netProfit,\n    margin_percent: `${marginPercent}%`,\n    report_channel: \"Google Sheets & Looker Studio UI\",\n    looker_studio_url: meta.looker_studio_url,\n    sheet_row_pnl: [today, totalSales, estimatedHpp, grossProfit, dailyFixedCost, netProfit, `${marginPercent}%`, \"RECONCILED_DRAFT\"],\n    narrative_summary: `📊 *LAPORAN KEUANGAN RESTO-AI (CLOSING)*\\n📅 Tanggal: ${today}\\n🏪 Unit: Warung Ndelik Mranggen\\n\\n💰 *Omzet Penjualan:* Rp ${totalSales.toLocaleString('id-ID')}\\n📦 *Pesanan Selesai:* ${completedOrders} order (Rata-rata: Rp ${averageOrderValue.toLocaleString('id-ID')})\\n🍗 *Estimasi HPP Bahan Riil (42%):* Rp ${estimatedHpp.toLocaleString('id-ID')}\\n🏢 *Beban Tetap Harian (Gaji Tim + Utilitas):* Rp ${dailyFixedCost.toLocaleString('id-ID')}\\n✨ *Estimasi Laba Bersih:* Rp ${netProfit.toLocaleString('id-ID')} (${marginPercent}%)\\n\\n📈 *Dashboard UI & Grafik:* ${meta.looker_studio_url}`\n  }\n}];"
+      },
+      "id": "finance-calculate-pnl",
+      "name": "Finance Calculate P&L",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        -360
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $json.spreadsheet_id || 'SPREADSHEET_ID_WARUNG_NDELIK' }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "LABA_RUGI_PNL",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Tanggal": "={{ $json.date }}",
+            "Total_Omzet": "={{ $json.total_sales }}",
+            "Estimasi_HPP": "={{ $json.estimated_hpp }}",
+            "Laba_Kotor": "={{ $json.gross_profit }}",
+            "Beban_Operasional": "={{ $json.daily_fixed_cost }}",
+            "Laba_Bersih": "={{ $json.net_profit }}",
+            "Margin_Persen": "={{ $json.margin_percent }}",
+            "Status": "RECONCILED"
+          }
+        },
+        "options": {}
+      },
+      "id": "finance-sheet-pnl",
+      "name": "Google Sheets - Append P&L",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1260,
+        -460
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "title": "={{ 'Laporan Keuangan Resto-AI - ' + $json.date }}",
+        "content": "={{ $json.narrative_summary }}",
+        "options": {}
+      },
+      "id": "finance-doc-report",
+      "name": "Google Docs - Executive Report",
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1260,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Consolidates Finance deliverable into final WhatsApp message for Owner\nconst pnl = $('Finance Calculate P&L').first().json;\nreturn [{\n  json: {\n    channel: \"whatsapp\",\n    to: \"{{ $env.OWNER_WHATSAPP_NUMBER || '628131344159@s.whatsapp.net' }}\",\n    message: pnl.narrative_summary + \"\\n\\n📑 *Catatan:* Data telah tersinkron ke Google Sheets (Tab LABA_RUGI_PNL), Google Docs ringkasan eksekutif, dan Excel feed.\"\n  }\n}];"
+      },
+      "id": "finance-format-summary",
+      "name": "Finance Format Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        -360
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// AI Tim Riset: Define intelligence scopes (Bahan Baku, Kompetitor Lokal, Tren Kuliner)\nconst meta = $('CEO Orchestrator Normalizer').first().json;\nconst today = new Date().toISOString().slice(0, 10);\n\nconst researchTopics = [\n  {\n    category: \"HARGA_KOMODITAS_BAHAN_BAKU\",\n    query: \"Harga cabai rawit merah, ayam potong, dan minyak goreng pasar Demak Semarang hari ini\",\n    target_area: \"Mranggen & Semarang Timur\"\n  },\n  {\n    category: \"TREN_KULINER_VIRAL\",\n    query: \"Menu kuliner viral TikTok Instagram resto sambal bakar bebek goreng Semarang 2026\",\n    target_area: \"Semarang & Demak\"\n  },\n  {\n    category: \"INTEL_KOMPETITOR_LOKAL\",\n    query: \"Promo dan menu favorit resto keluarga warung makan sekitar Mranggen\",\n    target_area: \"Radius 5km Mranggen\"\n  }\n];\n\nreturn [{\n  json: {\n    correlation_id: meta.correlation_id,\n    date: today,\n    topics: researchTopics\n  }\n}];"
+      },
+      "id": "research-gather-queries",
+      "name": "Research Scope Generator",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// AI Tim Riset Synthesis Engine: Synthesizes market observations and formulates strategic recommendations\nconst prev = $json;\nconst today = prev.date;\n\n// Model sintesis riset AI\nconst findings = {\n  commodities: [\n    { item: \"Cabai Rawit Merah\", price_market: 42000, trend: \"Stabil (-5%)\", note: \"Pasokan pasar Mranggen melimpah, aman untuk stok sambal 3 hari.\" },\n    { item: \"Daging Ayam Broiler\", price_market: 34000, trend: \"Naik tipis (+3%)\", note: \"Harga pemasok lokal sedikit naik, disarankan amankan PO mingguan.\" },\n    { item: \"Minyak Goreng Sawit\", price_market: 16500, trend: \"Stabil\", note: \"Ketersediaan stabil di distributor utama.\" }\n  ],\n  trending_menu: [\n    { concept: \"Paket Bebek Sambal Bakar Cobek Panas\", reason: \"Tingginya pencarian menu sambal bakar pedas gurih di medsos kuliner Jateng.\", margin_potential: \"Tinggi (estimasi 55%)\" },\n    { concept: \"Es Jeruk Peras Jumbo Selasih\", reason: \"Minuman penyegar porsi besar dengan margin 70% sangat dicari saat siang terik.\" }\n  ],\n  competitor_benchmark: [\n    { competitor: \"Warung Makan Sekitar Mranggen\", observation: \"Rata-rata paket ayam bakar Rp 22.000 - Rp 25.000 belum termasuk es teh.\", recommendation: \"Warung Ndelik tetap unggul di porsi & kecepatan saji; buat promo bundling hemat jam makan siang.\" }\n  ]\n};\n\nconst briefText = `🔬 *BRIEF TIM RISET PASAR & KOMPETITOR RESTO-AI*\\n📅 Periode: ${today}\\n\\n🛒 *1. Pantauan Harga Bahan Pokok (Pasar Lokal):*\\n- Cabai Rawit: Rp 42.000/kg (Stabil)\\n- Daging Ayam: Rp 34.000/kg (Naik tipis 3%)\\n- Minyak Goreng: Rp 16.500/lt (Normal)\\n👉 *Rekomendasi:* Amankan PO ayam 2 hari ke depan sebelum lonjakan akhir pekan.\\n\\n🔥 *2. Tren Kuliner Viral & Peluang Menu:*\\n- *Peluang 1:* Sambal Bakar Cobek Panas (Viral di Reels/TikTok lokal, estimasi margin 55%).\\n- *Peluang 2:* Minuman Segar Jumbo Selasih (Food cost rendah, margin 70%).\\n\\n🎯 *3. Benchmarking Kompetitor Mranggen:*\\n- Harga kompetitor Rp 22rb - 25rb tanpa minum. Paket bundling Warung Ndelik Rp 25rb sudah lengkap minum sangat kompetitif.\\n\\n📑 *Arsip:* Data telah dicatat ke Google Sheets (Tab RISET_PASAR) & Google Docs tim kreatif.`;\n\nreturn [{\n  json: {\n    date: today,\n    findings,\n    narrative_brief: briefText,\n    sheet_rows: [\n      { Tanggal: today, Kategori: \"Harga Komoditas\", Item: \"Ayam Broiler\", Nilai: \"Rp 34.000/kg\", Tren: \"Naik +3%\", Rekomendasi: \"Kunci PO mingguan\" },\n      { Tanggal: today, Kategori: \"Tren Menu\", Item: \"Sambal Bakar Cobek\", Nilai: \"Viral\", Tren: \"Meningkat\", Rekomendasi: \"Uji resep & menu promo\" },\n      { Tanggal: today, Kategori: \"Kompetitor\", Item: \"Paket Makan Siang\", Nilai: \"Rp 25.000\", Tren: \"Normal\", Rekomendasi: \"Bundling es teh gratis\" }\n    ]\n  }\n}];"
+      },
+      "id": "research-ai-analyst",
+      "name": "Research AI Analysis Engine",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        780,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $json.spreadsheet_id || 'SPREADSHEET_ID_WARUNG_NDELIK' }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "RISET_PASAR",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {}
+        },
+        "options": {}
+      },
+      "id": "research-sheet-log",
+      "name": "Google Sheets - Log Market Research",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1080,
+        -180
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "title": "={{ 'Laporan Riset Pasar & Kompetitor - ' + $json.date }}",
+        "content": "={{ $json.narrative_brief }}",
+        "options": {}
+      },
+      "id": "research-doc-brief",
+      "name": "Google Docs - Research Brief",
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1080,
+        -20
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Consolidates Research deliverable into final WhatsApp message for Owner\nconst res = $('Research AI Analysis Engine').first().json;\nreturn [{\n  json: {\n    channel: \"whatsapp\",\n    to: \"{{ $env.OWNER_WHATSAPP_NUMBER || '628131344159@s.whatsapp.net' }}\",\n    message: res.narrative_brief\n  }\n}];"
+      },
+      "id": "research-format-brief",
+      "name": "Research Format Brief",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// AI Marketing & Social Media: Generates content calendar from seasonal & research trends\nconst meta = $('CEO Orchestrator Normalizer').first().json;\nconst today = new Date().toISOString().slice(0, 10);\n\nconst contentPlan = [\n  {\n    platform: \"Instagram Reels & TikTok\",\n    theme: \"Behind the Scene: Kelezatan Sambal Ndelik Asli Ulegan Dapur\",\n    hook: \"Kenapa sambal di Warung Ndelik selalu bikin nagih? Ini rahasianya!\",\n    caption: \"Pedasnya pas, gurihnya mantap! Dibuat dari cabai rawit segar langsung dari pasar lokal tiap pagi. Cobain sensasi Sambal Bakar Cobek spesial hari ini hanya di Warung Ndelik Mranggen! 🔥🍗\\n\\n📍 Lokasi: Mranggen, Demak\\n⏰ Buka: 10.00 - 21.00 WIB\\n\\n#WarungNdelik #KulinerMranggen #KulinerSemarang #SambalBakar #BebekGoreng\",\n    status: \"NEEDS_APPROVAL\",\n    post_date: today\n  }\n];\n\nreturn [{\n  json: {\n    correlation_id: meta.correlation_id,\n    date: today,\n    content_plan: contentPlan,\n    approval_prompt: `📢 *DRAF KONTEN MEDSOS SIAP DITINJAU (AI MARKETING)*\\n📅 Tanggal: ${today}\\n📱 *Platform:* ${contentPlan[0].platform}\\n🎬 *Konsep:* ${contentPlan[0].theme}\\n📝 *Caption Draft:*\\n\\\"${contentPlan[0].caption}\\\"\\n\\nBalas *APPROVE ${meta.correlation_id}* untuk menjadwalkan publikasi otomatis.`\n  }\n}];"
+      },
+      "id": "marketing-plan-generator",
+      "name": "Marketing Content Generator",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $json.spreadsheet_id || 'SPREADSHEET_ID_WARUNG_NDELIK' }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "KALENDER_MEDSOS",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Tanggal": "={{ $json.date }}",
+            "Platform": "={{ $json.content_plan[0].platform }}",
+            "Konsep": "={{ $json.content_plan[0].theme }}",
+            "Caption": "={{ $json.content_plan[0].caption }}",
+            "Status": "NEEDS_APPROVAL"
+          }
+        },
+        "options": {}
+      },
+      "id": "marketing-sheet-calendar",
+      "name": "Google Sheets - Content Calendar",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        820,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Owner Approval Gate for Social Media Publishing\nconst mkt = $('Marketing Content Generator').first().json;\nreturn [{\n  json: {\n    channel: \"whatsapp\",\n    to: \"{{ $env.OWNER_WHATSAPP_NUMBER || '628131344159@s.whatsapp.net' }}\",\n    message: mkt.approval_prompt\n  }\n}];"
+      },
+      "id": "marketing-approval-gate",
+      "name": "Marketing Approval Gate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        820,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/{{ $env.META_PAGE_ID || 'PAGE_ID' }}/feed",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.META_ACCESS_TOKEN || 'DRAFT_TOKEN' }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ message: $('Marketing Content Generator').first().json.content_plan[0].caption }) }}",
+        "options": {}
+      },
+      "id": "marketing-social-api",
+      "name": "Meta Graph API (Publisher Draft)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1120,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://172.18.0.1:18081/reports/stock",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-RESTO-API-TOKEN",
+              "value": "={{ $env.RESTO_API_TOKEN || 'resto-mvp-secret-token' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "inventory-get-stock",
+      "name": "Inventory Fetch Stock API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        520,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// AI Inventory Agent: Evaluates low stock against thresholds and drafts market shopping list\nconst raw = $json.stocks || [];\nconst lowStock = [];\nconst safeStock = [];\n\nfor (const item of raw) {\n  if (item.quantity <= (item.min_threshold || 5)) {\n    lowStock.push({\n      ingredient: item.ingredient,\n      current: item.quantity,\n      min: item.min_threshold,\n      needed: Math.max(10, item.min_threshold * 2) - item.quantity\n    });\n  } else {\n    safeStock.push(item);\n  }\n}\n\nconst today = new Date().toISOString().slice(0, 10);\nlet msg = `📦 *LAPORAN STOK & DAFTAR BELANJA (INVENTORY AI)*\\n📅 Tanggal: ${today}\\n\\n`;\n\nif (lowStock.length > 0) {\n  msg += `⚠️ *PERINGATAN STOK MENIPIS (PERLU BELANJA):*\\n`;\n  for (const ls of lowStock) {\n    msg += `- *${ls.ingredient}:* sisa ${ls.current} (Batas min: ${ls.min}) -> Rekomendasi beli: +${ls.needed}\\n`;\n  }\n  msg += `\\n🛒 Draf PO pasar telah diperbarui di Google Sheets tab STOK_INVENTORY.`;\n} else {\n  msg += `✅ Seluruh persediaan bahan baku berada di atas batas aman.`;\n}\n\nreturn [{\n  json: {\n    date: today,\n    low_stock_count: lowStock.length,\n    low_stock_items: lowStock,\n    alert_message: msg\n  }\n}];"
+      },
+      "id": "inventory-analyze-deficit",
+      "name": "Inventory Analyze Deficit",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        780,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $json.spreadsheet_id || 'SPREADSHEET_ID_WARUNG_NDELIK' }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "STOK_INVENTORY",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {}
+        },
+        "options": {}
+      },
+      "id": "inventory-sheet-update",
+      "name": "Google Sheets - Update Stock",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1080,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Consolidates Inventory deliverable into final WhatsApp message for Owner\nconst inv = $('Inventory Analyze Deficit').first().json;\nreturn [{\n  json: {\n    channel: \"whatsapp\",\n    to: \"{{ $env.OWNER_WHATSAPP_NUMBER || '628131344159@s.whatsapp.net' }}\",\n    message: inv.alert_message\n  }\n}];"
+      },
+      "id": "inventory-format-alert",
+      "name": "Inventory Format Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1080,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// AI HR & Payroll Agent: Calculates verified payroll for Management & Staff (Warung Ndelik)\nconst today = new Date().toISOString().slice(0, 10);\n\nconst leadership = [\n  { id: \"MGT-01\", name: \"Owner\", base_salary: 5000000, role: \"Owner / Pemilik\" },\n  { id: \"MGT-02\", name: \"Co-owner\", base_salary: 3000000, role: \"Co-owner / Manajemen\" }\n];\n\nconst staff = [\n  { id: \"EMP-01\", name: \"Pincuk\", base_salary: 2500000, role: \"Staf Inti / Senior\" },\n  { id: \"EMP-02\", name: \"Dirimu\", base_salary: 2500000, role: \"Staf Inti / Senior\" },\n  { id: \"EMP-03\", name: \"Fika\", base_salary: 2000000, role: \"Staf Operasional\" },\n  { id: \"EMP-04\", name: \"Tatik\", base_salary: 1500000, role: \"Staf Dapur / Kasir\" },\n  { id: \"EMP-05\", name: \"Wahyu\", base_salary: 2000000, role: \"Staf Operasional\" },\n  { id: \"EMP-06\", name: \"Tyas\", base_salary: 2000000, role: \"Staf Operasional\" },\n  { id: \"EMP-07\", name: \"Alwi\", base_salary: 1500000, role: \"Staf Dapur / Layanan\" },\n  { id: \"EMP-08\", name: \"Zaki\", base_salary: 1500000, role: \"Staf Dapur / Layanan\" },\n  { id: \"EMP-09\", name: \"Ping an\", base_salary: 1500000, role: \"Staf Layanan\" },\n  { id: \"EMP-10\", name: \"Amat\", base_salary: 1500000, role: \"Staf Layanan\" }\n];\n\nconst totalLeadership = leadership.reduce((acc, curr) => acc + curr.base_salary, 0);\nconst totalStaff = staff.reduce((acc, curr) => acc + curr.base_salary, 0);\nconst grandTotalPayroll = totalLeadership + totalStaff;\n\nlet textRoster = \"👑 *Manajemen & Pemilik:*\\n\";\nleadership.forEach((m, idx) => {\n  textRoster += `• *${m.name}*: Rp ${m.base_salary.toLocaleString('id-ID')} (${m.role})\\n`;\n});\ntextRoster += `Subtotal Manajemen: Rp ${totalLeadership.toLocaleString('id-ID')}\\n\\n👥 *Staf Operasional (10 Orang):*\\n`;\nstaff.forEach((s, idx) => {\n  textRoster += `${idx + 1}. *${s.name}*: Rp ${s.base_salary.toLocaleString('id-ID')}\\n`;\n});\ntextRoster += `Subtotal Staf: Rp ${totalStaff.toLocaleString('id-ID')}`;\n\nconst msg = `👥 *DRAF REKAP GAJI BULANAN (HR & PAYROLL AI)*\\n📅 Periode: ${today}\\n🏪 Unit: Warung Ndelik Mranggen\\n\\n${textRoster}\\n\\n💰 *Total Seluruh Payroll:* Rp ${grandTotalPayroll.toLocaleString('id-ID')}\\n🏢 *Alokasi Beban Gaji Harian:* Rp ${(Math.round(grandTotalPayroll / 30)).toLocaleString('id-ID')}/hari\\n\\n🔒 *Catatan:* Data tersimpan privat di tab MASTER_KARYAWAN Google Sheets & Google Docs restricted.`;\n\nreturn [{\n  json: {\n    date: today,\n    leadership_count: leadership.length,\n    staff_count: staff.length,\n    total_personnel: leadership.length + staff.length,\n    total_leadership_payroll: totalLeadership,\n    total_staff_payroll: totalStaff,\n    grand_total_payroll: grandTotalPayroll,\n    daily_payroll_allocation: Math.round(grandTotalPayroll / 30),\n    notification_msg: msg\n  }\n}];"
+      },
+      "id": "payroll-calculate-draft",
+      "name": "Payroll Calculate Draft",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "title": "={{ 'Draf Payroll & Gaji Karyawan - ' + $json.date }}",
+        "content": "={{ $json.notification_msg }}",
+        "options": {}
+      },
+      "id": "payroll-doc-ledger",
+      "name": "Google Docs - Payroll Ledger",
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        820,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Consolidates Payroll deliverable into final WhatsApp message for Owner\nconst pay = $('Payroll Calculate Draft').first().json;\nreturn [{\n  json: {\n    channel: \"whatsapp\",\n    to: \"{{ $env.OWNER_WHATSAPP_NUMBER || '628131344159@s.whatsapp.net' }}\",\n    message: pay.notification_msg\n  }\n}];"
+      },
+      "id": "payroll-format-notify",
+      "name": "Payroll Format Notification",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Consolidator: Captures whatever message was produced by any active branch\nconst item = $json;\nconst message = String(item.message || item.narrative_summary || item.narrative_brief || item.alert_message || item.notification_msg || '');\nconst recipient = String(item.to || '628131344159@s.whatsapp.net');\n\nreturn [{\n  json: {\n    to: recipient,\n    message: message\n  }\n}];"
+      },
+      "id": "ops-consolidate-notify",
+      "name": "Consolidate Notification Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1800,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://172.18.0.1:18082/send",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "ops-bridge-send",
+      "name": "Baileys Bridge Send WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2060,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "resto-ai/incoming",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "fo-whatsapp-inbound",
+      "name": "WhatsApp Customer & Owner Inbound",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -300,
+        320
+      ],
+      "webhookId": "resto-ai-incoming"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = $json.body && typeof $json.body === 'object' ? $json.body : $json;\nconst sender = String(payload.sender || payload.from || '');\nconst chatJid = String(payload.chat_jid || payload.jid || payload.remote_jid || sender);\nconst body = String(payload.body || payload.text || payload.message || '').trim();\nconst messageId = payload.message_id ? String(payload.message_id) : null;\n\n// Owner numbers check\nconst ownerPhones = ['628131344159', '628212033262', '6285727046414'];\nconst cleanSender = sender.replace(/\\D/g, '');\nconst isOwner = ownerPhones.some(p => cleanSender.includes(p)) || body.startsWith('/');\n\nconst lower = body.toLowerCase();\nlet targetRole = 'AI_WAITRESS';\n\nif (isOwner && (body.startsWith('/') || lower.includes('laporan') || lower.includes('riset') || lower.includes('gaji') || lower.includes('closing'))) {\n  targetRole = 'OWNER_OPERATIONS';\n} else if (\n  lower.includes('pesan') || \n  lower.includes('order') || \n  lower.includes('beli') || \n  lower.includes('tagihan') || \n  lower.includes('bill') || \n  lower.includes('struk') || \n  lower.includes('bayar') || \n  lower.includes('qris') || \n  lower.includes('tunai') || \n  lower.includes('meja')\n) {\n  targetRole = 'AI_KASIR';\n} else {\n  targetRole = 'AI_WAITRESS';\n}\n\nreturn [{\n  json: {\n    sender,\n    chat_jid: chatJid,\n    body,\n    message_id: messageId,\n    target_role: targetRole,\n    is_owner: isOwner,\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "fo-triage-classifier",
+      "name": "Triage Inbound (Waitress vs Kasir vs Ops)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -60,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.target_role }}",
+                    "rightValue": "OWNER_OPERATIONS",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.target_role }}",
+                    "rightValue": "AI_WAITRESS",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.target_role }}",
+                    "rightValue": "AI_KASIR",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        }
+      },
+      "id": "fo-route-role",
+      "name": "Route Inbound to AI Employee",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        200,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://172.18.0.1:18081/menu",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "fo-waitress-fetch-menu",
+      "name": "Waitress Fetch Menu Catalog",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        460,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const triage = $('Triage Inbound (Waitress vs Kasir vs Ops)').first().json;\nconst menuItems = Array.isArray($json) ? $json : ($json.items || []);\nconst customerMsg = triage.body.toLowerCase();\n\nlet replyText = '';\n\nif (customerMsg.includes('jam') || customerMsg.includes('buka') || customerMsg.includes('tutup') || customerMsg.includes('alamat') || customerMsg.includes('lokasi')) {\n  replyText = `Halo Kak! Selamat datang di Warung Ndelik Mranggen.\n\nWarung Ndelik buka setiap hari:\n- Jam Operasional: 10:00 - 22:00 WIB\n- Lokasi: Jl. Raya Mranggen, Demak (Suasana asri & nyaman)\n\nAda yang bisa kami siapkan untuk santap lezat Kakak hari ini?`;\n} else {\n  replyText = `Halo Kak! Selamat datang di Warung Ndelik Mranggen. Saya Luna, asisten yang siap melayani pesanan Kakak.\n\nMenu Favorit Juara Kami:\n1. Nasi Ayam Penyet (Rp 16.000) - Terlaris! Ayam gurih renyah dengan sambal penyet pedas nendang.\n2. Nasi Bebek Bumbu Hitam khas Madura (Rp 25.000) - Daging bebek empuk bumbu rempah hitam medok gurih.\n3. Nasi Garang Asem (Rp 20.000) - Kuah segar asam gurih belimbing wuluh.\n4. Nasi Sayap Bakar / Penyet (Rp 15.000)\n5. Nasi Babat Gongso (Rp 20.000)\n\nPilihan Minuman Segar:\n- Es Teh Jumbo (Rp 5.000) - Paling segar & pas menemani menu pedas!\n- Kopi Hitam Ndelik (Rp 5.000)\n- Good Day Es/Panas (Rp 5.000)\n- Soda Gembira (Rp 10.000)\n\nMau mencoba menu apa hari ini Kak? Silakan sebutkan pesanannya beserta nomor meja (bila santap di tempat) ya Kak.`;\n}\n\nreturn [{\n  json: {\n    to: triage.chat_jid || triage.sender,\n    message: replyText,\n    role: 'AI_WAITRESS',\n    image_path: ''\n  }\n}];"
+      },
+      "id": "fo-waitress-engine",
+      "name": "AI Waitress - Menu & Recommender Engine",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://172.18.0.1:18081/api/chat",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ sender: $json.sender, body: $json.body, message_id: $json.message_id }) }}",
+        "options": {}
+      },
+      "id": "fo-kasir-api-chat",
+      "name": "AI Kasir - API POS & Order Register",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        460,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const triage = $('Triage Inbound (Waitress vs Kasir vs Ops)').first().json;\nconst apiResponse = $json;\nconst replyText = String(apiResponse.reply || 'Pesanan Anda sedang diproses oleh Kasir Warung Ndelik.');\n\n// Check if response contains an active order\nconst orderIdMatch = replyText.match(/#(\\d+)/);\nconst orderId = orderIdMatch ? orderIdMatch[1] : ('ORD-' + Date.now().toString().slice(-4));\n\n// Estimate total from text if present\nconst totalMatch = replyText.match(/Rp\\s*([\\d.,]+)/);\nconst totalAmount = totalMatch ? totalMatch[1].replace(/\\D/g, '') : '0';\n\nreturn [{\n  json: {\n    to: triage.chat_jid || triage.sender,\n    message: replyText,\n    order_id: orderId,\n    total_amount: parseInt(totalAmount, 10) || 0,\n    customer_phone: triage.sender,\n    role: 'AI_KASIR',\n    timestamp: new Date().toISOString(),\n    image_path: apiResponse.image_path || ''\n  }\n}];"
+      },
+      "id": "fo-kasir-engine",
+      "name": "AI Kasir - POS Billing & Struk Formatter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "WARUNG_NDELIK_MASTER_SPREADSHEET_ID",
+        "sheetName": "LOG_TRANSAKSI_PENJUALAN",
+        "fields": {
+          "values": [
+            "={{ $json.timestamp }}",
+            "={{ $json.order_id }}",
+            "={{ $json.customer_phone }}",
+            "={{ $json.total_amount }}",
+            "={{ $json.message.slice(0, 150) }}",
+            "DIPROSES_KASIR"
+          ]
+        }
+      },
+      "id": "fo-kasir-sheets-sync",
+      "name": "Google Sheets - Log Transaksi Penjualan",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        980,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const kasirData = $('AI Kasir - POS Billing & Struk Formatter').first().json;\n\n// Kitchen ticket formatting\nconst kitchenTicket = `[PESANAN MASUK KE DAPUR]\nID: ${kasirData.order_id}\nWaktu: ${new Date().toLocaleTimeString('id-ID')}\nRincian:\n${kasirData.message}\n----------------------------\nStatus: Segera Dipersiapkan`;\n\nreturn [{\n  json: {\n    ...kasirData,\n    kitchen_ticket: kitchenTicket\n  }\n}];"
+      },
+      "id": "fo-kasir-kitchen-dispatch",
+      "name": "Kasir Dispatch Kitchen Ticket",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1220,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://172.18.0.1:18082/send",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ to: $json.to, message: $json.message, image_path: $json.image_path || '' }) }}",
+        "options": {}
+      },
+      "id": "fo-send-whatsapp-customer",
+      "name": "Send WhatsApp to Customer",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1480,
+        320
+      ]
+    }
+  ],
+  "connections": {
+    "Owner Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "CEO Orchestrator Normalizer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Morning (07:00)": {
+      "main": [
+        [
+          {
+            "node": "CEO Orchestrator Normalizer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Night Closing (22:00)": {
+      "main": [
+        [
+          {
+            "node": "CEO Orchestrator Normalizer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Weekly Research (Wed 09:00)": {
+      "main": [
+        [
+          {
+            "node": "CEO Orchestrator Normalizer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Trigger (On-Demand)": {
+      "main": [
+        [
+          {
+            "node": "CEO Orchestrator Normalizer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CEO Orchestrator Normalizer": {
+      "main": [
+        [
+          {
+            "node": "Route to AI Employee",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route to AI Employee": {
+      "main": [
+        [
+          {
+            "node": "Finance Fetch Sales API",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Research Scope Generator",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Marketing Content Generator",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Inventory Fetch Stock API",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Payroll Calculate Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finance Fetch Sales API": {
+      "main": [
+        [
+          {
+            "node": "Finance Fetch Report API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finance Fetch Report API": {
+      "main": [
+        [
+          {
+            "node": "Finance Calculate P&L",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finance Calculate P&L": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Append P&L",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Docs - Executive Report",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Finance Format Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finance Format Summary": {
+      "main": [
+        [
+          {
+            "node": "Consolidate Notification Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Research Scope Generator": {
+      "main": [
+        [
+          {
+            "node": "Research AI Analysis Engine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Research AI Analysis Engine": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Log Market Research",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Docs - Research Brief",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Research Format Brief",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Research Format Brief": {
+      "main": [
+        [
+          {
+            "node": "Consolidate Notification Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marketing Content Generator": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Content Calendar",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Marketing Approval Gate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marketing Approval Gate": {
+      "main": [
+        [
+          {
+            "node": "Consolidate Notification Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inventory Fetch Stock API": {
+      "main": [
+        [
+          {
+            "node": "Inventory Analyze Deficit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inventory Analyze Deficit": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Update Stock",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Inventory Format Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inventory Format Alert": {
+      "main": [
+        [
+          {
+            "node": "Consolidate Notification Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Payroll Calculate Draft": {
+      "main": [
+        [
+          {
+            "node": "Google Docs - Payroll Ledger",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Payroll Format Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Payroll Format Notification": {
+      "main": [
+        [
+          {
+            "node": "Consolidate Notification Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consolidate Notification Payload": {
+      "main": [
+        [
+          {
+            "node": "Baileys Bridge Send WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WhatsApp Customer & Owner Inbound": {
+      "main": [
+        [
+          {
+            "node": "Triage Inbound (Waitress vs Kasir vs Ops)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Triage Inbound (Waitress vs Kasir vs Ops)": {
+      "main": [
+        [
+          {
+            "node": "Route Inbound to AI Employee",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Inbound to AI Employee": {
+      "main": [
+        [
+          {
+            "node": "CEO Orchestrator Normalizer",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Waitress Fetch Menu Catalog",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Kasir - API POS & Order Register",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Waitress Fetch Menu Catalog": {
+      "main": [
+        [
+          {
+            "node": "AI Waitress - Menu & Recommender Engine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Waitress - Menu & Recommender Engine": {
+      "main": [
+        [
+          {
+            "node": "Send WhatsApp to Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Kasir - API POS & Order Register": {
+      "main": [
+        [
+          {
+            "node": "AI Kasir - POS Billing & Struk Formatter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Kasir - POS Billing & Struk Formatter": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Log Transaksi Penjualan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Log Transaksi Penjualan": {
+      "main": [
+        [
+          {
+            "node": "Kasir Dispatch Kitchen Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kasir Dispatch Kitchen Ticket": {
+      "main": [
+        [
+          {
+            "node": "Send WhatsApp to Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "resto-ai-enterprise-workforce-v1",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}

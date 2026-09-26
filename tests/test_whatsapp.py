@@ -79,7 +79,7 @@ def test_whatsapp_menu_event_is_idempotent():
         db.close()
 
 
-def test_whatsapp_customer_order_and_simulated_payment():
+def test_whatsapp_customer_order_requests_payment_without_false_confirmation():
     sender = "628121111111"
     order_body, order_headers = signed_payload(
         message_id="wamid.order-1", sender=sender, text="PESAN 1 2"
@@ -108,9 +108,10 @@ def test_whatsapp_customer_order_and_simulated_payment():
     db = SessionLocal()
     try:
         order = db.get(Order, order_id)
-        assert order.customer_phone == sender
-        assert order.state == "PAID"
-        assert order.payment_state == "SIMULATED_CONFIRMED"
+        assert order is not None
+        assert getattr(order, "customer_phone") == sender
+        assert getattr(order, "state") == "PENDING_PAYMENT"
+        assert getattr(order, "payment_state") == "PENDING"
     finally:
         db.close()
 

@@ -149,5 +149,6 @@ class Reservation(Base):
     reservation_time = Column(String(20), nullable=False)  # HH:MM
     status = Column(String(30), nullable=False, default="CONFIRMED")  # CONFIRMED, COMPLETED, CANCELLED
     notes = Column(String(255), nullable=True, default="")
+    payment_order_id = Column(Integer, ForeignKey("orders.id"), nullable=True, index=True)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
 

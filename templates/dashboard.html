@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#ea580c">
+  <title>Warung Ndelik - Enterprise Financial & Operations ERP Dashboard</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .card-shadow { box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.02); }
+    .tab-active { border-bottom: 2px solid #ea580c; color: #ea580c; font-weight: 700; }
+    @media print {
+      header, nav, button, .no-print { display: none !important; }
+      body { background: white; color: black; }
+      .tab-content { display: block !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- TOP HEADER -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 via-orange-600 to-red-600 flex items-center justify-center text-white font-extrabold shadow-md shadow-orange-500/20">
+          WN
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-extrabold text-slate-900 text-lg leading-tight">WARUNG NDELIK</h1>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span> OPERASIONAL LIVE
+            </span>
+          </div>
+          <p class="text-xs text-slate-500">Mranggen, Demak • Enterprise Financial, Procurement & Menu ERP</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 sm:gap-3">
+        <button onclick="fetchData()" class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-100 flex items-center gap-1.5 transition">
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Refresh Data</span>
+        </button>
+        <button onclick="exportFullDataCSV()" class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-100 flex items-center gap-1.5 transition">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Ekspor CSV</span>
+        </button>
+        <button onclick="window.print()" class="px-3 py-1.5 rounded-lg bg-orange-600 text-white text-xs font-semibold hover:bg-orange-700 flex items-center gap-1.5 shadow-sm transition">
+          <i data-lucide="printer" class="w-3.5 h-3.5"></i> Cetak Laporan
+        </button>
+      </div>
+    </div>
+
+    <!-- NAVIGATION TABS -->
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex overflow-x-auto gap-6 text-xs text-slate-500 font-semibold border-t border-slate-100 no-print">
+      <button onclick="switchTab('overview')" id="tab-btn-overview" class="py-3 tab-active flex items-center gap-1.5 whitespace-nowrap">
+        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Overview Eksekutif
+      </button>
+      <button onclick="switchTab('pnl')" id="tab-btn-pnl" class="py-3 flex items-center gap-1.5 whitespace-nowrap hover:text-slate-800">
+        <i data-lucide="file-text" class="w-4 h-4"></i> Laba Rugi (P&L)
+      </button>
+      <button onclick="switchTab('purchasing')" id="tab-btn-purchasing" class="py-3 flex items-center gap-1.5 whitespace-nowrap hover:text-slate-800">
+        <i data-lucide="shopping-cart" class="w-4 h-4"></i> Belanja & Pengeluaran
+      </button>
+      <button onclick="switchTab('menu')" id="tab-btn-menu" class="py-3 flex items-center gap-1.5 whitespace-nowrap hover:text-slate-800">
+        <i data-lucide="utensils" class="w-4 h-4"></i> Menu Engineering
+      </button>
+      <button onclick="switchTab('inventory')" id="tab-btn-inventory" class="py-3 flex items-center gap-1.5 whitespace-nowrap hover:text-slate-800">
+        <i data-lucide="boxes" class="w-4 h-4"></i> Kartu Stok & Gudang
+      </button>
+      <button onclick="switchTab('hr')" id="tab-btn-hr" class="py-3 flex items-center gap-1.5 whitespace-nowrap hover:text-slate-800">
+        <i data-lucide="users" class="w-4 h-4"></i> SDM & Payroll Ledger
+      </button>
+      <button onclick="switchTab('research')" id="tab-btn-research" class="py-3 flex items-center gap-1.5 whitespace-nowrap hover:text-slate-800">
+        <i data-lucide="search" class="w-4 h-4"></i> Tim Riset & AI Advisory
+      </button>
+    </nav>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-8">
+
+    <!-- ============================================================== -->
+    <!-- TAB 1: OVERVIEW EKSEKUTIF -->
+    <!-- ============================================================== -->
+    <div id="tab-overview" class="tab-content space-y-6">
+      <!-- HERO BANNER -->
+      <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 rounded-2xl p-6 sm:p-8 text-white relative overflow-hidden shadow-xl">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div>
+            <span class="text-xs uppercase tracking-wider text-orange-400 font-bold">Periode Pembukuan Riil</span>
+            <h2 id="hero-period" class="text-xl sm:text-2xl font-bold mt-1 text-white">Memuat...</h2>
+            <p class="text-xs text-slate-400 mt-2">Buku Harian Agustus.xlsx & Payroll 12 Personil</p>
+          </div>
+          <div>
+            <span class="text-xs uppercase tracking-wider text-slate-400 font-medium">Total Akumulasi Omzet</span>
+            <h3 id="hero-total-omzet" class="text-2xl sm:text-3xl font-extrabold mt-1 text-emerald-400">Rp 0</h3>
+            <p id="hero-avg-omzet" class="text-xs text-slate-300 mt-1">Rata-rata: Rp 0 / hari</p>
+          </div>
+          <div>
+            <span class="text-xs uppercase tracking-wider text-slate-400 font-medium">Beban Tetap Bulanan</span>
+            <h3 id="hero-fixed-cost" class="text-2xl sm:text-3xl font-extrabold mt-1 text-orange-400">Rp 28.000.000</h3>
+            <p class="text-xs text-slate-300 mt-1">Gaji 12 Org (26,5jt) + Utilitas (1,5jt)</p>
+          </div>
+          <div>
+            <span class="text-xs uppercase tracking-wider text-slate-400 font-medium">Laba Bersih Akumulasi</span>
+            <h3 id="hero-net-profit" class="text-2xl sm:text-3xl font-extrabold mt-1 text-cyan-300">Rp 0</h3>
+            <p id="hero-margin" class="text-xs text-emerald-300 mt-1">Margin: 0% Bersih</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6 METRIC CARDS -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Omzet Harian</span>
+          <h4 id="ov-omzet" class="text-lg font-extrabold text-slate-900 mt-1">Rp 0</h4>
+          <span class="text-[10px] text-emerald-600 font-medium flex items-center gap-1 mt-1">
+            <i data-lucide="trending-up" class="w-3 h-3"></i> Rata-rata 28 Hari
+          </span>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">HPP Bahan Baku</span>
+          <h4 id="ov-hpp" class="text-lg font-extrabold text-slate-900 mt-1">Rp 0</h4>
+          <span class="text-[10px] text-amber-600 font-medium flex items-center gap-1 mt-1">
+            <i data-lucide="pie-chart" class="w-3 h-3"></i> ~42% Food Cost
+          </span>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Beban Tetap Harian</span>
+          <h4 id="ov-fixed" class="text-lg font-extrabold text-slate-900 mt-1">Rp 933.333</h4>
+          <span class="text-[10px] text-blue-600 font-medium flex items-center gap-1 mt-1">
+            <i data-lucide="users" class="w-3 h-3"></i> 12 Personil + Utilitas
+          </span>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Laba Bersih Harian</span>
+          <h4 id="ov-profit" class="text-lg font-extrabold text-slate-900 mt-1">Rp 0</h4>
+          <span class="text-[10px] text-purple-600 font-medium flex items-center gap-1 mt-1">
+            <i data-lucide="award" class="w-3 h-3"></i> Margin 26.9%
+          </span>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Belanja Masuk / Hari</span>
+          <h4 id="ov-purchase" class="text-lg font-extrabold text-slate-900 mt-1">Rp 0</h4>
+          <span class="text-[10px] text-rose-600 font-medium flex items-center gap-1 mt-1">
+            <i data-lucide="shopping-bag" class="w-3 h-3"></i> Arus Kas Belanja
+          </span>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Valuasi Stok Gudang</span>
+          <h4 id="ov-stockval" class="text-lg font-extrabold text-indigo-900 mt-1">Rp 0</h4>
+          <span class="text-[10px] text-indigo-600 font-medium flex items-center gap-1 mt-1">
+            <i data-lucide="boxes" class="w-3 h-3"></i> Aset 99 Bahan Baku
+          </span>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW: TREND & COMPOSITION -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 card-shadow">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                <i data-lucide="line-chart" class="w-4 h-4 text-orange-600"></i> Tren Finansial Harian (28 Hari Riil)
+              </h3>
+              <p class="text-xs text-slate-500">Perbandingan Omzet Penjualan vs HPP Bahan Baku vs Laba Bersih</p>
+            </div>
+          </div>
+          <div class="relative h-72 sm:h-80 w-full">
+            <canvas id="trendChart"></canvas>
+          </div>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 card-shadow flex flex-col justify-between">
+          <div>
+            <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2 mb-2">
+              <i data-lucide="pie-chart" class="w-4 h-4 text-orange-600"></i> Struktur Biaya Operasional Total
+            </h3>
+            <p class="text-xs text-slate-500 mb-3">Distribusi seluruh pengeluaran bulanan resto</p>
+            <div class="relative h-56 w-full flex items-center justify-center">
+              <canvas id="costChart"></canvas>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 text-xs space-y-1 text-slate-600">
+            <div class="flex justify-between"><span>Gaji Staf (10 Org):</span><b class="text-slate-800">Rp 18.500.000</b></div>
+            <div class="flex justify-between"><span>Gaji Manajemen:</span><b class="text-slate-800">Rp 8.000.000</b></div>
+            <div class="flex justify-between"><span>Utilitas (Listrik/Air):</span><b class="text-slate-800">Rp 1.500.000</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- TAB 2: LAPORAN LABA RUGI (P&L STATEMENT) -->
+    <!-- ============================================================== -->
+    <div id="tab-pnl" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200 card-shadow p-6 sm:p-8 space-y-6">
+        <div class="border-b border-slate-200 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+              <i data-lucide="file-text" class="w-5 h-5 text-orange-600"></i> Laporan Laba Rugi Komprehensif (Income Statement)
+            </h2>
+            <p class="text-xs text-slate-500">Standar pelaporan keuangan bisnis kuliner Warung Ndelik Mranggen</p>
+          </div>
+          <span class="px-3 py-1 bg-slate-100 text-slate-700 font-bold text-xs rounded-lg border border-slate-200">
+            Periode: 28 Hari Operasional Riil
+          </span>
+        </div>
+
+        <!-- FORMAL P&L BREAKDOWN TABLE -->
+        <div class="max-w-4xl mx-auto bg-slate-50 rounded-xl p-6 border border-slate-200 text-xs space-y-4">
+          <!-- 1. PENDAPATAN -->
+          <div>
+            <div class="flex justify-between font-extrabold text-slate-900 border-b border-slate-300 pb-1.5 text-sm">
+              <span>1. PENDAPATAN OPERASIONAL (REVENUE)</span>
+              <span id="pnl-rev-total" class="text-emerald-700">Rp 80.798.533</span>
+            </div>
+            <div class="pl-4 pt-2 space-y-1.5 text-slate-600">
+              <div class="flex justify-between"><span>Penjualan Makanan (72%)</span><span id="pnl-rev-food">Rp 58.174.944</span></div>
+              <div class="flex justify-between"><span>Penjualan Minuman & Aneka Snack (28%)</span><span id="pnl-rev-drink">Rp 22.623.589</span></div>
+            </div>
+          </div>
+
+          <!-- 2. HPP -->
+          <div>
+            <div class="flex justify-between font-extrabold text-slate-900 border-b border-slate-300 pb-1.5 text-sm">
+              <span>2. HARGA POKOK PENJUALAN (HPP / COGS)</span>
+              <span id="pnl-cogs-total" class="text-amber-800">Rp 32.947.239</span>
+            </div>
+            <div class="pl-4 pt-2 space-y-1.5 text-slate-600">
+              <div class="flex justify-between"><span>Bahan Baku Dapur (Beras, Ayam, Bebek, Minyak, Sayur)</span><span>Rp 26.038.717</span></div>
+              <div class="flex justify-between"><span>Bahan Baku Minuman (Es Batu, Kopi, Susu, Teh, Sirup)</span><span>Rp 3.952.380</span></div>
+              <div class="flex justify-between font-semibold text-amber-900"><span>Rasio Food Cost</span><span id="pnl-cogs-ratio">40.8% dari Omzet</span></div>
+            </div>
+          </div>
+
+          <!-- 3. LABA KOTOR -->
+          <div class="p-3 bg-emerald-50 rounded-lg border border-emerald-200 flex justify-between font-extrabold text-emerald-900 text-sm">
+            <span>3. LABA KOTOR (GROSS PROFIT)</span>
+            <span id="pnl-gross-profit">Rp 47.851.294 (59.2%)</span>
+          </div>
+
+          <!-- 4. BEBAN OPERASIONAL -->
+          <div>
+            <div class="flex justify-between font-extrabold text-slate-900 border-b border-slate-300 pb-1.5 text-sm">
+              <span>4. BEBAN OPERASIONAL & BIAYA TETAP (OPEX)</span>
+              <span class="text-rose-800">Rp 29.294.533</span>
+            </div>
+            <div class="pl-4 pt-2 space-y-1.5 text-slate-600">
+              <div class="flex justify-between"><span>Gaji 10 Staf Karyawan (Alokasi 28 Hari)</span><span>Rp 17.266.667</span></div>
+              <div class="flex justify-between"><span>Gaji Manajemen (Owner 5jt + Co-owner 3jt, 28 Hari)</span><span>Rp 7.466.667</span></div>
+              <div class="flex justify-between"><span>Utilitas (Listrik & Air, 28 Hari)</span><span>Rp 1.400.000</span></div>
+              <div class="flex justify-between"><span>Gas Elpiji Dapur (87 Tabung)</span><span>Rp 2.088.000</span></div>
+              <div class="flex justify-between"><span>Air Galon Minum & Dapur (116 Galon)</span><span>Rp 464.000</span></div>
+              <div class="flex justify-between"><span>Plastik, Kemasan, Tisu & Perlengkapan</span><span>Rp 609.200</span></div>
+            </div>
+          </div>
+
+          <!-- 5. LABA BERSIH -->
+          <div class="p-4 bg-indigo-50 rounded-xl border border-indigo-200 flex justify-between font-extrabold text-indigo-950 text-base">
+            <div>
+              <span>5. LABA BERSIH OPERASIONAL (NET PROFIT)</span>
+              <p class="text-[10px] text-indigo-600 font-normal mt-0.5">Keuntungan bersih setelah seluruh gaji manajemen, staf, dan pengeluaran</p>
+            </div>
+            <span id="pnl-net-profit" class="text-right">Rp 21.717.961<br><span class="text-xs text-emerald-700 font-bold">Margin Bersih: 26.9%</span></span>
+          </div>
+        </div>
+
+        <!-- TABEL RINCIAN P&L HARIAN -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-slate-800 text-sm">Rekapitulasi Laba Rugi Harian (28 Hari)</h3>
+            <input type="text" id="searchPnlTable" onkeyup="filterPnlTable()" placeholder="Cari tanggal..." class="px-3 py-1.5 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-orange-500">
+          </div>
+          <div class="overflow-x-auto max-h-80 rounded-xl border border-slate-200">
+            <table class="w-full text-left border-collapse text-xs" id="pnlTable">
+              <thead class="bg-slate-100 text-slate-700 font-bold sticky top-0 border-b border-slate-200">
+                <tr>
+                  <th class="py-2.5 px-4">Tanggal</th>
+                  <th class="py-2.5 px-4 text-emerald-700">Estimasi Omzet</th>
+                  <th class="py-2.5 px-4 text-amber-700">HPP Bahan Baku</th>
+                  <th class="py-2.5 px-4 text-slate-800">Laba Kotor</th>
+                  <th class="py-2.5 px-4 text-rose-700">Beban Tetap Harian</th>
+                  <th class="py-2.5 px-4 text-indigo-800 font-bold">Laba Bersih</th>
+                  <th class="py-2.5 px-4">Margin %</th>
+                </tr>
+              </thead>
+              <tbody id="pnl-table-body" class="divide-y divide-slate-100 bg-white">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- TAB 3: BELANJA & PENGELUARAN (PROCUREMENT) -->
+    <!-- ============================================================== -->
+    <div id="tab-purchasing" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200 card-shadow p-6 sm:p-8 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
+          <div>
+            <h2 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+              <i data-lucide="shopping-bag" class="w-5 h-5 text-indigo-600"></i> Rekapitulasi Belanja Harian & Belanja Operasional Lainnya
+            </h2>
+            <p class="text-xs text-slate-500">Arus kas keluar: Pasar dapur, minuman, serta operasional non-bahan (Gas, Galon, Tisu, Nota, Plastik)</p>
+          </div>
+          <span class="px-3 py-1 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-lg border border-indigo-200">
+            Total Belanja 28 Hari: Rp 33.152.297
+          </span>
+        </div>
+
+        <!-- 4 CARDS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Total Belanja Masuk</span>
+            <h4 class="text-lg font-bold text-slate-900 mt-1">Rp 33.152.297</h4>
+            <span class="text-[10px] text-slate-400">Rata-rata Rp 1.184.010 / hari</span>
+          </div>
+          <div class="p-4 rounded-xl bg-amber-50 border border-amber-200">
+            <span class="text-[11px] font-semibold text-amber-700 uppercase tracking-wider block">1. Belanja Pasar Dapur</span>
+            <h4 class="text-lg font-bold text-amber-900 mt-1">Rp 26.038.717</h4>
+            <span class="text-[10px] text-amber-600 font-medium">78.5% • Beras, Bebek, Ayam, Sayur, Bumbu</span>
+          </div>
+          <div class="p-4 rounded-xl bg-blue-50 border border-blue-200">
+            <span class="text-[11px] font-semibold text-blue-700 uppercase tracking-wider block">2. Belanja Bahan Minuman</span>
+            <h4 class="text-lg font-bold text-blue-900 mt-1">Rp 3.952.380</h4>
+            <span class="text-[10px] text-blue-600 font-medium">11.9% • Es Batu, Kopi, Susu, Good Day, Sirup</span>
+          </div>
+          <div class="p-4 rounded-xl bg-rose-50 border border-rose-200">
+            <span class="text-[11px] font-semibold text-rose-700 uppercase tracking-wider block">3. Belanja Ops & Perlengkapan</span>
+            <h4 class="text-lg font-bold text-rose-900 mt-1">Rp 3.161.200</h4>
+            <span class="text-[10px] text-rose-600 font-medium">9.5% • Gas Elpiji, Air Galon, Tisu, Nota, Plastik</span>
+          </div>
+        </div>
+
+        <!-- CHARTS -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 bg-slate-50 p-5 rounded-xl border border-slate-200">
+            <h3 class="font-bold text-slate-800 text-sm mb-1 flex items-center gap-1.5">
+              <i data-lucide="trending-up" class="w-4 h-4 text-indigo-600"></i> Top 10 Pengeluaran Belanja Terbesar
+            </h3>
+            <p class="text-[11px] text-slate-500 mb-3">Item yang menyerap anggaran belanja paling dominan selama periode pembukuan</p>
+            <div class="relative h-72 w-full">
+              <canvas id="topSpendingChart"></canvas>
+            </div>
+          </div>
+          <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between">
+            <div>
+              <h3 class="font-bold text-slate-800 text-sm mb-1 flex items-center gap-1.5">
+                <i data-lucide="pie-chart" class="w-4 h-4 text-indigo-600"></i> Proporsi Alokasi Belanja
+              </h3>
+              <p class="text-[11px] text-slate-500 mb-2">Persentase pengeluaran dapur vs ops</p>
+              <div class="relative h-48 w-full flex items-center justify-center">
+                <canvas id="purchasingDonutChart"></canvas>
+              </div>
+            </div>
+            <div class="pt-3 border-t border-slate-200 text-[11px] space-y-1 text-slate-600">
+              <div class="flex justify-between"><span>Pasar Dapur:</span><b class="text-amber-800">Rp 26.038.717 (78.5%)</b></div>
+              <div class="flex justify-between"><span>Bahan Minuman:</span><b class="text-blue-800">Rp 3.952.380 (11.9%)</b></div>
+              <div class="flex justify-between"><span>Ops (Gas/Galon/Tisu/Nota):</span><b class="text-rose-800">Rp 3.161.200 (9.5%)</b></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TABEL LOG BELANJA DENGAN TOMBOL LIHAT NOTA -->
+        <div class="overflow-hidden rounded-xl border border-slate-200">
+          <div class="p-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+                <i data-lucide="clipboard" class="w-4 h-4 text-indigo-600"></i> Tabel Log Belanja Harian Masuk (28 Hari)
+              </h3>
+              <p class="text-[11px] text-slate-500">Klik tombol "Lihat Nota/Item" untuk melihat detail belanjaan per tanggal</p>
+            </div>
+            <input type="text" id="searchBelanja" onkeyup="filterBelanjaTable()" placeholder="Cari tanggal belanja..." class="px-3 py-1.5 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div class="overflow-x-auto max-h-80">
+            <table class="w-full text-left border-collapse text-xs" id="belanjaTable">
+              <thead class="bg-slate-100 text-slate-700 font-bold sticky top-0 border-b border-slate-200">
+                <tr>
+                  <th class="py-2.5 px-4">Tanggal</th>
+                  <th class="py-2.5 px-4 text-amber-800">Belanja Dapur</th>
+                  <th class="py-2.5 px-4 text-blue-800">Belanja Minuman</th>
+                  <th class="py-2.5 px-4 text-rose-800">Ops Non-Bahan</th>
+                  <th class="py-2.5 px-4 text-indigo-950 font-extrabold">Total Belanja Masuk</th>
+                  <th class="py-2.5 px-4 text-center">Jumlah Item</th>
+                  <th class="py-2.5 px-4 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="belanja-table-body" class="divide-y divide-slate-100 bg-white">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- TAB 4: MENU ENGINEERING & PENJUALAN -->
+    <!-- ============================================================== -->
+    <div id="tab-menu" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200 card-shadow p-6 sm:p-8 space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+          <div class="flex items-center gap-2">
+            <span class="p-2 rounded-xl bg-orange-100 text-orange-600">
+              <i data-lucide="flame" class="w-5 h-5"></i>
+            </span>
+            <div>
+              <h2 class="text-xl font-extrabold text-slate-900">Analisis Menu Paling Laris & Menu Engineering</h2>
+              <p class="text-xs text-slate-500">Matriks Kasavana & Smith (Stars, Workhorses, Puzzles) berdasarkan konsumsi riil dapur Warung Ndelik</p>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 text-xs">
+            <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">⭐️ Star (Laba Besar & Laris)</span>
+            <span class="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 font-bold">🐎 Workhorse (Penarik Volume)</span>
+            <span class="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 font-bold">🧩 Puzzle (Potensi Tertidur)</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 bg-slate-50 p-5 rounded-xl border border-slate-200">
+            <h3 class="font-bold text-slate-800 text-sm mb-1 flex items-center gap-1.5">
+              <i data-lucide="bar-chart-2" class="w-4 h-4 text-orange-600"></i> Top 8 Menu: Jumlah Porsi vs Kontribusi Omzet
+            </h3>
+            <p class="text-[11px] text-slate-500 mb-3">Perbandingan volume penjualan terhadap pendapatan</p>
+            <div class="relative h-72 w-full">
+              <canvas id="menuRankingChart"></canvas>
+            </div>
+          </div>
+          <div class="bg-gradient-to-br from-orange-50 via-amber-50 to-white p-5 rounded-xl border border-orange-200 flex flex-col justify-between">
+            <div>
+              <h3 class="font-bold text-orange-950 text-sm flex items-center gap-1.5 mb-3">
+                <i data-lucide="sparkles" class="w-4 h-4 text-orange-600"></i> Rekomendasi Cerdas AI Employee
+              </h3>
+              <div class="space-y-3 text-xs text-slate-700">
+                <div class="p-3 bg-white rounded-lg border border-orange-100 shadow-sm">
+                  <b class="text-orange-700 block mb-0.5">1. Bundling Ayam Penyet + Es Teh Jumbo</b>
+                  <span>Ayam Penyet terjual 444 porsi (#1). Jadikan menu wajib bundling dengan Es Teh Jumbo (margin 70%) untuk mengerek keuntungan kasir.</span>
+                </div>
+                <div class="p-3 bg-white rounded-lg border border-orange-100 shadow-sm">
+                  <b class="text-emerald-700 block mb-0.5">2. Jadikan Bebek Bumbu Hitam Hero Medsos</b>
+                  <span>Bebek Bumbu Hitam menyumbang Rp 4 juta omzet dengan margin 46%. AI Marketing siap buat video proses masak bumbu hitam untuk Reels/TikTok.</span>
+                </div>
+                <div class="p-3 bg-white rounded-lg border border-orange-100 shadow-sm">
+                  <b class="text-amber-700 block mb-0.5">3. Naikkan Pamor Garang Asem & Babat</b>
+                  <span>Garang Asem & Babat Gongso punya margin 50-52% tapi baru terjual 65-90 porsi. Rekomendasikan ke kasir untuk ditawarkan di jam makan malam.</span>
+                </div>
+              </div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-orange-200/60 text-[11px] text-orange-800 font-medium flex items-center justify-between">
+              <span>Sinkronisasi otomatis dengan AI Marketing & Riset</span>
+              <i data-lucide="check-circle" class="w-3.5 h-3.5 text-orange-600"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-xl border border-slate-200">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+              <tr>
+                <th class="py-3 px-4 w-12 text-center">Rank</th>
+                <th class="py-3 px-4">Nama Menu</th>
+                <th class="py-3 px-4">Kategori</th>
+                <th class="py-3 px-4 text-center">Porsi Terjual</th>
+                <th class="py-3 px-4">Harga Jual</th>
+                <th class="py-3 px-4 text-emerald-700">Total Omzet</th>
+                <th class="py-3 px-4 text-indigo-700">Laba Kotor</th>
+                <th class="py-3 px-4 text-center">Margin %</th>
+                <th class="py-3 px-4">Klasifikasi Matrix & Aksi AI</th>
+              </tr>
+            </thead>
+            <tbody id="top-menu-table-body" class="divide-y divide-slate-100 text-slate-700 bg-white">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- TAB 5: KARTU STOK & INVENTORI GUDANG -->
+    <!-- ============================================================== -->
+    <div id="tab-inventory" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200 card-shadow p-6 sm:p-8 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
+          <div>
+            <h2 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+              <i data-lucide="boxes" class="w-5 h-5 text-indigo-600"></i> Kartu Stok & Valuasi Inventori Gudang
+            </h2>
+            <p class="text-xs text-slate-500">Monitoring 99 item bahan baku dapur & minuman lengkap dengan harga satuan dan valuasi aset</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="filterInventoryCategory('All')" class="px-3 py-1 bg-slate-100 text-slate-700 font-bold text-xs rounded-lg hover:bg-slate-200">Semua</button>
+            <button onclick="filterInventoryCategory('Bahan Dapur')" class="px-3 py-1 bg-amber-50 text-amber-700 font-bold text-xs rounded-lg border border-amber-200 hover:bg-amber-100">Bahan Dapur (74)</button>
+            <button onclick="filterInventoryCategory('Minuman & Ops')" class="px-3 py-1 bg-blue-50 text-blue-700 font-bold text-xs rounded-lg border border-blue-200 hover:bg-blue-100">Minuman & Ops (25)</button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto max-h-96 rounded-xl border border-slate-200">
+          <table class="w-full text-left border-collapse text-xs" id="inventoryTable">
+            <thead class="bg-slate-100 text-slate-700 font-bold sticky top-0 border-b border-slate-200">
+              <tr>
+                <th class="py-2.5 px-4 w-12 text-center">No</th>
+                <th class="py-2.5 px-4">Nama Item</th>
+                <th class="py-2.5 px-4">Kategori</th>
+                <th class="py-2.5 px-4 text-center">Satuan</th>
+                <th class="py-2.5 px-4 text-right">Stok Awal</th>
+                <th class="py-2.5 px-4 text-right">Masuk</th>
+                <th class="py-2.5 px-4 text-right">Total Tersedia</th>
+                <th class="py-2.5 px-4 text-right">Harga Satuan</th>
+                <th class="py-2.5 px-4 text-right font-bold text-slate-900">Sisa Stok</th>
+                <th class="py-2.5 px-4 text-right font-bold text-emerald-700">Valuasi Sisa (Rp)</th>
+                <th class="py-2.5 px-4 text-center">Status</th>
+              </tr>
+            </thead>
+            <tbody id="inventory-table-body" class="divide-y divide-slate-100 bg-white">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- TAB 6: SDM & PAYROLL LEDGER -->
+    <!-- ============================================================== -->
+    <div id="tab-hr" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200 card-shadow p-6 sm:p-8 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
+          <div>
+            <h2 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+              <i data-lucide="users" class="w-5 h-5 text-orange-600"></i> Manajemen SDM & Payroll Ledger (12 Personil)
+            </h2>
+            <p class="text-xs text-slate-500">Struktur gaji tetap manajemen dan staf operasional Warung Ndelik Mranggen</p>
+          </div>
+          <span class="px-3 py-1 bg-orange-50 text-orange-700 text-xs font-bold rounded-lg border border-orange-200">
+            Total Anggaran Payroll: Rp 26.500.000 / bulan
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 bg-slate-50 p-5 rounded-xl border border-slate-200">
+            <h3 class="font-bold text-slate-800 text-sm mb-1">Roster Gaji Personalia (12 Orang)</h3>
+            <p class="text-[11px] text-slate-500 mb-3">Owner (5jt), Co-owner (3jt), dan 10 Staf Operasional (18,5jt)</p>
+            <div class="relative h-64 w-full">
+              <canvas id="rosterChart"></canvas>
+            </div>
+          </div>
+          <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 flex flex-col justify-between">
+            <div>
+              <h3 class="font-bold text-slate-800 text-sm mb-2">Ringkasan Beban SDM</h3>
+              <div class="space-y-2.5 text-xs text-slate-600">
+                <div class="p-3 bg-white rounded-lg border border-slate-200 flex justify-between items-center">
+                  <span>Subtotal Manajemen (2 Org):</span>
+                  <b class="text-orange-700 font-extrabold">Rp 8.000.000</b>
+                </div>
+                <div class="p-3 bg-white rounded-lg border border-slate-200 flex justify-between items-center">
+                  <span>Subtotal Staf (10 Org):</span>
+                  <b class="text-blue-700 font-extrabold">Rp 18.500.000</b>
+                </div>
+                <div class="p-3 bg-white rounded-lg border border-slate-200 flex justify-between items-center">
+                  <span>Alokasi Beban Harian:</span>
+                  <b class="text-slate-800 font-extrabold">Rp 883.333 / hari</b>
+                </div>
+              </div>
+            </div>
+            <div class="pt-3 border-t border-slate-200 text-[11px] text-slate-500">
+              *Hak akses data gaji privat dibatasi hanya untuk Owner & Co-owner.
+            </div>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-xl border border-slate-200">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+              <tr>
+                <th class="py-3 px-4">Nama Personil</th>
+                <th class="py-3 px-4">Peran / Jabatan</th>
+                <th class="py-3 px-4 text-right">Gaji Pokok (Bulan)</th>
+                <th class="py-3 px-4 text-right">Alokasi Harian (30 Hari)</th>
+                <th class="py-3 px-4 text-center">Status</th>
+                <th class="py-3 px-4 text-center">Slip Gaji Digital</th>
+              </tr>
+            </thead>
+            <tbody id="roster-table-body" class="divide-y divide-slate-100 bg-white">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- TAB 7: TIM RISET & AI ADVISORY -->
+    <!-- ============================================================== -->
+    <div id="tab-research" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200 card-shadow p-6 sm:p-8 space-y-6">
+        <div class="border-b border-slate-200 pb-4">
+          <h2 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+            <i data-lucide="search" class="w-5 h-5 text-indigo-600"></i> Intelijen Pasar, Pantauan Komoditas & Rekomendasi Riset AI
+          </h2>
+          <p class="text-xs text-slate-500">Hasil observasi otomatis tim riset terhadap fluktuasi bahan baku lokal, tren kuliner, dan kompetitor Mranggen</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+            <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+              <i data-lucide="tag" class="w-4 h-4 text-amber-600"></i> 1. Pantauan Harga Komoditas Pasar
+            </h3>
+            <div class="space-y-2 text-xs text-slate-700">
+              <div class="flex justify-between border-b border-slate-200 pb-1"><span>Cabai Rawit Merah</span><b>Rp 42.000 / kg (Stabil)</b></div>
+              <div class="flex justify-between border-b border-slate-200 pb-1"><span>Daging Ayam Broiler</span><b>Rp 34.000 / kg (Naik +3%)</b></div>
+              <div class="flex justify-between border-b border-slate-200 pb-1"><span>Minyak Goreng Sawit</span><b>Rp 16.500 / lt (Normal)</b></div>
+              <div class="flex justify-between border-b border-slate-200 pb-1"><span>Beras Super</span><b>Rp 83.000 / sak (Aman)</b></div>
+            </div>
+            <p class="text-[11px] text-amber-800 bg-amber-50 p-2.5 rounded-lg border border-amber-200">
+              💡 <b>Saran Pembelian:</b> Amankan stok ayam broiler untuk 3 hari ke depan sebelum lonjakan harga akhir pekan di pasar Mranggen.
+            </p>
+          </div>
+
+          <div class="p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+            <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+              <i data-lucide="flame" class="w-4 h-4 text-orange-600"></i> 2. Tren Kuliner Viral (TikTok / Reels)
+            </h3>
+            <div class="space-y-2 text-xs text-slate-700">
+              <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+                <b class="text-orange-600 block">Sambal Bakar Cobek Panas</b>
+                <span>Pencarian menu sambal bakar mendidih sedang tinggi di seputar Semarang Timur & Demak. Margin bahan baku di atas 55%.</span>
+              </div>
+              <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+                <b class="text-orange-600 block">Es Jeruk Jumbo Selasih</b>
+                <span>Minuman porsi jumbo dengan biaya HPP rendah (Rp 1.500) sangat laris di cuaca panas.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+            <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+              <i data-lucide="compass" class="w-4 h-4 text-blue-600"></i> 3. Radar Kompetitor Lokal Mranggen
+            </h3>
+            <div class="space-y-2 text-xs text-slate-700">
+              <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+                <b class="text-slate-800 block">Warung Sekitar Radius 5km:</b>
+                <span>Rata-rata paket ayam bakar/penyet dijual Rp 22.000 - Rp 25.000 tanpa minum. Paket komplit Warung Ndelik Rp 25.000 sudah dengan es teh jumbo sangat unggul.</span>
+              </div>
+            </div>
+            <p class="text-[11px] text-blue-800 bg-blue-50 p-2.5 rounded-lg border border-blue-200">
+              🎯 <b>Rekomendasi Strategi:</b> Pasang banner promo 'Makan Enak Kenyang Gratis Es Teh Jumbo' di depan resto untuk menarik pemotor jalur Mranggen-Semarang.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL DETAIL BELANJAAN PER TANGGAL -->
+  <div id="modal-belanja" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden">
+      <div class="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <div>
+          <h3 id="modal-title" class="font-bold text-slate-900 text-base">Rincian Nota Belanja Masuk</h3>
+          <p id="modal-subtitle" class="text-xs text-slate-500">Daftar item bahan dan perlengkapan yang dibeli</p>
+        </div>
+        <button onclick="closeModal()" class="w-8 h-8 rounded-lg bg-slate-200 text-slate-600 hover:bg-slate-300 flex items-center justify-center font-bold">
+          ✕
+        </button>
+      </div>
+      <div class="p-5 overflow-y-auto flex-1">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+            <tr>
+              <th class="py-2 px-3">Nama Barang</th>
+              <th class="py-2 px-3">Kategori</th>
+              <th class="py-2 px-3 text-right">Kuantitas</th>
+              <th class="py-2 px-3 text-right">Harga Satuan</th>
+              <th class="py-2 px-3 text-right font-bold text-slate-900">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody id="modal-items-body" class="divide-y divide-slate-100">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+      <div class="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
+        <span class="text-xs text-slate-500">Total Belanja Hari Ini:</span>
+        <span id="modal-total" class="text-base font-extrabold text-indigo-950">Rp 0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    let globalData = {};
+    let trendChartInstance = null;
+    let costChartInstance = null;
+    let rosterChartInstance = null;
+    let menuRankingChartInstance = null;
+    let topSpendingChartInstance = null;
+    let purchasingDonutChartInstance = null;
+
+    function formatRp(val) {
+      return 'Rp ' + Number(val || 0).toLocaleString('id-ID');
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('nav button').forEach(el => {
+        el.classList.remove('tab-active');
+        el.classList.add('hover:text-slate-800');
+      });
+
+      const selectedTab = document.getElementById('tab-' + tabId);
+      const selectedBtn = document.getElementById('tab-btn-' + tabId);
+
+      if (selectedTab) selectedTab.classList.remove('hidden');
+      if (selectedBtn) {
+        selectedBtn.classList.add('tab-active');
+        selectedBtn.classList.remove('hover:text-slate-800');
+      }
+
+      // Trigger re-render of charts if tab has charts
+      setTimeout(() => {
+        if (tabId === 'overview' && trendChartInstance) trendChartInstance.resize();
+        if (tabId === 'menu' && menuRankingChartInstance) menuRankingChartInstance.resize();
+        if (tabId === 'purchasing' && topSpendingChartInstance) topSpendingChartInstance.resize();
+        if (tabId === 'hr' && rosterChartInstance) rosterChartInstance.resize();
+      }, 50);
+    }
+
+    async function fetchData() {
+      try {
+        const res = await fetch('/api/dashboard/data');
+        globalData = await res.json();
+        renderAll(globalData);
+      } catch (err) {
+        console.error("Gagal mengambil data:", err);
+      }
+    }
+
+    function renderAll(data) {
+      const kpi = data.kpi || {};
+      const charts = data.charts || {};
+      const roster = data.roster || [];
+      const records = data.daily_records || [];
+      const topMenus = data.top_menus || [];
+      const purchasing = data.purchasing || {};
+      const inventory = data.inventory || {};
+      const income = data.income_statement || {};
+
+      // 1. Hero & Overview KPIs
+      document.getElementById('hero-period').innerText = data.business.period || '26.08.26 s/d 24.09.26';
+      document.getElementById('hero-total-omzet').innerText = formatRp(kpi.total_omzet_period);
+      document.getElementById('hero-avg-omzet').innerText = 'Rata-rata: ' + formatRp(kpi.avg_daily_omzet) + ' / hari';
+      document.getElementById('hero-fixed-cost').innerText = formatRp(kpi.monthly_fixed_cost);
+      document.getElementById('hero-net-profit').innerText = formatRp(kpi.total_net_profit);
+      document.getElementById('hero-margin').innerText = 'Margin: ' + kpi.avg_margin_percent + '% Bersih';
+
+      document.getElementById('ov-omzet').innerText = formatRp(kpi.avg_daily_omzet);
+      document.getElementById('ov-hpp').innerText = formatRp(kpi.avg_daily_hpp);
+      document.getElementById('ov-fixed').innerText = formatRp(kpi.daily_fixed_cost);
+      document.getElementById('ov-profit').innerText = formatRp(kpi.avg_daily_profit);
+      document.getElementById('ov-purchase').innerText = formatRp(purchasing.avg_daily_purchase);
+      document.getElementById('ov-stockval').innerText = formatRp(kpi.total_inventory_value);
+
+      // 2. Income Statement (P&L Tab)
+      if (income.revenue) {
+        document.getElementById('pnl-rev-total').innerText = formatRp(income.revenue.total_revenue);
+        document.getElementById('pnl-rev-food').innerText = formatRp(income.revenue.gross_food_sales);
+        document.getElementById('pnl-rev-drink').innerText = formatRp(income.revenue.gross_beverage_sales);
+        document.getElementById('pnl-cogs-total').innerText = formatRp(income.cogs.total_cogs);
+        document.getElementById('pnl-cogs-ratio').innerText = income.cogs.cogs_percentage + '% dari Omzet';
+        document.getElementById('pnl-gross-profit').innerText = formatRp(income.gross_profit) + ' (' + (100 - income.cogs.cogs_percentage).toFixed(1) + '%)';
+        document.getElementById('pnl-net-profit').innerHTML = formatRp(income.net_profit) + '<br><span class="text-xs text-emerald-700 font-bold">Margin Bersih: ' + income.net_margin_percent + '%</span>';
+      }
+
+      // Populate PnL Table
+      const pnlTbody = document.getElementById('pnl-table-body');
+      pnlTbody.innerHTML = '';
+      records.forEach(r => {
+        pnlTbody.innerHTML += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="py-2.5 px-4 font-bold text-slate-900">${r.tanggal}</td>
+            <td class="py-2.5 px-4 font-medium text-emerald-700">${formatRp(r.estimasi_omzet)}</td>
+            <td class="py-2.5 px-4 font-medium text-amber-700">${formatRp(r.pemakaian_hpp)}</td>
+            <td class="py-2.5 px-4 font-medium">${formatRp(r.laba_kotor)}</td>
+            <td class="py-2.5 px-4 text-slate-500">${formatRp(r.beban_tetap)}</td>
+            <td class="py-2.5 px-4 font-bold text-indigo-700">${formatRp(r.laba_bersih)}</td>
+            <td class="py-2.5 px-4 font-semibold">${r.margin_persen}%</td>
+          </tr>
+        `;
+      });
+
+      // 3. Purchasing Tab
+      const belanjaTbody = document.getElementById('belanja-table-body');
+      belanjaTbody.innerHTML = '';
+      const dailyPurchases = purchasing.daily_purchases || [];
+      dailyPurchases.forEach((dp, idx) => {
+        belanjaTbody.innerHTML += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="py-2.5 px-4 font-bold text-slate-900">${dp.tanggal}</td>
+            <td class="py-2.5 px-4 font-medium text-amber-800">${formatRp(dp.belanja_dapur)}</td>
+            <td class="py-2.5 px-4 font-medium text-blue-800">${formatRp(dp.belanja_minuman)}</td>
+            <td class="py-2.5 px-4 font-medium text-rose-800">${formatRp(dp.belanja_operasional)}</td>
+            <td class="py-2.5 px-4 font-extrabold text-indigo-950">${formatRp(dp.total_belanja)}</td>
+            <td class="py-2.5 px-4 text-center font-semibold text-slate-700">${dp.items_count} item</td>
+            <td class="py-2.5 px-4 text-center">
+              <button onclick="openModal(${idx})" class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded text-[11px] font-bold transition">
+                📄 Rincian Nota
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      // 4. Top Menus Tab
+      const topMenuTbody = document.getElementById('top-menu-table-body');
+      topMenuTbody.innerHTML = '';
+      topMenus.forEach(m => {
+        let badgeClass = 'bg-slate-100 text-slate-700';
+        let badgeIcon = '📋';
+        if (m.badge_type === 'star') {
+          badgeClass = 'bg-emerald-100 text-emerald-800 border border-emerald-200';
+          badgeIcon = '⭐️';
+        } else if (m.badge_type === 'workhorse') {
+          badgeClass = 'bg-blue-100 text-blue-800 border border-blue-200';
+          badgeIcon = '🐎';
+        } else if (m.badge_type === 'puzzle') {
+          badgeClass = 'bg-amber-100 text-amber-800 border border-amber-200';
+          badgeIcon = '🧩';
+        }
+
+        topMenuTbody.innerHTML += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="py-3 px-4 text-center font-bold text-slate-800">#${m.rank}</td>
+            <td class="py-3 px-4">
+              <span class="font-bold text-slate-900 block">${m.name}</span>
+              <span class="text-[11px] text-slate-400">${m.category}</span>
+            </td>
+            <td class="py-3 px-4 text-slate-600">${m.category}</td>
+            <td class="py-3 px-4 text-center font-extrabold text-orange-600 text-sm">${m.sold_qty} <span class="text-[10px] text-slate-400 font-normal">porsi</span></td>
+            <td class="py-3 px-4 font-medium">${formatRp(m.price)}</td>
+            <td class="py-3 px-4 font-bold text-emerald-700">${formatRp(m.revenue)}</td>
+            <td class="py-3 px-4 font-bold text-indigo-700">${formatRp(m.gross_profit)}</td>
+            <td class="py-3 px-4 text-center font-bold text-slate-800">${m.margin_percent}%</td>
+            <td class="py-3 px-4 max-w-xs">
+              <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${badgeClass} mb-1">
+                ${badgeIcon} ${m.classification}
+              </span>
+              <p class="text-[11px] text-slate-600 leading-snug">${m.ai_strategy}</p>
+            </td>
+          </tr>
+        `;
+      });
+
+      // 5. Inventory Tab Table
+      renderInventoryTable(inventory.items || []);
+
+      // 6. HR Roster Table
+      const rosterTbody = document.getElementById('roster-table-body');
+      rosterTbody.innerHTML = '';
+      roster.forEach((p, idx) => {
+        const isMgt = (p.name === 'Owner' || p.name === 'Co-owner');
+        const badgeColor = isMgt ? 'bg-orange-100 text-orange-800 border-orange-200' : 'bg-slate-100 text-slate-700 border-slate-200';
+        rosterTbody.innerHTML += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="py-3 px-4 font-bold text-slate-900">${p.name}</td>
+            <td class="py-3 px-4">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border ${badgeColor}">${p.role}</span>
+            </td>
+            <td class="py-3 px-4 text-right font-extrabold text-slate-900">${formatRp(p.base_salary)}</td>
+            <td class="py-3 px-4 text-right text-slate-500">${formatRp(Math.round(p.base_salary / 30))} / hari</td>
+            <td class="py-3 px-4 text-center">
+              <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[10px] font-bold">Aktif Penuh</span>
+            </td>
+            <td class="py-3 px-4 text-center">
+              <button onclick="alert('Slip Gaji Digital: ' + '${p.name}' + '\nPeriode: September 2026\nGaji Pokok: ' + formatRp(${p.base_salary}) + '\nStatus: Draf Terverifikasi')" class="text-orange-600 hover:text-orange-800 font-bold text-[11px]">
+                📄 Cetak Slip
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      // 7. Initialize Charts
+      renderCharts(charts);
+
+      // Re-trigger lucide icons
+      lucide.createIcons();
+    }
+
+    function renderInventoryTable(items) {
+      const invTbody = document.getElementById('inventory-table-body');
+      invTbody.innerHTML = '';
+      items.forEach((it, idx) => {
+        let badgeColor = 'bg-emerald-50 text-emerald-700';
+        if (it.status === 'Kritis') badgeColor = 'bg-rose-50 text-rose-700 border-rose-200';
+        else if (it.status === 'Perlu Restock') badgeColor = 'bg-amber-50 text-amber-700 border-amber-200';
+
+        invTbody.innerHTML += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="py-2 px-4 text-center text-slate-400">${idx + 1}</td>
+            <td class="py-2 px-4 font-bold text-slate-900">${it.name}</td>
+            <td class="py-2 px-4 text-slate-500">${it.category}</td>
+            <td class="py-2 px-4 text-center font-medium">${it.satuan}</td>
+            <td class="py-2 px-4 text-right">${it.stock_awal}</td>
+            <td class="py-2 px-4 text-right font-medium text-blue-600">+${it.masuk}</td>
+            <td class="py-2 px-4 text-right">${it.total_tersedia}</td>
+            <td class="py-2 px-4 text-right font-medium">${formatRp(it.harga_satuan)}</td>
+            <td class="py-2 px-4 text-right font-extrabold text-slate-900">${it.stock_akhir}</td>
+            <td class="py-2 px-4 text-right font-extrabold text-emerald-700">${formatRp(it.total_value)}</td>
+            <td class="py-2 px-4 text-center">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${badgeColor}">${it.status}</span>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function filterInventoryCategory(cat) {
+      const items = globalData.inventory ? globalData.inventory.items : [];
+      if (cat === 'All') {
+        renderInventoryTable(items);
+      } else {
+        renderInventoryTable(items.filter(i => i.category === cat));
+      }
+    }
+
+    function renderCharts(charts) {
+      // 1. Trend Line Chart
+      const ctxTrend = document.getElementById('trendChart').getContext('2d');
+      if (trendChartInstance) trendChartInstance.destroy();
+      trendChartInstance = new Chart(ctxTrend, {
+        type: 'line',
+        data: {
+          labels: charts.daily_dates,
+          datasets: [
+            {
+              label: 'Estimasi Omzet (Rp)',
+              data: charts.daily_omzet,
+              borderColor: '#10b981',
+              backgroundColor: 'rgba(16, 185, 129, 0.08)',
+              borderWidth: 2,
+              tension: 0.3,
+              fill: true
+            },
+            {
+              label: 'HPP Bahan Baku (Rp)',
+              data: charts.daily_hpp,
+              borderColor: '#f59e0b',
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              borderDash: [4, 4],
+              tension: 0.3
+            },
+            {
+              label: 'Laba Bersih (Rp)',
+              data: charts.daily_net_profit,
+              borderColor: '#6366f1',
+              backgroundColor: 'rgba(99, 102, 241, 0.1)',
+              borderWidth: 2.5,
+              tension: 0.3,
+              fill: true
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'top', labels: { font: { family: 'Plus Jakarta Sans', size: 11 } } },
+            tooltip: { callbacks: { label: function(c) { return c.dataset.label + ': ' + formatRp(c.raw); } } }
+          },
+          scales: {
+            y: { ticks: { callback: function(val) { return 'Rp ' + (val/1000000).toFixed(1) + ' jt'; } } }
+          }
+        }
+      });
+
+      // 2. Cost Breakdown Donut
+      const ctxCost = document.getElementById('costChart').getContext('2d');
+      if (costChartInstance) costChartInstance.destroy();
+      costChartInstance = new Chart(ctxCost, {
+        type: 'doughnut',
+        data: {
+          labels: charts.cost_breakdown.labels,
+          datasets: [{
+            data: charts.cost_breakdown.values,
+            backgroundColor: ['#3b82f6', '#ea580c', '#f59e0b', '#10b981', '#f43f5e'],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9 } } },
+            tooltip: { callbacks: { label: function(c) { return c.label + ': ' + formatRp(c.raw); } } }
+          }
+        }
+      });
+
+      // 3. Top Spending Horizontal Bar
+      if (charts.top_spending) {
+        const ctxTopSpend = document.getElementById('topSpendingChart').getContext('2d');
+        if (topSpendingChartInstance) topSpendingChartInstance.destroy();
+        topSpendingChartInstance = new Chart(ctxTopSpend, {
+          type: 'bar',
+          data: {
+            labels: charts.top_spending.names,
+            datasets: [{
+              label: 'Total Pengeluaran (Rp)',
+              data: charts.top_spending.values,
+              backgroundColor: '#6366f1',
+              borderRadius: 5
+            }]
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: { callbacks: { label: function(c) { return 'Total: ' + formatRp(c.raw); } } }
+            },
+            scales: {
+              x: { ticks: { callback: function(val) { return 'Rp ' + (val/1000000).toFixed(1) + ' jt'; } } },
+              y: { ticks: { font: { size: 10, weight: 'bold' } } }
+            }
+          }
+        });
+      }
+
+      // 4. Purchasing Donut
+      if (charts.purchasing_breakdown) {
+        const ctxPDonut = document.getElementById('purchasingDonutChart').getContext('2d');
+        if (purchasingDonutChartInstance) purchasingDonutChartInstance.destroy();
+        purchasingDonutChartInstance = new Chart(ctxPDonut, {
+          type: 'doughnut',
+          data: {
+            labels: charts.purchasing_breakdown.labels,
+            datasets: [{
+              data: charts.purchasing_breakdown.values,
+              backgroundColor: ['#f59e0b', '#3b82f6', '#f43f5e'],
+              borderWidth: 2,
+              borderColor: '#ffffff'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9 } } },
+              tooltip: { callbacks: { label: function(c) { return c.label + ': ' + formatRp(c.raw); } } }
+            }
+          }
+        });
+      }
+
+      // 5. Menu Ranking Chart
+      if (charts.menu_ranking) {
+        const ctxMenu = document.getElementById('menuRankingChart').getContext('2d');
+        if (menuRankingChartInstance) menuRankingChartInstance.destroy();
+        menuRankingChartInstance = new Chart(ctxMenu, {
+          type: 'bar',
+          data: {
+            labels: charts.menu_ranking.names,
+            datasets: [{
+              label: 'Porsi Terjual',
+              data: charts.menu_ranking.quantities,
+              backgroundColor: '#ea580c',
+              borderRadius: 5
+            }]
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'top', labels: { font: { size: 11 } } },
+              tooltip: {
+                callbacks: {
+                  label: function(c) {
+                    const rev = charts.menu_ranking.revenues[c.dataIndex];
+                    return `Porsi: ${c.raw} | Omzet: ${formatRp(rev)}`;
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // 6. Roster Bar Chart
+      if (charts.personnel) {
+        const ctxRoster = document.getElementById('rosterChart').getContext('2d');
+        if (rosterChartInstance) rosterChartInstance.destroy();
+        rosterChartInstance = new Chart(ctxRoster, {
+          type: 'bar',
+          data: {
+            labels: charts.personnel.labels,
+            datasets: [{
+              label: 'Gaji Pokok (Rp)',
+              data: charts.personnel.salaries,
+              backgroundColor: charts.personnel.labels.map(l => (l === 'Owner' || l === 'Co-owner') ? '#ea580c' : '#3b82f6'),
+              borderRadius: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: { callbacks: { label: function(c) { return formatRp(c.raw); } } }
+            },
+            scales: {
+              y: { ticks: { callback: function(val) { return 'Rp ' + (val/1000000).toFixed(1) + ' jt'; } } }
+            }
+          }
+        });
+      }
+    }
+
+    // Modal Details Logic
+    function openModal(index) {
+      const purchasing = globalData.purchasing || {};
+      const day = purchasing.daily_purchases[index];
+      if (!day) return;
+
+      document.getElementById('modal-title').innerText = `Rincian Nota Belanja (${day.tanggal})`;
+      document.getElementById('modal-subtitle').innerText = `Total ${day.items_count} item belanja masuk`;
+      document.getElementById('modal-total').innerText = formatRp(day.total_belanja);
+
+      const tbody = document.getElementById('modal-items-body');
+      tbody.innerHTML = '';
+      (day.details || []).forEach(it => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="py-2 px-3 font-bold text-slate-800">${it.item}</td>
+            <td class="py-2 px-3 text-slate-500">${it.kategori}</td>
+            <td class="py-2 px-3 text-right font-medium">${it.qty}</td>
+            <td class="py-2 px-3 text-right text-slate-600">${formatRp(it.harga)}</td>
+            <td class="py-2 px-3 text-right font-bold text-indigo-950">${formatRp(it.subtotal)}</td>
+          </tr>
+        `;
+      });
+
+      document.getElementById('modal-belanja').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('modal-belanja').classList.add('hidden');
+    }
+
+    function exportFullDataCSV() {
+      const records = globalData.daily_records || [];
+      let csv = "Tanggal,Omzet,HPP_Bahan,Laba_Kotor,Beban_Tetap,Laba_Bersih,Margin_Persen\n";
+      records.forEach(r => {
+        csv += `${r.tanggal},${r.estimasi_omzet},${r.pemakaian_hpp},${r.laba_kotor},${r.beban_tetap},${r.laba_bersih},${r.margin_persen}\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.setAttribute('href', url);
+      a.setAttribute('download', 'Laporan_Keuangan_Warung_Ndelik.csv');
+      a.click();
+    }
+
+    function filterPnlTable() {
+      const input = document.getElementById("searchPnlTable").value.toUpperCase();
+      const trs = document.getElementById("pnl-table-body").getElementsByTagName("tr");
+      for (let i = 0; i < trs.length; i++) {
+        const td = trs[i].getElementsByTagName("td")[0];
+        if (td) {
+          const txt = td.textContent || td.innerText;
+          trs[i].style.display = txt.toUpperCase().indexOf(input) > -1 ? "" : "none";
+        }
+      }
+    }
+
+    function filterBelanjaTable() {
+      const input = document.getElementById("searchBelanja").value.toUpperCase();
+      const trs = document.getElementById("belanja-table-body").getElementsByTagName("tr");
+      for (let i = 0; i < trs.length; i++) {
+        const td = trs[i].getElementsByTagName("td")[0];
+        if (td) {
+          const txt = td.textContent || td.innerText;
+          trs[i].style.display = txt.toUpperCase().indexOf(input) > -1 ? "" : "none";
+        }
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchData();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

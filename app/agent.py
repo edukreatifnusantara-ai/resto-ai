@@ -32,6 +32,22 @@ from app.models import (
 
 logger = logging.getLogger(__name__)
 
+
+_EMOJI_OR_EMOTICON = re.compile(
+    "[\U0001F000-\U0001FAFF\U00002600-\U000027BF\U0000FE0F\U0000200D]"
+    r"|(?<!\w)(?::|;|=|8|x|X)[-^']?[)(DPpOo/\\\\]|(?<!\w)<3(?!\w)|(?<!\w)[xX][dD](?!\w)"
+)
+
+
+def _natural_customer_reply(text: str) -> str:
+    """Keep customer-facing AI replies conversational and free of emojis/emoticons."""
+    text = _EMOJI_OR_EMOTICON.sub("", text or "")
+    text = re.sub(r"[ \t]+\n", "\n", text)
+    text = re.sub(r"\s+([,.;!?])", r"\1", text)
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    return text.strip()
+
+
 # Conversation memory per sender phone (last 10 turns)
 _CONVERSATION_HISTORY: dict[str, deque[dict[str, str]]] = defaultdict(lambda: deque(maxlen=10))
 
@@ -360,13 +376,13 @@ def customer_create_order(
     if pay_method == "CASH":
         # Alert owner/cashier via WhatsApp
         owner_alert = (
-            f"🔔 *PESANAN BARU (BAYAR TUNAI / CASH)*\n"
-            f"• ID Pesanan: #{order.id}\n"
-            f"• Lokasi/Meja: {clean_table}\n"
-            f"• Pelanggan: {customer_phone}\n"
-            f"• Total Tagihan: Rp{float(order.total):,.0f}\n"
-            f"• Menu: {', '.join(it['name'] + ' x' + str(it['quantity']) for it in order_items)}\n"
-            f"Mohon tagih tunai di kasir dan konfirmasi dengan ketik: 'LUNAS {order.id}'"
+            "*PESANAN BARU — PEMBAYARAN TUNAI*\n"
+            f"ID Pesanan: #{order.id}\n"
+            f"Lokasi/Meja: {clean_table}\n"
+            f"Pelanggan: {customer_phone}\n"
+            f"Total tagihan: Rp{float(order.total):,.0f}\n"
+            f"Menu: {', '.join(it['name'] + ' x' + str(it['quantity']) for it in order_items)}\n"
+            f"Mohon konfirmasi setelah pembayaran tunai untuk Pesanan #{order.id} diterima."
         ).replace(",", ".")
         for op in os.getenv("OWNER_PHONE_NUMBERS", "").split(","):
             if op.strip():
@@ -453,22 +469,21 @@ def customer_check_order(db: Session, customer_phone: str, order_id: int) -> dic
 
 
 def customer_confirm_payment(db: Session, customer_phone: str, order_id: int) -> dict[str, Any]:
+    """Report the current payment state; customer chat cannot mark an order as paid."""
     order = db.query(Order).filter(Order.id == order_id, Order.customer_phone == customer_phone).first()
     if not order:
         return {"error": f"Pesanan #{order_id} tidak ditemukan."}
     if getattr(order, "payment_state", "") == PaymentStatus.SIMULATED_CONFIRMED:
-        return {"status": "already_paid", "message": f"Pesanan #{order_id} sudah terbayar sebelumnya dengan Nomor Antrean: {getattr(order, 'queue_number', '-')}"}
-
-    from app.database import assign_order_queue
-    setattr(order, "state", OrderStatus.PAID)
-    setattr(order, "payment_state", PaymentStatus.SIMULATED_CONFIRMED)
-    q_num = assign_order_queue(db, order)
-    db.commit()
+        return {
+            "status": "already_paid",
+            "message": f"Pesanan #{order_id} sudah lunas dan dapat diproses.",
+        }
     return {
-        "status": "success",
-        "order_id": order.id,
-        "queue_number": q_num,
-        "message": f"Pembayaran untuk Pesanan #{order_id} berhasil dikonfirmasi. Nomor Antrean Anda: {q_num}. Pesanan siap diproses dapur!",
+        "status": "pending_verification",
+        "message": (
+            f"Pembayaran Pesanan #{order_id} masih menunggu verifikasi. "
+            "Pesanan dan reservasi akan dilayani setelah pembayaran lunas terkonfirmasi."
+        ),
     }
 
 
@@ -526,8 +541,32 @@ def customer_create_reservation(
     reservation_time: str,
     guest_count: int = 2,
     notes: str = "",
+    payment_order_id: int | None = None,
 ) -> dict[str, Any]:
-    """Create table reservation and notify customer and owner."""
+    """Confirm a table reservation only after its linked order is paid in full."""
+    if not payment_order_id:
+        return {
+            "error": (
+                "Reservasi belum dapat dikonfirmasi karena pembayaran belum terhubung. "
+                "Silakan buat pesanan terlebih dahulu, lakukan pembayaran sampai lunas, "
+                "lalu kirim nomor pesanan yang sudah dibayar."
+            )
+        }
+
+    paid_order = db.query(Order).filter(
+        Order.id == int(payment_order_id),
+        Order.customer_phone == customer_phone,
+    ).first()
+    if not paid_order:
+        return {"error": "Pesanan pembayaran tidak ditemukan untuk nomor WhatsApp ini."}
+    if paid_order.payment_state != PaymentStatus.SIMULATED_CONFIRMED:
+        return {
+            "error": (
+                f"Reservasi belum dapat dikonfirmasi karena Pesanan #{paid_order.id} belum lunas. "
+                "Reservasi akan dilayani setelah pembayaran terverifikasi."
+            )
+        }
+
     from datetime import datetime, timedelta
     if not reservation_date:
         reservation_date = (datetime.utcnow() + timedelta(hours=7)).strftime("%Y-%m-%d")
@@ -558,6 +597,7 @@ def customer_create_reservation(
         reservation_time=reservation_time,
         status="CONFIRMED",
         notes=notes or "",
+        payment_order_id=paid_order.id,
     )
     db.add(resv)
     db.commit()
@@ -565,14 +605,15 @@ def customer_create_reservation(
 
     from app.midtrans import send_whatsapp_bridge_message
     owner_msg = (
-        f"🔔 *RESERVASI MEJA BARU DI WARUNG NDELIK*\n"
-        f"• Nama: {customer_name}\n"
-        f"• No HP: {customer_phone}\n"
-        f"• Meja: {matched_tbl_number} ({tbl.area}, Kapasitas {tbl.capacity} orang)\n"
-        f"• Tanggal: {reservation_date}\n"
-        f"• Jam: {reservation_time} WIB\n"
-        f"• Jumlah Tamu: {guest_count} orang\n"
-        f"• Catatan: {notes or '-'}"
+        "*RESERVASI MEJA DIKONFIRMASI*\n"
+        f"Nama: {customer_name}\n"
+        f"No. WhatsApp: {customer_phone}\n"
+        f"Meja: {matched_tbl_number} ({tbl.area}, kapasitas {tbl.capacity} orang)\n"
+        f"Tanggal: {reservation_date}\n"
+        f"Jam: {reservation_time} WIB\n"
+        f"Jumlah tamu: {guest_count} orang\n"
+        f"Pesanan lunas: #{paid_order.id}\n"
+        f"Catatan: {notes or '-'}"
     )
     for op in os.getenv("OWNER_PHONE_NUMBERS", "").split(","):
         if op.strip():
@@ -587,7 +628,11 @@ def customer_create_reservation(
         "reservation_time": reservation_time,
         "guest_count": guest_count,
         "area": tbl.area,
-        "message": f"Reservasi meja {matched_tbl_number} ({tbl.area}) untuk {customer_name} pada tanggal {reservation_date} pukul {reservation_time} WIB berhasil dikonfirmasi.",
+        "payment_order_id": paid_order.id,
+        "message": (
+            f"Reservasi {matched_tbl_number} untuk {customer_name} pada {reservation_date}, "
+            f"pukul {reservation_time} WIB sudah dikonfirmasi. Pembayaran Pesanan #{paid_order.id} telah lunas."
+        ),
     }
 
 
@@ -618,11 +663,10 @@ def owner_confirm_cash_payment(
 
     if cust_phone:
         cust_msg = (
-            f"Halo kak! Pembayaran TUNAI di kasir untuk Pesanan #{order.id} ({tbl_num}) "
-            f"sebesar Rp{float(order.total):,.0f} telah BERHASIL kami terima.\n"
-            f"🎟️ *Nomor Antrean Anda: {queue_number}*\n"
-            f"Pesanan sekarang sedang disiapkan di dapur dan akan segera diantarkan ke {tbl_num}. "
-            f"Selamat menikmati hidangan Warung Ndelik!"
+            f"Pembayaran tunai untuk Pesanan #{order.id} ({tbl_num}) sebesar "
+            f"Rp{float(order.total):,.0f} sudah kami terima.\n"
+            f"*Nomor antrean: {queue_number}*\n"
+            f"Pesanan sedang disiapkan dan akan diantarkan ke {tbl_num}. Terima kasih sudah memesan di Warung Ndelik."
         ).replace(",", ".")
         send_whatsapp_bridge_message(cust_phone, cust_msg)
 
@@ -826,7 +870,7 @@ CUSTOMER_TOOLS_SCHEMA = [
         "type": "function",
         "function": {
             "name": "customer_create_reservation",
-            "description": "Membuat booking / reservasi meja di Warung Ndelik untuk pelanggan.",
+            "description": "Mengonfirmasi reservasi meja hanya untuk pelanggan yang sudah melunasi pesanan terkait.",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -836,8 +880,9 @@ CUSTOMER_TOOLS_SCHEMA = [
                     "reservation_time": {"type": "string", "description": "Jam reservasi format HH:MM (misal: 19:00)"},
                     "guest_count": {"type": "integer", "description": "Jumlah tamu/orang"},
                     "notes": {"type": "string", "description": "Catatan tambahan untuk resto"},
+                    "payment_order_id": {"type": "integer", "description": "Nomor pesanan milik pelanggan yang sudah berstatus lunas"},
                 },
-                "required": ["customer_name", "table_number", "reservation_date", "reservation_time"],
+                "required": ["customer_name", "table_number", "reservation_date", "reservation_time", "payment_order_id"],
             },
         },
     },
@@ -859,7 +904,7 @@ CUSTOMER_TOOLS_SCHEMA = [
         "type": "function",
         "function": {
             "name": "customer_confirm_payment",
-            "description": "Mengonfirmasi pembayaran simulasi pesanan agar pesanan siap diteruskan ke dapur.",
+            "description": "Mengecek apakah pembayaran pesanan sudah terverifikasi. Fungsi ini tidak dapat menandai pembayaran sebagai lunas.",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -952,6 +997,7 @@ def _execute_tool_call(db: Session, sender: str, is_owner_role: bool, func_name:
             reservation_time=args.get("reservation_time", ""),
             guest_count=int(args.get("guest_count", 2)),
             notes=args.get("notes", ""),
+            payment_order_id=int(args["payment_order_id"]) if args.get("payment_order_id") else None,
         )
 
 
@@ -1003,10 +1049,11 @@ def run_ai_agent(db: Session, sender: str, user_message: str) -> dict[str, Any]:
             "- Jika pelanggan memilih QRIS, beri tahu bahwa barcode QRIS otomatis dikirimkan ke chat dan nomor antrean terbit saat pembayaran terverifikasi.\n"
             "- Jika pelanggan memilih CASH, beri tahu ID pesanan dan arahkan untuk membayar tunai di kasir. Nomor antrean terbit setelah kasir mengonfirmasi.\n"
             "- Reservasi Meja & Info Meja Kosong:\n"
-            "  * Jika pelanggan ingin reservasi meja atau bertanya meja mana saja yang kosong/tersedia, gunakan fungsi customer_check_available_tables untuk memberikan daftar meja yang kosong beserta kapasitas dan lokasinya (Area Utama, Semi Outdoor, Lesehan Gazebo, atau Ruang VIP).\n"
-            "  * Jika pelanggan ingin memesan/booking meja tertentu, gunakan customer_create_reservation.\n"
+            "  * Jika pelanggan ingin melihat meja yang tersedia, gunakan customer_check_available_tables dan sampaikan hasilnya secara ringkas.\n"
+            "  * Reservasi hanya boleh dikonfirmasi apabila pelanggan memiliki pesanan terkait yang sudah LUNAS dan terverifikasi. Minta nomor pesanan lunas tersebut, lalu panggil customer_create_reservation dengan payment_order_id.\n"
+            "  * Jangan pernah menyatakan meja dipesan, diamankan, atau reservasi berhasil sebelum fungsi customer_create_reservation mengembalikan konfirmasi sukses. Jika pembayaran belum lunas, jelaskan dengan singkat bahwa reservasi akan dilayani setelah pembayaran terverifikasi.\n"
             "- Jangan pernah membuka informasi rahasia omset resto, modal HPP, atau mengubah harga/menu untuk pelanggan umum.\n\n"
-            "Gaya bicara: Ramah, santun, panggil pelanggan 'kak' atau 'kakak', gunakan bahasa Indonesia santai tapi sopan layaknya pelayan restoran profesional."
+            "Gaya bicara: Berbahasa Indonesia yang hangat, sopan, dan alami seperti staf Warung Ndelik yang benar-benar sedang membantu pelanggan. Sesuaikan jawaban dengan pertanyaan dan percakapan sebelumnya; jangan memakai kalimat template berulang atau gaya chatbot. Jangan gunakan emoji maupun emotikon. Gunakan daftar hanya ketika menyampaikan menu, pilihan, atau langkah yang memang perlu dirapikan."
         )
         tools = CUSTOMER_TOOLS_SCHEMA
 
@@ -1028,7 +1075,7 @@ def run_ai_agent(db: Session, sender: str, user_message: str) -> dict[str, Any]:
             "messages": messages,
             "tools": tools,
             "tool_choice": "auto",
-            "temperature": 0.3,
+            "temperature": 0.55,
         }
 
         req = urllib.request.Request(
@@ -1074,6 +1121,9 @@ def run_ai_agent(db: Session, sender: str, user_message: str) -> dict[str, Any]:
                 "tool_call_id": call_id,
                 "content": json.dumps(tool_output, ensure_ascii=False),
             })
+
+    if not is_owner_user:
+        final_reply = _natural_customer_reply(final_reply)
 
     if final_reply:
         history.append({"role": "user", "content": user_message})

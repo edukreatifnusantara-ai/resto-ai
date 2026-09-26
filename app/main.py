@@ -1,4 +1,6 @@
 # pyright: reportAttributeAccessIssue=false, reportArgumentType=false, reportGeneralTypeIssues=false, reportCallIssue=false
+import base64
+import binascii
 import os
 import secrets
 from datetime import datetime, timedelta
@@ -10,7 +12,7 @@ load_dotenv("/home/edukreativ-vps/resto-ai/.env.runtime")
 load_dotenv()
 
 from fastapi import FastAPI, HTTPException, Depends, Request, Query
-from fastapi.responses import JSONResponse, PlainTextResponse
+from fastapi.responses import JSONResponse, PlainTextResponse, HTMLResponse
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import or_, update
 from sqlalchemy.exc import IntegrityError
@@ -18,7 +20,9 @@ from sqlalchemy.orm import Session
 from typing import List, Any
 
 from app.database import init_db, SessionLocal
-from app.agent import run_ai_agent, is_owner
+from app.agent import run_ai_agent, is_owner, customer_request_qris
+from app.voice import VoiceTranscriptionError, transcribe_audio
+from app.dashboard import get_dashboard_summary_data, get_dashboard_html_page
 from app.models import (
     Base, MenuItem, Recipe, Stock, Order,
     OrderStatus, PaymentStatus, WhatsAppEvent,
@@ -45,10 +49,14 @@ async def require_runtime_token(request: Request, call_next):
     # and mutation endpoints require the staging token.
     # Meta calls the webhook without the internal API token. It is protected
     # independently by the verify token and X-Hub-Signature-256.
-    if request.url.path in {"/", "/webhooks/whatsapp", "/api/chat", "/webhooks/midtrans"}:
+    if request.url.path in {"/", "/webhooks/whatsapp", "/api/chat", "/webhooks/midtrans", "/dashboard", "/api/dashboard/data"}:
         return await call_next(request)
-    expected = os.getenv("RESTO_API_TOKEN")
     supplied = request.headers.get("X-RESTO-API-TOKEN", "")
+    if request.url.path == "/api/voice/transcribe":
+        bridge_token = os.getenv("RESTO_VOICE_BRIDGE_TOKEN", "")
+        if bridge_token and supplied and secrets.compare_digest(supplied, bridge_token):
+            return await call_next(request)
+    expected = os.getenv("RESTO_API_TOKEN")
     if not expected:
         return JSONResponse(
             {"detail": "RESTO_API_TOKEN belum dikonfigurasi"}, status_code=503
@@ -79,6 +87,16 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+@app.get("/dashboard", response_class=HTMLResponse, response_description="Web UI Financial & Operational Dashboard")
+def dashboard_view():
+    return HTMLResponse(content=get_dashboard_html_page())
+
+
+@app.get("/api/dashboard/data", response_description="Dashboard data feed")
+def dashboard_data_api(db: Session = Depends(get_db)):
+    return get_dashboard_summary_data(db)
 
 
 def transition_order(order: OrderModel, new_state: str) -> None:
@@ -212,26 +230,96 @@ def get_order(order_id: int, db: Session = Depends(get_db)):
     }
 
 
+WARUNG_NDELIK_MAP_URL = "https://maps.app.goo.gl/tnFXrux6SU7nGj5x5"
+
+
 def _chatbot_help() -> str:
     return (
-        "Perintah Resto-AI (SIMULASI):\\n"
-        "MENU — lihat menu\\n"
-        "PESAN <id_menu> <jumlah> — buat order\\n"
-        "BAYAR <id_order> — konfirmasi pembayaran simulasi\\n"
-        "STATUS <id_order> — lihat status order\\n"
-        "BATAL <id_order> — batalkan order"
+        "*BANTUAN WARUNG NDELIK*\n\n"
+        "• Ketik *MENU* untuk memilih kategori\n"
+        "• Ketik *MENU MAKANAN*, *MENU MINUMAN*, atau *MENU SNACK*\n"
+        "• Ketik *LOKASI* untuk petunjuk arah\n"
+        "• Pesan: *PESAN <nomor_menu> <jumlah>*\n"
+        "• Cek pesanan: *STATUS <id_order>*\n"
+        "• Batalkan pesanan: *BATAL <id_order>*"
     )
 
 
-def _chatbot_menu(db: Session) -> str:
-    items = db.query(MenuItem).order_by(MenuItem.id).all()
+def _chatbot_location() -> str:
+    return (
+        "*LOKASI WARUNG NDELIK*\n\n"
+        "Silakan buka petunjuk arah melalui Google Maps:\n"
+        f"{WARUNG_NDELIK_MAP_URL}"
+    )
+
+
+def _menu_category(item: MenuItem) -> str:
+    """Group the seeded menu book into compact WhatsApp-friendly sections."""
+    if item.id <= 27:
+        return "MAKANAN"
+    if item.id <= 43:
+        return "MINUMAN"
+    return "SNACK"
+
+
+def _chatbot_menu(db: Session, requested_category: str | None = None) -> str:
+    items = [
+        item
+        for item in db.query(MenuItem).order_by(MenuItem.id).all()
+        if bool(getattr(item, "is_active", True))
+    ]
     if not items:
-        return "Menu belum tersedia."
-    lines = ["Menu Resto-AI (DATA DUMMY / SIMULASI):"]
-    for item in items:
-        lines.append(f"{item.id}. {item.name} — Rp{item.price:,.0f}".replace(",", "."))
-    lines.append("\\nPesan dengan format: PESAN <id_menu> <jumlah>")
-    return "\\n".join(lines)
+        return "Maaf, menu belum tersedia saat ini."
+
+    aliases = {
+        "MAKANAN": "MAKANAN",
+        "MAKAN": "MAKANAN",
+        "MINUMAN": "MINUMAN",
+        "MINUM": "MINUMAN",
+        "SNACK": "SNACK",
+        "CEMILAN": "SNACK",
+        "PELENGKAP": "SNACK",
+    }
+    category = aliases.get((requested_category or "").strip().upper())
+
+    if requested_category and category is None:
+        return (
+            "Kategori belum dikenali.\n\n"
+            "Ketik salah satu:\n"
+            "• *MENU MAKANAN*\n"
+            "• *MENU MINUMAN*\n"
+            "• *MENU SNACK*"
+        )
+
+    if category is None:
+        return (
+            "*MENU WARUNG NDELIK*\n\n"
+            "Pilih kategori agar lebih mudah dibaca:\n"
+            "• *MENU MAKANAN*\n"
+            "• *MENU MINUMAN*\n"
+            "• *MENU SNACK*\n\n"
+            "Setelah memilih nomor menu, kirim contoh:\n"
+            "*PESAN 1 2*\n"
+            "Artinya pesan menu nomor 1 sebanyak 2 porsi.\n\n"
+            "Butuh petunjuk arah? Ketik *LOKASI*."
+        )
+
+    labels = {
+        "MAKANAN": "*MENU MAKANAN*",
+        "MINUMAN": "*MENU MINUMAN*",
+        "SNACK": "*MENU SNACK & PELENGKAP*",
+    }
+    section_items = [item for item in items if _menu_category(item) == category]
+    lines = [labels[category], ""]
+    for item in section_items:
+        price = f"Rp{item.price:,.0f}".replace(",", ".")
+        lines.append(f"*{item.id}.* {item.name} — {price}")
+    lines.extend([
+        "",
+        "Ketik contoh: *PESAN 1 2*",
+        "Ketik *MENU* untuk memilih kategori lain.",
+    ])
+    return "\n".join(lines)
 
 
 def _owned_order(db: Session, sender: str, order_id: int) -> OrderModel | None:
@@ -251,19 +339,17 @@ def handle_whatsapp_text(
     """Handle incoming WhatsApp messages with two-way AI agent and deterministic fallbacks."""
     text = " ".join(body.strip().split())
     if not text:
-        return "Halo, ini Resto-AI.\\n\\n" + _chatbot_help()
-
-    # If sender is Owner, prioritize AI Agent controller
-    if is_owner(sender):
-        ai_reply = run_ai_agent(db, sender, text)
-        if isinstance(ai_reply, dict) and ai_reply.get("reply"):
-            return ai_reply
-        elif isinstance(ai_reply, str) and ai_reply:
-            return ai_reply
+        return "Halo, selamat datang di Warung Ndelik.\n\n" + _chatbot_help()
 
     upper = text.upper()
+    if upper in {"HALO", "HI", "HAI", "HELP", "BANTUAN", "MULAI"}:
+        return "Halo, selamat datang di Warung Ndelik.\n\n" + _chatbot_help()
+    if upper in {"LOKASI", "ALAMAT", "MAP", "MAPS", "GOOGLE MAPS"}:
+        return _chatbot_location()
     if upper in {"MENU", "DAFTAR MENU"}:
         return _chatbot_menu(db)
+    if upper.startswith("MENU "):
+        return _chatbot_menu(db, text[5:])
 
     parts = text.split()
     command = parts[0].upper()
@@ -279,9 +365,9 @@ def handle_whatsapp_text(
             ).one_or_none()
             if existing is not None:
                 return (
-                    f"Order #{existing.id} dibuat dengan status {existing.state}.\\n"
+                    f"Order #{existing.id} dibuat dengan status {existing.state}.\n"
                     f"Total: Rp{existing.total:,.0f}".replace(",", ".")
-                    + f"\\nBalas BAYAR {existing.id} untuk pembayaran SIMULASI."
+                    + f"\nBalas *BAYAR {existing.id}* untuk pembayaran."
                 )
         try:
             result = create_order(
@@ -295,9 +381,9 @@ def handle_whatsapp_text(
         except HTTPException as exc:
             return f"Order belum dapat dibuat: {exc.detail}"
         return (
-            f"Order #{result['id']} dibuat dengan status DRAFT.\\n"
-            f"Total: Rp{result['total']:,.0f}".replace(",", ".")
-            + f"\\nBalas BAYAR {result['id']} untuk pembayaran SIMULASI."
+            f"*ORDER #{result['id']} BERHASIL DIBUAT*\n"
+            f"Total: *Rp{result['total']:,.0f}*".replace(",", ".")
+            + f"\n\nBalas *BAYAR {result['id']}* untuk melanjutkan pembayaran."
         )
 
     if command in {"STATUS", "CEK"} and len(parts) == 2 and parts[1].isdigit():
@@ -305,10 +391,10 @@ def handle_whatsapp_text(
         if order is None:
             return "Order tidak ditemukan."
         return (
-            f"Order #{order.id}\\n"
-            f"Status: {order.state}\\n"
-            f"Pembayaran: {order.payment_state}\\n"
-            f"Total: Rp{order.total:,.0f}".replace(",", ".")
+            f"*STATUS ORDER #{order.id}*\n"
+            f"Status: *{order.state}*\n"
+            f"Pembayaran: {order.payment_state}\n"
+            f"Total: *Rp{order.total:,.0f}*".replace(",", ".")
         )
 
     if command == "BATAL" and len(parts) == 2 and parts[1].isdigit():
@@ -326,31 +412,38 @@ def handle_whatsapp_text(
         order_id = int(parts[1])
         order = _owned_order(db, sender, order_id)
         if order is None:
-            return "Order tidak ditemukan."
+            return "Pesanan tidak ditemukan."
+        if order.payment_state == PaymentStatus.SIMULATED_CONFIRMED:
+            return f"Pesanan #{order_id} sudah lunas."
+        if order.payment_method == "CASH":
+            return (
+                f"Untuk Pesanan #{order_id}, silakan lakukan pembayaran tunai di kasir. "
+                "Pesanan dan reservasi baru dapat diproses setelah kasir mengonfirmasi pembayaran lunas."
+            )
         try:
             if order.state == OrderStatus.DRAFT:
                 request_payment(order_id, db)
-            result = simulate_payment(order_id, db)
+            qris = customer_request_qris(db, sender, order_id)
         except HTTPException as exc:
-            return f"Pembayaran tidak dapat diproses: {exc.detail}"
-        return (
-            f"Order #{order_id} berstatus PAID.\\n"
-            "Pembayaran ini SIMULASI dan bukan settlement nyata."
-            if result.get("payment_state") == PaymentStatus.SIMULATED_CONFIRMED
-            else f"Order #{order_id}: {result}"
-        )
+            return f"Pembayaran belum dapat diproses: {exc.detail}"
+        if qris.get("error"):
+            return str(qris["error"])
+        return {
+            "reply": (
+                f"Silakan scan QRIS untuk Pesanan #{order_id} sebesar {qris['formatted_total']}. "
+                "Kami akan memproses pesanan dan reservasi setelah pembayaran terverifikasi lunas."
+            ),
+            "image_path": qris.get("qr_image_path", ""),
+        }
 
-    # For any conversational customer messages, run AI Agent
+    # Pesan bebas tetap dapat dibantu AI, setelah perintah pelanggan diproses.
     ai_reply = run_ai_agent(db, sender, text)
     if isinstance(ai_reply, dict) and ai_reply.get("reply"):
         return ai_reply
     elif isinstance(ai_reply, str) and ai_reply:
         return ai_reply
 
-    if upper in {"HALO", "HI", "HAI", "HELP", "BANTUAN", "MULAI"}:
-        return "Halo, ini Resto-AI.\\n\\n" + _chatbot_help()
-
-    return "Perintah belum dikenali.\\n\\n" + _chatbot_help()
+    return "Maaf, pesan belum dikenali.\n\n" + _chatbot_help()
 
 
 def _claim_whatsapp_event(db: Session, message: dict[str, str]) -> tuple[WhatsAppEvent, bool]:
@@ -518,22 +611,22 @@ async def midtrans_webhook(request: Request, db: Session = Depends(get_db)):
 
             # 1. Notify Customer via WhatsApp Bridge
             cust_msg = (
-                f"Halo kak! Pembayaran untuk Pesanan #{order.id} ({tbl_num}) sebesar "
-                f"Rp{total_val:,.0f} telah BERHASIL kami terima melalui QRIS.\n"
-                f"🎟️ *Nomor Antrean Anda: {q_num}*\n"
-                f"Pesanan sekarang sedang disiapkan di dapur dan akan diantar ke {tbl_num}. Terima kasih telah memesan di Warung Ndelik!"
+                f"Pembayaran QRIS untuk Pesanan #{order.id} ({tbl_num}) sebesar "
+                f"Rp{total_val:,.0f} sudah kami terima.\n"
+                f"*Nomor antrean: {q_num}*\n"
+                f"Pesanan sedang disiapkan dan akan diantar ke {tbl_num}. Terima kasih sudah memesan di Warung Ndelik."
             ).replace(",", ".")
             send_whatsapp_bridge_message(cust_phone, cust_msg)
 
             # 2. Notify Owner via WhatsApp Bridge
             owner_msg = (
-                f"🔔 *NOTIFIKASI PEMBAYARAN QRIS MASUK (LUNAS)*\n"
-                f"• ID Pesanan: #{order.id}\n"
-                f"• Lokasi/Meja: {tbl_num}\n"
-                f"• 🎟️ Nomor Antrean: *{q_num}*\n"
-                f"• Total: Rp{total_val:,.0f}\n"
-                f"• Pelanggan: {cust_phone}\n"
-                f"Pesanan diteruskan ke antrean dapur."
+                "*PEMBAYARAN QRIS DITERIMA*\n"
+                f"ID Pesanan: #{order.id}\n"
+                f"Lokasi/Meja: {tbl_num}\n"
+                f"Nomor antrean: *{q_num}*\n"
+                f"Total: Rp{total_val:,.0f}\n"
+                f"Pelanggan: {cust_phone}\n"
+                "Pesanan diteruskan ke antrean dapur."
             ).replace(",", ".")
             for op in os.getenv("OWNER_PHONE_NUMBERS", "").split(","):
                 if op.strip():
@@ -556,6 +649,29 @@ class DirectChatMessage(BaseModel):
     sender: str
     body: str
     message_id: str | None = None
+
+
+class VoiceTranscriptionRequest(BaseModel):
+    audio_base64: str
+    mime_type: str
+    filename: str = "voice-note.ogg"
+
+
+@app.post("/api/voice/transcribe", response_description="Transcribe an inbound WhatsApp voice note")
+def transcribe_voice_note(payload: VoiceTranscriptionRequest):
+    try:
+        audio_bytes = base64.b64decode(payload.audio_base64, validate=True)
+    except (binascii.Error, ValueError):
+        raise HTTPException(status_code=400, detail="Payload audio tidak valid")
+    try:
+        transcript = transcribe_audio(
+            audio_bytes,
+            payload.mime_type,
+            filename=payload.filename,
+        )
+    except VoiceTranscriptionError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+    return {"transcript": transcript}
 
 
 @app.post("/api/chat", response_description="Direct customer chatbot message")

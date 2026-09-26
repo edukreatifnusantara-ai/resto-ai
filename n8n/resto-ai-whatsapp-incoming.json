@@ -1,0 +1,126 @@
+{
+  "id": "resto-ai-whatsapp-incoming-v1",
+  "name": "Resto-AI - WhatsApp Incoming via n8n",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "resto-ai/incoming",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "resto-webhook-incoming",
+      "name": "WhatsApp Incoming",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 0],
+      "webhookId": "resto-ai-incoming"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = $json.body && typeof $json.body === 'object' ? $json.body : $json;\n\nreturn [{\n  json: {\n    sender: String(payload.sender || ''),\n    chat_jid: String(payload.chat_jid || payload.jid || payload.remote_jid || payload.sender || ''),\n    body: String(payload.body || ''),\n    message_id: payload.message_id ? String(payload.message_id) : null,\n  },\n}];"
+      },
+      "id": "resto-normalize-incoming",
+      "name": "Normalize Incoming",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [240, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://172.18.0.1:18081/api/chat",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "resto-api-chat",
+      "name": "Resto-AI API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [520, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $json;\nconst incoming = $('Normalize Incoming').first().json;\nconst recipient = String(incoming.chat_jid || incoming.sender || '');\n\nif (!response.reply && !response.image_path) {\n  return [{\n    json: {\n      to: recipient,\n      message: 'Maaf, Resto-AI belum dapat memproses pesan ini.',\n      image_path: '',\n    },\n  }];\n}\n\nreturn [{\n  json: {\n    to: recipient,\n    message: String(response.reply || ''),\n    image_path: response.image_path ? String(response.image_path) : '',\n  },\n}];"
+      },
+      "id": "resto-prepare-outbound",
+      "name": "Prepare WhatsApp Reply",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [800, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://172.18.0.1:18082/send",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "resto-bridge-send",
+      "name": "Baileys Bridge Send",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1080, 0]
+    }
+  ],
+  "connections": {
+    "WhatsApp Incoming": {
+      "main": [
+        [
+          {
+            "node": "Normalize Incoming",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Incoming": {
+      "main": [
+        [
+          {
+            "node": "Resto-AI API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resto-AI API": {
+      "main": [
+        [
+          {
+            "node": "Prepare WhatsApp Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare WhatsApp Reply": {
+      "main": [
+        [
+          {
+            "node": "Baileys Bridge Send",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "resto-ai-whatsapp-v1",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}

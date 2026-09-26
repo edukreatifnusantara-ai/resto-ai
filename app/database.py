@@ -179,6 +179,11 @@ def ensure_schema():
         "queue_number": "ALTER TABLE orders ADD COLUMN queue_number VARCHAR(20)",
     }
     missing = [name for name in migrations if name not in columns]
+    reservation_columns = {column["name"] for column in inspect(engine).get_columns("reservations")}
+    reservation_migrations = {
+        "payment_order_id": "ALTER TABLE reservations ADD COLUMN payment_order_id INTEGER",
+    }
+    missing_reservation = [name for name in reservation_migrations if name not in reservation_columns]
     event_columns = {column["name"] for column in inspect(engine).get_columns("whatsapp_events")}
     event_migrations = {
         "claimed_at": "ALTER TABLE whatsapp_events ADD COLUMN claimed_at DATETIME",
@@ -194,10 +199,12 @@ def ensure_schema():
     }
     missing_menu = [name for name in menu_migrations if name not in menu_columns]
 
-    if missing or missing_event or missing_menu:
+    if missing or missing_reservation or missing_event or missing_menu:
         with engine.begin() as connection:
             for name in missing:
                 connection.execute(text(migrations[name]))
+            for name in missing_reservation:
+                connection.execute(text(reservation_migrations[name]))
             for name in missing_event:
                 connection.execute(text(event_migrations[name]))
             for name in missing_menu:

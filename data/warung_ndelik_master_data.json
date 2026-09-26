@@ -1,0 +1,7107 @@
+{
+  "business_name": "Warung Ndelik",
+  "location": "Mranggen, Demak",
+  "verified_at": "2026-09-26",
+  "payroll": {
+    "total_personnel_count": 12,
+    "leadership_count": 2,
+    "staff_count": 10,
+    "total_monthly_payroll": 26500000,
+    "daily_payroll_allocation": 883333.33,
+    "leadership": [
+      {
+        "id": "MGT-01",
+        "name": "Owner",
+        "base_salary": 5000000,
+        "role": "Owner / Pemilik"
+      },
+      {
+        "id": "MGT-02",
+        "name": "Co-owner",
+        "base_salary": 3000000,
+        "role": "Co-owner / Manajemen"
+      }
+    ],
+    "staff": [
+      {
+        "id": "EMP-01",
+        "name": "Pincuk",
+        "base_salary": 2500000,
+        "role": "Staf Inti / Senior"
+      },
+      {
+        "id": "EMP-02",
+        "name": "Dirimu",
+        "base_salary": 2500000,
+        "role": "Staf Inti / Senior"
+      },
+      {
+        "id": "EMP-03",
+        "name": "Fika",
+        "base_salary": 2000000,
+        "role": "Staf Operasional"
+      },
+      {
+        "id": "EMP-04",
+        "name": "Tatik",
+        "base_salary": 1500000,
+        "role": "Staf Dapur / Kasir"
+      },
+      {
+        "id": "EMP-05",
+        "name": "Wahyu",
+        "base_salary": 2000000,
+        "role": "Staf Operasional"
+      },
+      {
+        "id": "EMP-06",
+        "name": "Tyas",
+        "base_salary": 2000000,
+        "role": "Staf Operasional"
+      },
+      {
+        "id": "EMP-07",
+        "name": "Alwi",
+        "base_salary": 1500000,
+        "role": "Staf Dapur / Layanan"
+      },
+      {
+        "id": "EMP-08",
+        "name": "Zaki",
+        "base_salary": 1500000,
+        "role": "Staf Dapur / Layanan"
+      },
+      {
+        "id": "EMP-09",
+        "name": "Ping an",
+        "base_salary": 1500000,
+        "role": "Staf Layanan"
+      },
+      {
+        "id": "EMP-10",
+        "name": "Amat",
+        "base_salary": 1500000,
+        "role": "Staf Layanan"
+      }
+    ],
+    "all_roster": [
+      {
+        "id": "MGT-01",
+        "name": "Owner",
+        "base_salary": 5000000,
+        "role": "Owner / Pemilik"
+      },
+      {
+        "id": "MGT-02",
+        "name": "Co-owner",
+        "base_salary": 3000000,
+        "role": "Co-owner / Manajemen"
+      },
+      {
+        "id": "EMP-01",
+        "name": "Pincuk",
+        "base_salary": 2500000,
+        "role": "Staf Inti / Senior"
+      },
+      {
+        "id": "EMP-02",
+        "name": "Dirimu",
+        "base_salary": 2500000,
+        "role": "Staf Inti / Senior"
+      },
+      {
+        "id": "EMP-03",
+        "name": "Fika",
+        "base_salary": 2000000,
+        "role": "Staf Operasional"
+      },
+      {
+        "id": "EMP-04",
+        "name": "Tatik",
+        "base_salary": 1500000,
+        "role": "Staf Dapur / Kasir"
+      },
+      {
+        "id": "EMP-05",
+        "name": "Wahyu",
+        "base_salary": 2000000,
+        "role": "Staf Operasional"
+      },
+      {
+        "id": "EMP-06",
+        "name": "Tyas",
+        "base_salary": 2000000,
+        "role": "Staf Operasional"
+      },
+      {
+        "id": "EMP-07",
+        "name": "Alwi",
+        "base_salary": 1500000,
+        "role": "Staf Dapur / Layanan"
+      },
+      {
+        "id": "EMP-08",
+        "name": "Zaki",
+        "base_salary": 1500000,
+        "role": "Staf Dapur / Layanan"
+      },
+      {
+        "id": "EMP-09",
+        "name": "Ping an",
+        "base_salary": 1500000,
+        "role": "Staf Layanan"
+      },
+      {
+        "id": "EMP-10",
+        "name": "Amat",
+        "base_salary": 1500000,
+        "role": "Staf Layanan"
+      }
+    ]
+  },
+  "fixed_costs": {
+    "monthly_payroll": 26500000,
+    "monthly_electricity_and_water": 1500000,
+    "total_monthly_fixed_cost": 28000000,
+    "annual_fixed_cost": 336000000,
+    "daily_fixed_cost_allocation": 933333.33
+  },
+  "historical_hpp_benchmark": {
+    "period": "26.08.26 s/d 24.09.26 (28 hari)",
+    "total_pemakaian_bahan": 32947239,
+    "rata_rata_pemakaian_harian": 1176687.11,
+    "daily_summary": [
+      {
+        "tanggal": "26.08.26",
+        "total_stok_tersedia": 2399650,
+        "sisa_stok_akhir": 943530,
+        "pemakaian_bahan_hpp": 1456120
+      },
+      {
+        "tanggal": "27.08.26",
+        "total_stok_tersedia": 2342030,
+        "sisa_stok_akhir": 1114265,
+        "pemakaian_bahan_hpp": 1227765
+      },
+      {
+        "tanggal": "28.08.26",
+        "total_stok_tersedia": 2767215,
+        "sisa_stok_akhir": 1101348,
+        "pemakaian_bahan_hpp": 1665867
+      },
+      {
+        "tanggal": "29.08.26",
+        "total_stok_tersedia": 2443150,
+        "sisa_stok_akhir": 941600,
+        "pemakaian_bahan_hpp": 1501550
+      },
+      {
+        "tanggal": "30.08.26",
+        "total_stok_tersedia": 941600,
+        "sisa_stok_akhir": 1012500,
+        "pemakaian_bahan_hpp": -70900
+      },
+      {
+        "tanggal": "01.09.26",
+        "total_stok_tersedia": 2297195,
+        "sisa_stok_akhir": 1155330,
+        "pemakaian_bahan_hpp": 1141865
+      },
+      {
+        "tanggal": "02.09.26",
+        "total_stok_tersedia": 2478630,
+        "sisa_stok_akhir": 1242415,
+        "pemakaian_bahan_hpp": 1236215
+      },
+      {
+        "tanggal": "03.09.26",
+        "total_stok_tersedia": 1975965,
+        "sisa_stok_akhir": 1215835,
+        "pemakaian_bahan_hpp": 760130
+      },
+      {
+        "tanggal": "04.09.26",
+        "total_stok_tersedia": 2235335,
+        "sisa_stok_akhir": 1119480,
+        "pemakaian_bahan_hpp": 1115855
+      },
+      {
+        "tanggal": "05.09.26",
+        "total_stok_tersedia": 2226180,
+        "sisa_stok_akhir": 1120110,
+        "pemakaian_bahan_hpp": 1106070
+      },
+      {
+        "tanggal": "06.09.26",
+        "total_stok_tersedia": 2320110,
+        "sisa_stok_akhir": 1214460,
+        "pemakaian_bahan_hpp": 1105650
+      },
+      {
+        "tanggal": "07.09.26",
+        "total_stok_tersedia": 2280185,
+        "sisa_stok_akhir": 1220990,
+        "pemakaian_bahan_hpp": 1059195
+      },
+      {
+        "tanggal": "08.09.26",
+        "total_stok_tersedia": 2254890,
+        "sisa_stok_akhir": 1229820,
+        "pemakaian_bahan_hpp": 1025070
+      },
+      {
+        "tanggal": "09.09.26",
+        "total_stok_tersedia": 2315470,
+        "sisa_stok_akhir": 1045280,
+        "pemakaian_bahan_hpp": 1270190
+      },
+      {
+        "tanggal": "10.09.26",
+        "total_stok_tersedia": 2095230,
+        "sisa_stok_akhir": 1372605,
+        "pemakaian_bahan_hpp": 722625
+      },
+      {
+        "tanggal": "11.09.26",
+        "total_stok_tersedia": 2420105,
+        "sisa_stok_akhir": 1102740,
+        "pemakaian_bahan_hpp": 1317365
+      },
+      {
+        "tanggal": "12.09.26",
+        "total_stok_tersedia": 3000582,
+        "sisa_stok_akhir": 1353080,
+        "pemakaian_bahan_hpp": 1647502
+      },
+      {
+        "tanggal": "13.09.26",
+        "total_stok_tersedia": 2901575,
+        "sisa_stok_akhir": 1205630,
+        "pemakaian_bahan_hpp": 1695945
+      },
+      {
+        "tanggal": "15.09.26",
+        "total_stok_tersedia": 2521505,
+        "sisa_stok_akhir": 1289675,
+        "pemakaian_bahan_hpp": 1231830
+      },
+      {
+        "tanggal": "16.09.26",
+        "total_stok_tersedia": 2054005,
+        "sisa_stok_akhir": 1193225,
+        "pemakaian_bahan_hpp": 860780
+      },
+      {
+        "tanggal": "17.09.26",
+        "total_stok_tersedia": 1973975,
+        "sisa_stok_akhir": 788950,
+        "pemakaian_bahan_hpp": 1185025
+      },
+      {
+        "tanggal": "18.09.26",
+        "total_stok_tersedia": 2249175,
+        "sisa_stok_akhir": 1139765,
+        "pemakaian_bahan_hpp": 1109410
+      },
+      {
+        "tanggal": "19.09.26",
+        "total_stok_tersedia": 2539965,
+        "sisa_stok_akhir": 1427270,
+        "pemakaian_bahan_hpp": 1112695
+      },
+      {
+        "tanggal": "20.09.26",
+        "total_stok_tersedia": 3169570,
+        "sisa_stok_akhir": 950195,
+        "pemakaian_bahan_hpp": 2219375
+      },
+      {
+        "tanggal": "21.09.26",
+        "total_stok_tersedia": 2540115,
+        "sisa_stok_akhir": 1430225,
+        "pemakaian_bahan_hpp": 1109890
+      },
+      {
+        "tanggal": "22.09.26",
+        "total_stok_tersedia": 2232950,
+        "sisa_stok_akhir": 1231295,
+        "pemakaian_bahan_hpp": 1001655
+      },
+      {
+        "tanggal": "23.09.26",
+        "total_stok_tersedia": 2652525,
+        "sisa_stok_akhir": 1430265,
+        "pemakaian_bahan_hpp": 1222260
+      },
+      {
+        "tanggal": "24.09.26",
+        "total_stok_tersedia": 2387990,
+        "sisa_stok_akhir": 1477750,
+        "pemakaian_bahan_hpp": 910240
+      }
+    ]
+  },
+  "catalog_sample": {
+    "dapur_items_count": 74,
+    "minuman_items_count": 25,
+    "dapur": [
+      {
+        "no": 1,
+        "item": "Bawang Putih",
+        "stock_awal": 0.26,
+        "masuk": 0.25,
+        "total_tersedia": 0.51,
+        "harga_satuan": 36000,
+        "stock_akhir": 0.37,
+        "satuan": "Kg"
+      },
+      {
+        "no": 2,
+        "item": "Bawang Merah",
+        "stock_awal": 0.23,
+        "masuk": 0,
+        "total_tersedia": 0.23,
+        "harga_satuan": 36000,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 3,
+        "item": "Bawang Bombay",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 4,
+        "item": "Cabai Rawi/Lalapan",
+        "stock_awal": 0.03,
+        "masuk": 0,
+        "total_tersedia": 0.03,
+        "harga_satuan": 60000,
+        "stock_akhir": 0.1,
+        "satuan": "Kg"
+      },
+      {
+        "no": 5,
+        "item": "Cabai Merah",
+        "stock_awal": 0,
+        "masuk": 0.25,
+        "total_tersedia": 0.25,
+        "harga_satuan": 40000,
+        "stock_akhir": 0.25,
+        "satuan": "Kg"
+      },
+      {
+        "no": 6,
+        "item": "Cabai Setan",
+        "stock_awal": 0.1,
+        "masuk": 0.25,
+        "total_tersedia": 0.35,
+        "harga_satuan": 50000,
+        "stock_akhir": 0.25,
+        "satuan": "Kg"
+      },
+      {
+        "no": 7,
+        "item": "Daun Bawang",
+        "stock_awal": 0,
+        "masuk": 1,
+        "total_tersedia": 1,
+        "harga_satuan": 13000,
+        "stock_akhir": 1,
+        "satuan": "Kg"
+      },
+      {
+        "no": 8,
+        "item": "Serai",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 9,
+        "item": "Merica",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 10,
+        "item": "Ketumbar",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 11,
+        "item": "Kemiri",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 12,
+        "item": "Jahe",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 13,
+        "item": "Kunyit",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 14,
+        "item": "Laos",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 20000,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 15,
+        "item": "Daun Salam",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 16000,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 16,
+        "item": "Kencur",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 17,
+        "item": "Tomat",
+        "stock_awal": 0.44,
+        "masuk": 1,
+        "total_tersedia": 1.44,
+        "harga_satuan": 20000,
+        "stock_akhir": 1,
+        "satuan": "Kg"
+      },
+      {
+        "no": 18,
+        "item": "Timun",
+        "stock_awal": 2.5,
+        "masuk": 0,
+        "total_tersedia": 2.5,
+        "harga_satuan": 11000,
+        "stock_akhir": 1.5,
+        "satuan": "Kg"
+      },
+      {
+        "no": 19,
+        "item": "Kentang Sayur",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 20,
+        "item": "Wortel",
+        "stock_awal": 0.25,
+        "masuk": 0,
+        "total_tersedia": 0.25,
+        "harga_satuan": 15000,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 21,
+        "item": "Kol",
+        "stock_awal": 0.5,
+        "masuk": 2,
+        "total_tersedia": 2.5,
+        "harga_satuan": 8000,
+        "stock_akhir": 1.6,
+        "satuan": "Kg"
+      },
+      {
+        "no": 22,
+        "item": "Kembang Kol",
+        "stock_awal": 0.17,
+        "masuk": 0,
+        "total_tersedia": 0.17,
+        "harga_satuan": 8000,
+        "stock_akhir": 0.1,
+        "satuan": "Kg"
+      },
+      {
+        "no": 23,
+        "item": "Putren",
+        "stock_awal": 1,
+        "masuk": 1,
+        "total_tersedia": 2,
+        "harga_satuan": 3000,
+        "stock_akhir": 2,
+        "satuan": "Kg"
+      },
+      {
+        "no": 24,
+        "item": "Sawi Hijau",
+        "stock_awal": 0.64,
+        "masuk": 1,
+        "total_tersedia": 1.6400000000000001,
+        "harga_satuan": 11500,
+        "stock_akhir": 0.5,
+        "satuan": "Kg"
+      },
+      {
+        "no": 25,
+        "item": "Sawi Putih",
+        "stock_awal": 1,
+        "masuk": 0,
+        "total_tersedia": 1,
+        "harga_satuan": 8500,
+        "stock_akhir": 0.9,
+        "satuan": "Kg"
+      },
+      {
+        "no": 26,
+        "item": "Kangkung",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 3750,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 27,
+        "item": "Jeruk Nipis",
+        "stock_awal": 0.2,
+        "masuk": 0.5,
+        "total_tersedia": 0.7,
+        "harga_satuan": 24000,
+        "stock_akhir": 0.2,
+        "satuan": "Kg"
+      },
+      {
+        "no": 28,
+        "item": "Cambah",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 12000,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 29,
+        "item": "Terasi",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 30,
+        "item": "Brambang Goreng",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 32000,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 31,
+        "item": "Gula Jawa",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 56000,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 32,
+        "item": "Gula Pasir",
+        "stock_awal": 2,
+        "masuk": 3,
+        "total_tersedia": 5,
+        "harga_satuan": 17500,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 33,
+        "item": "Garam",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 3000,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 34,
+        "item": "Moto",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 11000,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 35,
+        "item": "Masako",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 600,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 36,
+        "item": "Royco",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 600,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 37,
+        "item": "Marinasi",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 1200,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 38,
+        "item": "Ketumbar Bubuk",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 39,
+        "item": "Beras",
+        "stock_awal": 1,
+        "masuk": 1,
+        "total_tersedia": 2,
+        "harga_satuan": 83000,
+        "stock_akhir": 1,
+        "satuan": "Kg"
+      },
+      {
+        "no": 40,
+        "item": "Minyak",
+        "stock_awal": 2,
+        "masuk": 2,
+        "total_tersedia": 4,
+        "harga_satuan": 21000,
+        "stock_akhir": 1.5,
+        "satuan": "Kg"
+      },
+      {
+        "no": 41,
+        "item": "Telor",
+        "stock_awal": 8.5,
+        "masuk": 0,
+        "total_tersedia": 8.5,
+        "harga_satuan": 25000,
+        "stock_akhir": 7,
+        "satuan": "Kg"
+      },
+      {
+        "no": 42,
+        "item": "Saos",
+        "stock_awal": 17,
+        "masuk": 24,
+        "total_tersedia": 41,
+        "harga_satuan": 250,
+        "stock_akhir": 33,
+        "satuan": "Kg"
+      },
+      {
+        "no": 43,
+        "item": "Kecap",
+        "stock_awal": 2,
+        "masuk": 3,
+        "total_tersedia": 5,
+        "harga_satuan": 15500,
+        "stock_akhir": 4,
+        "satuan": "Kg"
+      },
+      {
+        "no": 44,
+        "item": "Blue Band",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 45,
+        "item": "Mie Dara",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 46,
+        "item": "Mie Soun",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 47,
+        "item": "Mie Kwetiaw",
+        "stock_awal": 18,
+        "masuk": 0,
+        "total_tersedia": 18,
+        "harga_satuan": 6000,
+        "stock_akhir": 15,
+        "satuan": "Kg"
+      },
+      {
+        "no": 48,
+        "item": "Sterofom",
+        "stock_awal": 55,
+        "masuk": 0,
+        "total_tersedia": 55,
+        "harga_satuan": 0,
+        "stock_akhir": 49,
+        "satuan": "Kg"
+      },
+      {
+        "no": 49,
+        "item": "Tepung Terigu",
+        "stock_awal": 1.5,
+        "masuk": 1,
+        "total_tersedia": 2.5,
+        "harga_satuan": 12000,
+        "stock_akhir": 1,
+        "satuan": "Kg"
+      },
+      {
+        "no": 50,
+        "item": "Tepung Beras",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 9000,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 51,
+        "item": "Tepung Kanji",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 52,
+        "item": "Tempe",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 6000,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 53,
+        "item": "Tempe Ikat",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 1000,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 54,
+        "item": "Tahu",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 55,
+        "item": "Tahu Bakso",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 56,
+        "item": "Galantin",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 57,
+        "item": "Kertas 0",
+        "stock_awal": 1.25,
+        "masuk": 0,
+        "total_tersedia": 1.25,
+        "harga_satuan": 20000,
+        "stock_akhir": 0.25,
+        "satuan": "Kg"
+      },
+      {
+        "no": 58,
+        "item": "Kertas Kotak",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 59,
+        "item": "Ayam Penyet",
+        "stock_awal": 14,
+        "masuk": 7,
+        "total_tersedia": 21,
+        "harga_satuan": 5700,
+        "stock_akhir": 13,
+        "satuan": "Kg"
+      },
+      {
+        "no": 60,
+        "item": "Ayam Soto",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 61,
+        "item": "Ayam Suiran",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 39000,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 62,
+        "item": "Sayap",
+        "stock_awal": 7,
+        "masuk": 0,
+        "total_tersedia": 7,
+        "harga_satuan": 4875,
+        "stock_akhir": 6,
+        "satuan": "Kg"
+      },
+      {
+        "no": 63,
+        "item": "Bebek",
+        "stock_awal": 12.25,
+        "masuk": 0,
+        "total_tersedia": 12.25,
+        "harga_satuan": 21000,
+        "stock_akhir": 11.25,
+        "satuan": "Kg"
+      },
+      {
+        "no": 64,
+        "item": "Babat",
+        "stock_awal": 0.6,
+        "masuk": 0,
+        "total_tersedia": 0.6,
+        "harga_satuan": 100000,
+        "stock_akhir": 0.46,
+        "satuan": "Kg"
+      },
+      {
+        "no": 65,
+        "item": "Nugget",
+        "stock_awal": 2,
+        "masuk": 0,
+        "total_tersedia": 2,
+        "harga_satuan": 17500,
+        "stock_akhir": 2,
+        "satuan": "Kg"
+      },
+      {
+        "no": 66,
+        "item": "Cireng",
+        "stock_awal": 2,
+        "masuk": 4,
+        "total_tersedia": 6,
+        "harga_satuan": 8000,
+        "stock_akhir": 5.5,
+        "satuan": "Kg"
+      },
+      {
+        "no": 67,
+        "item": "Kentang",
+        "stock_awal": 0.65,
+        "masuk": 2,
+        "total_tersedia": 2.65,
+        "harga_satuan": 31000,
+        "stock_akhir": 1.6,
+        "satuan": "Kg"
+      },
+      {
+        "no": 68,
+        "item": "Sosis",
+        "stock_awal": 0.29,
+        "masuk": 1,
+        "total_tersedia": 1.29,
+        "harga_satuan": 24000,
+        "stock_akhir": 1,
+        "satuan": "Kg"
+      },
+      {
+        "no": 69,
+        "item": "Bakso",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 70,
+        "item": "Jeru Peras",
+        "stock_awal": 1,
+        "masuk": 2,
+        "total_tersedia": 3,
+        "harga_satuan": 15000,
+        "stock_akhir": 1.5,
+        "satuan": "Kg"
+      },
+      {
+        "no": 71,
+        "item": "Stick Keju",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "Kg"
+      },
+      {
+        "no": 72,
+        "item": "Asam Manis",
+        "stock_awal": 12,
+        "masuk": 0,
+        "total_tersedia": 12,
+        "harga_satuan": 0,
+        "stock_akhir": 12,
+        "satuan": "Kg"
+      },
+      {
+        "no": 73,
+        "item": "Saus Padang",
+        "stock_awal": 3,
+        "masuk": 0,
+        "total_tersedia": 3,
+        "harga_satuan": 0,
+        "stock_akhir": 2,
+        "satuan": "Kg"
+      },
+      {
+        "no": 74,
+        "item": "Garang Asem",
+        "stock_awal": 0,
+        "masuk": 13,
+        "total_tersedia": 13,
+        "harga_satuan": 4875,
+        "stock_akhir": 10,
+        "satuan": "Kg"
+      }
+    ],
+    "minuman": [
+      {
+        "no": 1,
+        "item": "Uwuh",
+        "stock_awal": 23,
+        "masuk": 0,
+        "total_tersedia": 23,
+        "harga_satuan": 1240,
+        "stock_akhir": 22,
+        "satuan": "pcs"
+      },
+      {
+        "no": 2,
+        "item": "Kopi Hitam",
+        "stock_awal": 30,
+        "masuk": 0,
+        "total_tersedia": 30,
+        "harga_satuan": 1000,
+        "stock_akhir": 25,
+        "satuan": "pcs"
+      },
+      {
+        "no": 3,
+        "item": "Good Day Merah",
+        "stock_awal": 8,
+        "masuk": 10,
+        "total_tersedia": 18,
+        "harga_satuan": 1650,
+        "stock_akhir": 7,
+        "satuan": "pcs"
+      },
+      {
+        "no": 4,
+        "item": "Good Day Coklat",
+        "stock_awal": 0,
+        "masuk": 10,
+        "total_tersedia": 10,
+        "harga_satuan": 1650,
+        "stock_akhir": 7,
+        "satuan": "pcs"
+      },
+      {
+        "no": 5,
+        "item": "White Coffee",
+        "stock_awal": 12,
+        "masuk": 0,
+        "total_tersedia": 12,
+        "harga_satuan": 1750,
+        "stock_akhir": 10,
+        "satuan": "pcs"
+      },
+      {
+        "no": 6,
+        "item": "Susu Putih",
+        "stock_awal": 17,
+        "masuk": 0,
+        "total_tersedia": 17,
+        "harga_satuan": 1500,
+        "stock_akhir": 15,
+        "satuan": "pcs"
+      },
+      {
+        "no": 7,
+        "item": "Susu Coklat",
+        "stock_awal": 5,
+        "masuk": 6,
+        "total_tersedia": 11,
+        "harga_satuan": 1500,
+        "stock_akhir": 8,
+        "satuan": "pcs"
+      },
+      {
+        "no": 8,
+        "item": "Soda",
+        "stock_awal": 5,
+        "masuk": 12,
+        "total_tersedia": 17,
+        "harga_satuan": 3350,
+        "stock_akhir": 13,
+        "satuan": "pcs"
+      },
+      {
+        "no": 9,
+        "item": "Sirup",
+        "stock_awal": 1,
+        "masuk": 1,
+        "total_tersedia": 2,
+        "harga_satuan": 23000,
+        "stock_akhir": 1,
+        "satuan": "pcs"
+      },
+      {
+        "no": 10,
+        "item": "Teh",
+        "stock_awal": 2,
+        "masuk": 10,
+        "total_tersedia": 12,
+        "harga_satuan": 9000,
+        "stock_akhir": 10,
+        "satuan": "pcs"
+      },
+      {
+        "no": 11,
+        "item": "Sedotan",
+        "stock_awal": 1,
+        "masuk": 1,
+        "total_tersedia": 2,
+        "harga_satuan": 6000,
+        "stock_akhir": 1,
+        "satuan": "pcs"
+      },
+      {
+        "no": 12,
+        "item": "Es Batu",
+        "stock_awal": 2,
+        "masuk": 5,
+        "total_tersedia": 7,
+        "harga_satuan": 8000,
+        "stock_akhir": 2,
+        "satuan": "pcs"
+      },
+      {
+        "no": 13,
+        "item": "Tisu",
+        "stock_awal": 5,
+        "masuk": 0,
+        "total_tersedia": 5,
+        "harga_satuan": 3300,
+        "stock_akhir": 3,
+        "satuan": "pcs"
+      },
+      {
+        "no": 14,
+        "item": "Plastik Bungkus Sterofom",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "pcs"
+      },
+      {
+        "no": 15,
+        "item": "Plastik Bungkus Cup",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "pcs"
+      },
+      {
+        "no": 16,
+        "item": "Plastik 1kg",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "pcs"
+      },
+      {
+        "no": 17,
+        "item": "Plastik 2kg",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "pcs"
+      },
+      {
+        "no": 18,
+        "item": "Plastik 1/2kg",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "pcs"
+      },
+      {
+        "no": 19,
+        "item": "Plastik 1/4kg",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "pcs"
+      },
+      {
+        "no": 20,
+        "item": "Plastk Sampah Loreng",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 6000,
+        "stock_akhir": 0,
+        "satuan": "pcs"
+      },
+      {
+        "no": 21,
+        "item": "Plastik Sampah Hitam",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 8000,
+        "stock_akhir": 0,
+        "satuan": "pcs"
+      },
+      {
+        "no": 22,
+        "item": "Sunlight",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 0,
+        "stock_akhir": 0,
+        "satuan": "pcs"
+      },
+      {
+        "no": 23,
+        "item": "Air Galon",
+        "stock_awal": 3,
+        "masuk": 4,
+        "total_tersedia": 7,
+        "harga_satuan": 4000,
+        "stock_akhir": 4,
+        "satuan": "pcs"
+      },
+      {
+        "no": 24,
+        "item": "Gas",
+        "stock_awal": 1,
+        "masuk": 4,
+        "total_tersedia": 5,
+        "harga_satuan": 24000,
+        "stock_akhir": 3,
+        "satuan": "pcs"
+      },
+      {
+        "no": 25,
+        "item": "Nota 3 Play",
+        "stock_awal": 0,
+        "masuk": 0,
+        "total_tersedia": 0,
+        "harga_satuan": 6000,
+        "stock_akhir": 0,
+        "satuan": "pcs"
+      }
+    ]
+  },
+  "purchasing_summary": {
+    "period": "26.08.26 s/d 24.09.26 (28 hari)",
+    "total_purchases": 33152297.0,
+    "avg_daily_purchase": 1184010.61,
+    "breakdown": {
+      "dapur_pasar": {
+        "total": 26038717.0,
+        "percentage": 78.5,
+        "description": "Bahan baku masak dapur (Beras, Bebek, Ayam, Telur, Minyak, Sayur, Bumbu)"
+      },
+      "minuman": {
+        "total": 3952380.0,
+        "percentage": 11.9,
+        "description": "Bahan minuman (Es batu, Kopi, Teh, Susu, Good Day, Sirup, Soda)"
+      },
+      "operasional_perlengkapan": {
+        "total": 3161200.0,
+        "percentage": 9.5,
+        "description": "Belanja non-bahan (Gas elpiji, Air galon, Tisu, Plastik kresek/sampah, Nota kasir 3-play, Sabun Sunlight)"
+      }
+    },
+    "top_spending_items": [
+      {
+        "item": "Beras",
+        "category": "Belanja Pasar Dapur",
+        "total_spent": 4150000.0,
+        "total_qty": 50.0,
+        "avg_unit_price": 83000.0
+      },
+      {
+        "item": "Bebek",
+        "category": "Belanja Pasar Dapur",
+        "total_spent": 3780000.0,
+        "total_qty": 180.0,
+        "avg_unit_price": 21000.0
+      },
+      {
+        "item": "Ayam Penyet",
+        "category": "Belanja Pasar Dapur",
+        "total_spent": 2528550.0,
+        "total_qty": 453.0,
+        "avg_unit_price": 5250.0
+      },
+      {
+        "item": "Gas",
+        "category": "Operasional / Non-Bahan",
+        "total_spent": 2088000.0,
+        "total_qty": 87.0,
+        "avg_unit_price": 24000.0
+      },
+      {
+        "item": "Gula Pasir",
+        "category": "Belanja Pasar Dapur",
+        "total_spent": 1960000.0,
+        "total_qty": 112.0,
+        "avg_unit_price": 17500.0
+      },
+      {
+        "item": "Minyak",
+        "category": "Belanja Pasar Dapur",
+        "total_spent": 1659000.0,
+        "total_qty": 79.0,
+        "avg_unit_price": 21000.0
+      },
+      {
+        "item": "Telor",
+        "category": "Belanja Pasar Dapur",
+        "total_spent": 1525000.0,
+        "total_qty": 61.0,
+        "avg_unit_price": 25000.0
+      },
+      {
+        "item": "Mie Kwetiaw",
+        "category": "Belanja Pasar Dapur",
+        "total_spent": 1092000.0,
+        "total_qty": 182.0,
+        "avg_unit_price": 6000.0
+      },
+      {
+        "item": "Kecap",
+        "category": "Belanja Pasar Dapur",
+        "total_spent": 945500.0,
+        "total_qty": 61.0,
+        "avg_unit_price": 15500.0
+      },
+      {
+        "item": "Es Batu",
+        "category": "Belanja Bahan Minuman",
+        "total_spent": 904000.0,
+        "total_qty": 113.0,
+        "avg_unit_price": 8000.0
+      },
+      {
+        "item": "Teh",
+        "category": "Belanja Bahan Minuman",
+        "total_spent": 720000.0,
+        "total_qty": 80.0,
+        "avg_unit_price": 9000.0
+      },
+      {
+        "item": "Babat",
+        "category": "Belanja Pasar Dapur",
+        "total_spent": 700000.0,
+        "total_qty": 7.0,
+        "avg_unit_price": 100000.0
+      },
+      {
+        "item": "Nugget",
+        "category": "Belanja Pasar Dapur",
+        "total_spent": 630000.0,
+        "total_qty": 36.0,
+        "avg_unit_price": 17500.0
+      },
+      {
+        "item": "Tepung Terigu",
+        "category": "Belanja Pasar Dapur",
+        "total_spent": 576000.0,
+        "total_qty": 48.0,
+        "avg_unit_price": 12000.0
+      },
+      {
+        "item": "Jeru Peras",
+        "category": "Belanja Pasar Dapur",
+        "total_spent": 570000.0,
+        "total_qty": 38.0,
+        "avg_unit_price": 15000.0
+      },
+      {
+        "item": "Bawang Putih",
+        "category": "Belanja Pasar Dapur",
+        "total_spent": 495000.0,
+        "total_qty": 13.75,
+        "avg_unit_price": 36000.0
+      },
+      {
+        "item": "Cireng",
+        "category": "Belanja Pasar Dapur",
+        "total_spent": 488000.0,
+        "total_qty": 61.0,
+        "avg_unit_price": 8000.0
+      },
+      {
+        "item": "Air Galon",
+        "category": "Operasional / Non-Bahan",
+        "total_spent": 464000.0,
+        "total_qty": 116.0,
+        "avg_unit_price": 4000.0
+      },
+      {
+        "item": "Cabai Setan",
+        "category": "Belanja Pasar Dapur",
+        "total_spent": 440000.0,
+        "total_qty": 8.8,
+        "avg_unit_price": 50000.0
+      },
+      {
+        "item": "Kol",
+        "category": "Belanja Pasar Dapur",
+        "total_spent": 436800.0,
+        "total_qty": 54.6,
+        "avg_unit_price": 8000.0
+      },
+      {
+        "item": "Timun",
+        "category": "Belanja Pasar Dapur",
+        "total_spent": 423500.0,
+        "total_qty": 38.5,
+        "avg_unit_price": 11000.0
+      },
+      {
+        "item": "Sirup",
+        "category": "Belanja Bahan Minuman",
+        "total_spent": 414000.0,
+        "total_qty": 18.0,
+        "avg_unit_price": 23000.0
+      },
+      {
+        "item": "Sayap",
+        "category": "Belanja Pasar Dapur",
+        "total_spent": 405125.0,
+        "total_qty": 87.0,
+        "avg_unit_price": 4625.0
+      },
+      {
+        "item": "Good Day Merah",
+        "category": "Belanja Bahan Minuman",
+        "total_spent": 379500.0,
+        "total_qty": 230.0,
+        "avg_unit_price": 1650.0
+      },
+      {
+        "item": "Cabai Merah",
+        "category": "Belanja Pasar Dapur",
+        "total_spent": 374000.0,
+        "total_qty": 9.5,
+        "avg_unit_price": 36000.0
+      }
+    ],
+    "daily_purchases": [
+      {
+        "tanggal": "26.08.26",
+        "belanja_dapur": 1309850.0,
+        "belanja_minuman": 105500.0,
+        "belanja_operasional": 107000.0,
+        "total_belanja": 1522350.0,
+        "items_count": 41,
+        "details": [
+          {
+            "item": "Bawang Putih",
+            "qty": 0.5,
+            "harga": 36000.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bawang Merah",
+            "qty": 0.5,
+            "harga": 36000.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Merah",
+            "qty": 0.5,
+            "harga": 36000.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Setan",
+            "qty": 0.5,
+            "harga": 50000.0,
+            "subtotal": 25000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Daun Bawang",
+            "qty": 1.0,
+            "harga": 13000.0,
+            "subtotal": 13000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Laos",
+            "qty": 0.25,
+            "harga": 20000.0,
+            "subtotal": 5000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Daun Salam",
+            "qty": 0.25,
+            "harga": 16000.0,
+            "subtotal": 4000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Timun",
+            "qty": 2.0,
+            "harga": 11000.0,
+            "subtotal": 22000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Wortel",
+            "qty": 1.0,
+            "harga": 15000.0,
+            "subtotal": 15000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kol",
+            "qty": 5.5,
+            "harga": 8000.0,
+            "subtotal": 44000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kembang Kol",
+            "qty": 1.0,
+            "harga": 8000.0,
+            "subtotal": 8000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Putren",
+            "qty": 2.0,
+            "harga": 3000.0,
+            "subtotal": 6000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sawi Hijau",
+            "qty": 3.0,
+            "harga": 11500.0,
+            "subtotal": 34500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeruk Nipis",
+            "qty": 0.25,
+            "harga": 24000.0,
+            "subtotal": 6000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Brambang Goreng",
+            "qty": 0.25,
+            "harga": 32000.0,
+            "subtotal": 8000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Gula Pasir",
+            "qty": 4.0,
+            "harga": 17500.0,
+            "subtotal": 70000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Garam",
+            "qty": 1.0,
+            "harga": 3000.0,
+            "subtotal": 3000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Marinasi",
+            "qty": 28.0,
+            "harga": 1200.0,
+            "subtotal": 33600.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Beras",
+            "qty": 1.0,
+            "harga": 83000.0,
+            "subtotal": 83000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Minyak",
+            "qty": 5.0,
+            "harga": 21000.0,
+            "subtotal": 105000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Saos",
+            "qty": 2.0,
+            "harga": 5500.0,
+            "subtotal": 11000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kecap",
+            "qty": 3.0,
+            "harga": 15500.0,
+            "subtotal": 46500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Mie Kwetiaw",
+            "qty": 6.0,
+            "harga": 6000.0,
+            "subtotal": 36000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tepung Terigu",
+            "qty": 1.0,
+            "harga": 12000.0,
+            "subtotal": 12000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tempe",
+            "qty": 5.0,
+            "harga": 6000.0,
+            "subtotal": 30000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Ayam Penyet",
+            "qty": 21.0,
+            "harga": 5250.0,
+            "subtotal": 110250.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bebek",
+            "qty": 20.0,
+            "harga": 21000.0,
+            "subtotal": 420000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Nugget",
+            "qty": 2.0,
+            "harga": 17500.0,
+            "subtotal": 35000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cireng",
+            "qty": 2.0,
+            "harga": 8000.0,
+            "subtotal": 16000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sosis",
+            "qty": 1.0,
+            "harga": 24000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeru Peras",
+            "qty": 2.0,
+            "harga": 15000.0,
+            "subtotal": 30000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kopi Hitam",
+            "qty": 10.0,
+            "harga": 1000.0,
+            "subtotal": 10000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Good Day Merah",
+            "qty": 10.0,
+            "harga": 1650.0,
+            "subtotal": 16500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Good Day Coklat",
+            "qty": 10.0,
+            "harga": 1650.0,
+            "subtotal": 16500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "White Coffee",
+            "qty": 10.0,
+            "harga": 1750.0,
+            "subtotal": 17500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Putih",
+            "qty": 18.0,
+            "harga": 1500.0,
+            "subtotal": 27000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Coklat",
+            "qty": 12.0,
+            "harga": 1500.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Tisu",
+            "qty": 10.0,
+            "harga": 3300.0,
+            "subtotal": 33000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Plastk Sampah Loreng",
+            "qty": 1.0,
+            "harga": 6000.0,
+            "subtotal": 6000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Plastik Sampah Hitam",
+            "qty": 1.0,
+            "harga": 8000.0,
+            "subtotal": 8000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Nota 3 Play",
+            "qty": 10.0,
+            "harga": 6000.0,
+            "subtotal": 60000.0,
+            "kategori": "Operasional / Non-Bahan"
+          }
+        ]
+      },
+      {
+        "tanggal": "27.08.26",
+        "belanja_dapur": 986500.0,
+        "belanja_minuman": 100000.0,
+        "belanja_operasional": 194000.0,
+        "total_belanja": 1280500.0,
+        "items_count": 31,
+        "details": [
+          {
+            "item": "Bawang Putih",
+            "qty": 0.5,
+            "harga": 36000.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bawang Merah",
+            "qty": 0.5,
+            "harga": 36000.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Merah",
+            "qty": 0.5,
+            "harga": 36000.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Setan",
+            "qty": 0.5,
+            "harga": 50000.0,
+            "subtotal": 25000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Daun Bawang",
+            "qty": 1.0,
+            "harga": 13000.0,
+            "subtotal": 13000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tomat",
+            "qty": 0.5,
+            "harga": 20000.0,
+            "subtotal": 10000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kol",
+            "qty": 2.0,
+            "harga": 8000.0,
+            "subtotal": 16000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Putren",
+            "qty": 3.0,
+            "harga": 3000.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sawi Hijau",
+            "qty": 1.0,
+            "harga": 11500.0,
+            "subtotal": 11500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sawi Putih",
+            "qty": 1.0,
+            "harga": 8500.0,
+            "subtotal": 8500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cambah",
+            "qty": 1.0,
+            "harga": 12000.0,
+            "subtotal": 12000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Gula Pasir",
+            "qty": 4.0,
+            "harga": 17500.0,
+            "subtotal": 70000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Garam",
+            "qty": 1.0,
+            "harga": 3000.0,
+            "subtotal": 3000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Moto",
+            "qty": 1.0,
+            "harga": 11000.0,
+            "subtotal": 11000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Beras",
+            "qty": 2.0,
+            "harga": 83000.0,
+            "subtotal": 166000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Minyak",
+            "qty": 4.0,
+            "harga": 21000.0,
+            "subtotal": 84000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kecap",
+            "qty": 3.0,
+            "harga": 15500.0,
+            "subtotal": 46500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Mie Kwetiaw",
+            "qty": 6.0,
+            "harga": 6000.0,
+            "subtotal": 36000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tepung Terigu",
+            "qty": 2.0,
+            "harga": 12000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tempe",
+            "qty": 5.0,
+            "harga": 6000.0,
+            "subtotal": 30000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tempe Ikat",
+            "qty": 10.0,
+            "harga": 1000.0,
+            "subtotal": 10000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Ayam Suiran",
+            "qty": 1.0,
+            "harga": 37000.0,
+            "subtotal": 37000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bebek",
+            "qty": 10.0,
+            "harga": 21000.0,
+            "subtotal": 210000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Babat",
+            "qty": 1.0,
+            "harga": 100000.0,
+            "subtotal": 100000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kopi Hitam",
+            "qty": 10.0,
+            "harga": 1000.0,
+            "subtotal": 10000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Teh",
+            "qty": 10.0,
+            "harga": 9000.0,
+            "subtotal": 90000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Plastk Sampah Loreng",
+            "qty": 1.0,
+            "harga": 6000.0,
+            "subtotal": 6000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Plastik Sampah Hitam",
+            "qty": 1.0,
+            "harga": 8000.0,
+            "subtotal": 8000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Air Galon",
+            "qty": 6.0,
+            "harga": 4000.0,
+            "subtotal": 24000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Gas",
+            "qty": 4.0,
+            "harga": 24000.0,
+            "subtotal": 96000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Nota 3 Play",
+            "qty": 10.0,
+            "harga": 6000.0,
+            "subtotal": 60000.0,
+            "kategori": "Operasional / Non-Bahan"
+          }
+        ]
+      },
+      {
+        "tanggal": "28.08.26",
+        "belanja_dapur": 1199250.0,
+        "belanja_minuman": 304700.0,
+        "belanja_operasional": 122000.0,
+        "total_belanja": 1625950.0,
+        "items_count": 37,
+        "details": [
+          {
+            "item": "Bawang Putih",
+            "qty": 0.5,
+            "harga": 36000.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bawang Merah",
+            "qty": 0.5,
+            "harga": 36000.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Merah",
+            "qty": 0.5,
+            "harga": 36000.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Setan",
+            "qty": 0.5,
+            "harga": 50000.0,
+            "subtotal": 25000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Daun Bawang",
+            "qty": 1.0,
+            "harga": 13000.0,
+            "subtotal": 13000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tomat",
+            "qty": 1.0,
+            "harga": 20000.0,
+            "subtotal": 20000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Timun",
+            "qty": 4.0,
+            "harga": 11000.0,
+            "subtotal": 44000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kol",
+            "qty": 3.0,
+            "harga": 8000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sawi Hijau",
+            "qty": 1.0,
+            "harga": 11500.0,
+            "subtotal": 11500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sawi Putih",
+            "qty": 1.0,
+            "harga": 8500.0,
+            "subtotal": 8500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeruk Nipis",
+            "qty": 0.5,
+            "harga": 24000.0,
+            "subtotal": 12000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Gula Pasir",
+            "qty": 8.0,
+            "harga": 17500.0,
+            "subtotal": 140000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Beras",
+            "qty": 3.0,
+            "harga": 83000.0,
+            "subtotal": 249000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Minyak",
+            "qty": 5.0,
+            "harga": 21000.0,
+            "subtotal": 105000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Telor",
+            "qty": 2.0,
+            "harga": 25000.0,
+            "subtotal": 50000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Mie Kwetiaw",
+            "qty": 6.0,
+            "harga": 6000.0,
+            "subtotal": 36000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tepung Terigu",
+            "qty": 2.0,
+            "harga": 12000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tempe",
+            "qty": 5.0,
+            "harga": 6000.0,
+            "subtotal": 30000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Ayam Penyet",
+            "qty": 7.0,
+            "harga": 5250.0,
+            "subtotal": 36750.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bebek",
+            "qty": 10.0,
+            "harga": 21000.0,
+            "subtotal": 210000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Nugget",
+            "qty": 3.0,
+            "harga": 17500.0,
+            "subtotal": 52500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cireng",
+            "qty": 3.0,
+            "harga": 8000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeru Peras",
+            "qty": 2.0,
+            "harga": 15000.0,
+            "subtotal": 30000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kopi Hitam",
+            "qty": 10.0,
+            "harga": 1000.0,
+            "subtotal": 10000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Good Day Merah",
+            "qty": 20.0,
+            "harga": 1650.0,
+            "subtotal": 33000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Good Day Coklat",
+            "qty": 10.0,
+            "harga": 1650.0,
+            "subtotal": 16500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Putih",
+            "qty": 18.0,
+            "harga": 1500.0,
+            "subtotal": 27000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Coklat",
+            "qty": 6.0,
+            "harga": 1500.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Soda",
+            "qty": 12.0,
+            "harga": 3350.0,
+            "subtotal": 40200.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sirup",
+            "qty": 1.0,
+            "harga": 23000.0,
+            "subtotal": 23000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Teh",
+            "qty": 10.0,
+            "harga": 9000.0,
+            "subtotal": 90000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sedotan",
+            "qty": 2.0,
+            "harga": 6000.0,
+            "subtotal": 12000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Es Batu",
+            "qty": 7.0,
+            "harga": 8000.0,
+            "subtotal": 56000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Plastk Sampah Loreng",
+            "qty": 1.0,
+            "harga": 6000.0,
+            "subtotal": 6000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Plastik Sampah Hitam",
+            "qty": 1.0,
+            "harga": 8000.0,
+            "subtotal": 8000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Air Galon",
+            "qty": 6.0,
+            "harga": 4000.0,
+            "subtotal": 24000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Gas",
+            "qty": 3.0,
+            "harga": 24000.0,
+            "subtotal": 72000.0,
+            "kategori": "Operasional / Non-Bahan"
+          }
+        ]
+      },
+      {
+        "tanggal": "29.08.26",
+        "belanja_dapur": 1432900.0,
+        "belanja_minuman": 271000.0,
+        "belanja_operasional": 165000.0,
+        "total_belanja": 1868900.0,
+        "items_count": 33,
+        "details": [
+          {
+            "item": "Bawang Putih",
+            "qty": 1.0,
+            "harga": 36000.0,
+            "subtotal": 36000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bawang Merah",
+            "qty": 0.5,
+            "harga": 36000.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Merah",
+            "qty": 0.5,
+            "harga": 40000.0,
+            "subtotal": 20000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Setan",
+            "qty": 1.0,
+            "harga": 50000.0,
+            "subtotal": 50000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Daun Bawang",
+            "qty": 1.0,
+            "harga": 13000.0,
+            "subtotal": 13000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeruk Nipis",
+            "qty": 0.5,
+            "harga": 24000.0,
+            "subtotal": 12000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Gula Pasir",
+            "qty": 8.0,
+            "harga": 17500.0,
+            "subtotal": 140000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Garam",
+            "qty": 2.0,
+            "harga": 3000.0,
+            "subtotal": 6000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Moto",
+            "qty": 2.0,
+            "harga": 11000.0,
+            "subtotal": 22000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Masako",
+            "qty": 24.0,
+            "harga": 600.0,
+            "subtotal": 14400.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Beras",
+            "qty": 2.0,
+            "harga": 83000.0,
+            "subtotal": 166000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Minyak",
+            "qty": 5.0,
+            "harga": 21000.0,
+            "subtotal": 105000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Telor",
+            "qty": 4.0,
+            "harga": 25000.0,
+            "subtotal": 100000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Saos",
+            "qty": 2.0,
+            "harga": 5500.0,
+            "subtotal": 11000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kecap",
+            "qty": 3.0,
+            "harga": 15500.0,
+            "subtotal": 46500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Mie Kwetiaw",
+            "qty": 20.0,
+            "harga": 6000.0,
+            "subtotal": 120000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tepung Terigu",
+            "qty": 3.0,
+            "harga": 12000.0,
+            "subtotal": 36000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bebek",
+            "qty": 20.0,
+            "harga": 21000.0,
+            "subtotal": 420000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Nugget",
+            "qty": 2.0,
+            "harga": 17500.0,
+            "subtotal": 35000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cireng",
+            "qty": 4.0,
+            "harga": 8000.0,
+            "subtotal": 32000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeru Peras",
+            "qty": 2.0,
+            "harga": 15000.0,
+            "subtotal": 30000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Good Day Merah",
+            "qty": 20.0,
+            "harga": 1650.0,
+            "subtotal": 33000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Good Day Coklat",
+            "qty": 10.0,
+            "harga": 1650.0,
+            "subtotal": 16500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "White Coffee",
+            "qty": 10.0,
+            "harga": 1750.0,
+            "subtotal": 17500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Putih",
+            "qty": 12.0,
+            "harga": 1500.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Coklat",
+            "qty": 6.0,
+            "harga": 1500.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sirup",
+            "qty": 1.0,
+            "harga": 23000.0,
+            "subtotal": 23000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Teh",
+            "qty": 10.0,
+            "harga": 9000.0,
+            "subtotal": 90000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sedotan",
+            "qty": 2.0,
+            "harga": 6000.0,
+            "subtotal": 12000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Es Batu",
+            "qty": 8.0,
+            "harga": 8000.0,
+            "subtotal": 64000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Tisu",
+            "qty": 10.0,
+            "harga": 3300.0,
+            "subtotal": 33000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Air Galon",
+            "qty": 6.0,
+            "harga": 4000.0,
+            "subtotal": 24000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Gas",
+            "qty": 4.0,
+            "harga": 24000.0,
+            "subtotal": 96000.0,
+            "kategori": "Operasional / Non-Bahan"
+          }
+        ]
+      },
+      {
+        "tanggal": "30.08.26",
+        "belanja_dapur": 0,
+        "belanja_minuman": 0,
+        "belanja_operasional": 0,
+        "total_belanja": 0,
+        "items_count": 0,
+        "details": []
+      },
+      {
+        "tanggal": "01.09.26",
+        "belanja_dapur": 925445.0,
+        "belanja_minuman": 155500.0,
+        "belanja_operasional": 116000.0,
+        "total_belanja": 1196945.0,
+        "items_count": 34,
+        "details": [
+          {
+            "item": "Bawang Putih",
+            "qty": 0.5,
+            "harga": 36000.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bawang Merah",
+            "qty": 0.5,
+            "harga": 36000.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Merah",
+            "qty": 0.5,
+            "harga": 40000.0,
+            "subtotal": 20000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Daun Bawang",
+            "qty": 0.89,
+            "harga": 13000.0,
+            "subtotal": 11570.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tomat",
+            "qty": 1.0,
+            "harga": 20000.0,
+            "subtotal": 20000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Timun",
+            "qty": 3.0,
+            "harga": 11000.0,
+            "subtotal": 33000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kol",
+            "qty": 3.0,
+            "harga": 8000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sawi Hijau",
+            "qty": 1.0,
+            "harga": 11500.0,
+            "subtotal": 11500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sawi Putih",
+            "qty": 1.25,
+            "harga": 8500.0,
+            "subtotal": 10625.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kangkung",
+            "qty": 1.0,
+            "harga": 3750.0,
+            "subtotal": 3750.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeruk Nipis",
+            "qty": 0.5,
+            "harga": 24000.0,
+            "subtotal": 12000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Gula Pasir",
+            "qty": 4.0,
+            "harga": 17500.0,
+            "subtotal": 70000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Garam",
+            "qty": 1.0,
+            "harga": 3000.0,
+            "subtotal": 3000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Moto",
+            "qty": 1.0,
+            "harga": 11000.0,
+            "subtotal": 11000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Beras",
+            "qty": 3.0,
+            "harga": 83000.0,
+            "subtotal": 249000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Saos",
+            "qty": 2.0,
+            "harga": 5500.0,
+            "subtotal": 11000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kecap",
+            "qty": 5.0,
+            "harga": 15500.0,
+            "subtotal": 77500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tepung Terigu",
+            "qty": 3.0,
+            "harga": 12000.0,
+            "subtotal": 36000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tepung Beras",
+            "qty": 0.5,
+            "harga": 9000.0,
+            "subtotal": 4500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tempe",
+            "qty": 5.0,
+            "harga": 6000.0,
+            "subtotal": 30000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Ayam Penyet",
+            "qty": 14.0,
+            "harga": 5250.0,
+            "subtotal": 73500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sayap",
+            "qty": 16.0,
+            "harga": 4625.0,
+            "subtotal": 74000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Nugget",
+            "qty": 1.0,
+            "harga": 17500.0,
+            "subtotal": 17500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cireng",
+            "qty": 4.0,
+            "harga": 8000.0,
+            "subtotal": 32000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sosis",
+            "qty": 1.0,
+            "harga": 24000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeru Peras",
+            "qty": 2.0,
+            "harga": 15000.0,
+            "subtotal": 30000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Uwuh",
+            "qty": 50.0,
+            "harga": 1240.0,
+            "subtotal": 62000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Kopi Hitam",
+            "qty": 10.0,
+            "harga": 1000.0,
+            "subtotal": 10000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Good Day Merah",
+            "qty": 10.0,
+            "harga": 1650.0,
+            "subtotal": 16500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Putih",
+            "qty": 12.0,
+            "harga": 1500.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Coklat",
+            "qty": 6.0,
+            "harga": 1500.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Es Batu",
+            "qty": 5.0,
+            "harga": 8000.0,
+            "subtotal": 40000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Air Galon",
+            "qty": 5.0,
+            "harga": 4000.0,
+            "subtotal": 20000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Gas",
+            "qty": 4.0,
+            "harga": 24000.0,
+            "subtotal": 96000.0,
+            "kategori": "Operasional / Non-Bahan"
+          }
+        ]
+      },
+      {
+        "tanggal": "02.09.26",
+        "belanja_dapur": 1022500.0,
+        "belanja_minuman": 93000.0,
+        "belanja_operasional": 136000.0,
+        "total_belanja": 1251500.0,
+        "items_count": 28,
+        "details": [
+          {
+            "item": "Bawang Putih",
+            "qty": 0.25,
+            "harga": 36000.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bawang Merah",
+            "qty": 0.5,
+            "harga": 36000.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Merah",
+            "qty": 0.5,
+            "harga": 40000.0,
+            "subtotal": 20000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tomat",
+            "qty": 1.0,
+            "harga": 20000.0,
+            "subtotal": 20000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sawi Hijau",
+            "qty": 1.0,
+            "harga": 11500.0,
+            "subtotal": 11500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Gula Pasir",
+            "qty": 4.0,
+            "harga": 17500.0,
+            "subtotal": 70000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Garam",
+            "qty": 1.0,
+            "harga": 3000.0,
+            "subtotal": 3000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Masako",
+            "qty": 10.0,
+            "harga": 600.0,
+            "subtotal": 6000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Beras",
+            "qty": 2.0,
+            "harga": 83000.0,
+            "subtotal": 166000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Saos",
+            "qty": 1.0,
+            "harga": 5500.0,
+            "subtotal": 5500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kecap",
+            "qty": 2.0,
+            "harga": 15500.0,
+            "subtotal": 31000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Mie Kwetiaw",
+            "qty": 17.0,
+            "harga": 6000.0,
+            "subtotal": 102000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kertas 0",
+            "qty": 1.0,
+            "harga": 20000.0,
+            "subtotal": 20000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Ayam Penyet",
+            "qty": 14.0,
+            "harga": 5250.0,
+            "subtotal": 73500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bebek",
+            "qty": 10.0,
+            "harga": 21000.0,
+            "subtotal": 210000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Babat",
+            "qty": 1.0,
+            "harga": 100000.0,
+            "subtotal": 100000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Nugget",
+            "qty": 2.0,
+            "harga": 17500.0,
+            "subtotal": 35000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cireng",
+            "qty": 8.0,
+            "harga": 8000.0,
+            "subtotal": 64000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sosis",
+            "qty": 2.0,
+            "harga": 24000.0,
+            "subtotal": 48000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeru Peras",
+            "qty": 2.0,
+            "harga": 15000.0,
+            "subtotal": 30000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kopi Hitam",
+            "qty": 10.0,
+            "harga": 1000.0,
+            "subtotal": 10000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Good Day Merah",
+            "qty": 10.0,
+            "harga": 1650.0,
+            "subtotal": 16500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Good Day Coklat",
+            "qty": 10.0,
+            "harga": 1650.0,
+            "subtotal": 16500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Putih",
+            "qty": 12.0,
+            "harga": 1500.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Coklat",
+            "qty": 6.0,
+            "harga": 1500.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sirup",
+            "qty": 1.0,
+            "harga": 23000.0,
+            "subtotal": 23000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Air Galon",
+            "qty": 5.0,
+            "harga": 4000.0,
+            "subtotal": 20000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Gas",
+            "qty": 4.0,
+            "harga": 24000.0,
+            "subtotal": 96000.0,
+            "kategori": "Operasional / Non-Bahan"
+          }
+        ]
+      },
+      {
+        "tanggal": "03.09.26",
+        "belanja_dapur": 665750.0,
+        "belanja_minuman": 0,
+        "belanja_operasional": 20000.0,
+        "total_belanja": 685750.0,
+        "items_count": 13,
+        "details": [
+          {
+            "item": "Bawang Putih",
+            "qty": 0.25,
+            "harga": 36000.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Daun Bawang",
+            "qty": 1.0,
+            "harga": 13000.0,
+            "subtotal": 13000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Timun",
+            "qty": 2.0,
+            "harga": 11000.0,
+            "subtotal": 22000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sawi Hijau",
+            "qty": 1.0,
+            "harga": 11500.0,
+            "subtotal": 11500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sawi Putih",
+            "qty": 1.0,
+            "harga": 8500.0,
+            "subtotal": 8500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeruk Nipis",
+            "qty": 0.25,
+            "harga": 24000.0,
+            "subtotal": 6000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Gula Pasir",
+            "qty": 2.0,
+            "harga": 17500.0,
+            "subtotal": 35000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Masako",
+            "qty": 10.0,
+            "harga": 600.0,
+            "subtotal": 6000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Beras",
+            "qty": 1.0,
+            "harga": 83000.0,
+            "subtotal": 83000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kertas 0",
+            "qty": 1.0,
+            "harga": 20000.0,
+            "subtotal": 20000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Ayam Penyet",
+            "qty": 7.0,
+            "harga": 5250.0,
+            "subtotal": 36750.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bebek",
+            "qty": 20.0,
+            "harga": 21000.0,
+            "subtotal": 420000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeru Peras",
+            "qty": 1.0,
+            "harga": 15000.0,
+            "subtotal": 15000.0,
+            "kategori": "Belanja Pasar Dapur"
+          }
+        ]
+      },
+      {
+        "tanggal": "04.09.26",
+        "belanja_dapur": 804500.0,
+        "belanja_minuman": 203000.0,
+        "belanja_operasional": 6000.0,
+        "total_belanja": 1013500.0,
+        "items_count": 22,
+        "details": [
+          {
+            "item": "Bawang Putih",
+            "qty": 0.5,
+            "harga": 36000.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bawang Merah",
+            "qty": 0.5,
+            "harga": 36000.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Merah",
+            "qty": 0.5,
+            "harga": 40000.0,
+            "subtotal": 20000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Setan",
+            "qty": 0.5,
+            "harga": 50000.0,
+            "subtotal": 25000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Timun",
+            "qty": 2.0,
+            "harga": 11000.0,
+            "subtotal": 22000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sawi Putih",
+            "qty": 1.0,
+            "harga": 8500.0,
+            "subtotal": 8500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeruk Nipis",
+            "qty": 0.25,
+            "harga": 24000.0,
+            "subtotal": 6000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cambah",
+            "qty": 1.0,
+            "harga": 12000.0,
+            "subtotal": 12000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Gula Pasir",
+            "qty": 7.0,
+            "harga": 17500.0,
+            "subtotal": 122500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Garam",
+            "qty": 2.0,
+            "harga": 3000.0,
+            "subtotal": 6000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Moto",
+            "qty": 1.0,
+            "harga": 11000.0,
+            "subtotal": 11000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Beras",
+            "qty": 2.0,
+            "harga": 83000.0,
+            "subtotal": 166000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kecap",
+            "qty": 5.0,
+            "harga": 15500.0,
+            "subtotal": 77500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Mie Kwetiaw",
+            "qty": 20.0,
+            "harga": 6000.0,
+            "subtotal": 120000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tepung Terigu",
+            "qty": 2.0,
+            "harga": 12000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sayap",
+            "qty": 32.0,
+            "harga": 4625.0,
+            "subtotal": 148000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kopi Hitam",
+            "qty": 30.0,
+            "harga": 1000.0,
+            "subtotal": 30000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Good Day Merah",
+            "qty": 20.0,
+            "harga": 1650.0,
+            "subtotal": 33000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Putih",
+            "qty": 12.0,
+            "harga": 1500.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Teh",
+            "qty": 10.0,
+            "harga": 9000.0,
+            "subtotal": 90000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sedotan",
+            "qty": 1.0,
+            "harga": 6000.0,
+            "subtotal": 6000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Es Batu",
+            "qty": 4.0,
+            "harga": 8000.0,
+            "subtotal": 32000.0,
+            "kategori": "Belanja Bahan Minuman"
+          }
+        ]
+      },
+      {
+        "tanggal": "05.09.26",
+        "belanja_dapur": 734250.0,
+        "belanja_minuman": 162200.0,
+        "belanja_operasional": 169000.0,
+        "total_belanja": 1065450.0,
+        "items_count": 29,
+        "details": [
+          {
+            "item": "Bawang Putih",
+            "qty": 0.5,
+            "harga": 36000.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bawang Merah",
+            "qty": 0.5,
+            "harga": 36000.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Merah",
+            "qty": 0.25,
+            "harga": 40000.0,
+            "subtotal": 10000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Setan",
+            "qty": 0.25,
+            "harga": 50000.0,
+            "subtotal": 12500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Daun Bawang",
+            "qty": 1.0,
+            "harga": 13000.0,
+            "subtotal": 13000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tomat",
+            "qty": 1.0,
+            "harga": 20000.0,
+            "subtotal": 20000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Timun",
+            "qty": 1.0,
+            "harga": 11000.0,
+            "subtotal": 11000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Wortel",
+            "qty": 0.25,
+            "harga": 15000.0,
+            "subtotal": 3750.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kol",
+            "qty": 4.0,
+            "harga": 8000.0,
+            "subtotal": 32000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sawi Hijau",
+            "qty": 1.0,
+            "harga": 11500.0,
+            "subtotal": 11500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Gula Pasir",
+            "qty": 8.0,
+            "harga": 17500.0,
+            "subtotal": 140000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Moto",
+            "qty": 1.0,
+            "harga": 11000.0,
+            "subtotal": 11000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Beras",
+            "qty": 3.0,
+            "harga": 83000.0,
+            "subtotal": 249000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kecap",
+            "qty": 3.0,
+            "harga": 15500.0,
+            "subtotal": 46500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tepung Terigu",
+            "qty": 2.0,
+            "harga": 12000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Nugget",
+            "qty": 2.0,
+            "harga": 17500.0,
+            "subtotal": 35000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cireng",
+            "qty": 5.0,
+            "harga": 8000.0,
+            "subtotal": 40000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sosis",
+            "qty": 1.0,
+            "harga": 24000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeru Peras",
+            "qty": 1.0,
+            "harga": 15000.0,
+            "subtotal": 15000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kopi Hitam",
+            "qty": 30.0,
+            "harga": 1000.0,
+            "subtotal": 30000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Good Day Merah",
+            "qty": 10.0,
+            "harga": 1650.0,
+            "subtotal": 16500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Good Day Coklat",
+            "qty": 10.0,
+            "harga": 1650.0,
+            "subtotal": 16500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Putih",
+            "qty": 18.0,
+            "harga": 1500.0,
+            "subtotal": 27000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Coklat",
+            "qty": 6.0,
+            "harga": 1500.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Soda",
+            "qty": 12.0,
+            "harga": 3350.0,
+            "subtotal": 40200.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sirup",
+            "qty": 1.0,
+            "harga": 23000.0,
+            "subtotal": 23000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Tisu",
+            "qty": 10.0,
+            "harga": 3300.0,
+            "subtotal": 33000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Air Galon",
+            "qty": 10.0,
+            "harga": 4000.0,
+            "subtotal": 40000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Gas",
+            "qty": 4.0,
+            "harga": 24000.0,
+            "subtotal": 96000.0,
+            "kategori": "Operasional / Non-Bahan"
+          }
+        ]
+      },
+      {
+        "tanggal": "06.09.26",
+        "belanja_dapur": 1080000.0,
+        "belanja_minuman": 18000.0,
+        "belanja_operasional": 96000.0,
+        "total_belanja": 1194000.0,
+        "items_count": 19,
+        "details": [
+          {
+            "item": "Bawang Putih",
+            "qty": 0.5,
+            "harga": 36000.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bawang Merah",
+            "qty": 0.25,
+            "harga": 36000.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Rawi/Lalapan",
+            "qty": 0.25,
+            "harga": 60000.0,
+            "subtotal": 15000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Merah",
+            "qty": 1.0,
+            "harga": 40000.0,
+            "subtotal": 40000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Setan",
+            "qty": 0.5,
+            "harga": 50000.0,
+            "subtotal": 25000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Daun Salam",
+            "qty": 1.0,
+            "harga": 16000.0,
+            "subtotal": 16000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kol",
+            "qty": 3.5,
+            "harga": 8000.0,
+            "subtotal": 28000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kangkung",
+            "qty": 3.0,
+            "harga": 3750.0,
+            "subtotal": 11250.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Beras",
+            "qty": 1.0,
+            "harga": 83000.0,
+            "subtotal": 83000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Telor",
+            "qty": 15.0,
+            "harga": 25000.0,
+            "subtotal": 375000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kecap",
+            "qty": 3.0,
+            "harga": 15500.0,
+            "subtotal": 46500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Mie Kwetiaw",
+            "qty": 20.0,
+            "harga": 6000.0,
+            "subtotal": 120000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tepung Terigu",
+            "qty": 2.0,
+            "harga": 12000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Ayam Penyet",
+            "qty": 21.0,
+            "harga": 5250.0,
+            "subtotal": 110250.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Babat",
+            "qty": 1.0,
+            "harga": 100000.0,
+            "subtotal": 100000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Nugget",
+            "qty": 2.0,
+            "harga": 17500.0,
+            "subtotal": 35000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sosis",
+            "qty": 1.0,
+            "harga": 24000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Susu Putih",
+            "qty": 12.0,
+            "harga": 1500.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Gas",
+            "qty": 4.0,
+            "harga": 24000.0,
+            "subtotal": 96000.0,
+            "kategori": "Operasional / Non-Bahan"
+          }
+        ]
+      },
+      {
+        "tanggal": "07.09.26",
+        "belanja_dapur": 625500.0,
+        "belanja_minuman": 221700.0,
+        "belanja_operasional": 134000.0,
+        "total_belanja": 981200.0,
+        "items_count": 23,
+        "details": [
+          {
+            "item": "Bawang Putih",
+            "qty": 0.5,
+            "harga": 36000.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Daun Bawang",
+            "qty": 1.0,
+            "harga": 13000.0,
+            "subtotal": 13000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tomat",
+            "qty": 0.5,
+            "harga": 20000.0,
+            "subtotal": 10000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Timun",
+            "qty": 1.0,
+            "harga": 11000.0,
+            "subtotal": 11000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Gula Pasir",
+            "qty": 5.0,
+            "harga": 17500.0,
+            "subtotal": 87500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Beras",
+            "qty": 1.0,
+            "harga": 83000.0,
+            "subtotal": 83000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tepung Terigu",
+            "qty": 2.0,
+            "harga": 12000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Ayam Penyet",
+            "qty": 14.0,
+            "harga": 5250.0,
+            "subtotal": 73500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bebek",
+            "qty": 10.0,
+            "harga": 21000.0,
+            "subtotal": 210000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Nugget",
+            "qty": 1.0,
+            "harga": 17500.0,
+            "subtotal": 17500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sosis",
+            "qty": 2.0,
+            "harga": 24000.0,
+            "subtotal": 48000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeru Peras",
+            "qty": 2.0,
+            "harga": 15000.0,
+            "subtotal": 30000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Good Day Merah",
+            "qty": 10.0,
+            "harga": 1650.0,
+            "subtotal": 16500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Good Day Coklat",
+            "qty": 10.0,
+            "harga": 1650.0,
+            "subtotal": 16500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "White Coffee",
+            "qty": 10.0,
+            "harga": 1750.0,
+            "subtotal": 17500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Putih",
+            "qty": 6.0,
+            "harga": 1500.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Coklat",
+            "qty": 6.0,
+            "harga": 1500.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Soda",
+            "qty": 12.0,
+            "harga": 3350.0,
+            "subtotal": 40200.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sirup",
+            "qty": 1.0,
+            "harga": 23000.0,
+            "subtotal": 23000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Teh",
+            "qty": 10.0,
+            "harga": 9000.0,
+            "subtotal": 90000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sedotan",
+            "qty": 1.0,
+            "harga": 6000.0,
+            "subtotal": 6000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Air Galon",
+            "qty": 8.0,
+            "harga": 4000.0,
+            "subtotal": 32000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Gas",
+            "qty": 4.0,
+            "harga": 24000.0,
+            "subtotal": 96000.0,
+            "kategori": "Operasional / Non-Bahan"
+          }
+        ]
+      },
+      {
+        "tanggal": "08.09.26",
+        "belanja_dapur": 833400.0,
+        "belanja_minuman": 77500.0,
+        "belanja_operasional": 102000.0,
+        "total_belanja": 1012900.0,
+        "items_count": 26,
+        "details": [
+          {
+            "item": "Bawang Putih",
+            "qty": 1.0,
+            "harga": 36000.0,
+            "subtotal": 36000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bawang Merah",
+            "qty": 0.25,
+            "harga": 36000.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Rawi/Lalapan",
+            "qty": 0.25,
+            "harga": 60000.0,
+            "subtotal": 15000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Merah",
+            "qty": 1.0,
+            "harga": 40000.0,
+            "subtotal": 40000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Setan",
+            "qty": 0.05,
+            "harga": 50000.0,
+            "subtotal": 2500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Daun Bawang",
+            "qty": 0.8,
+            "harga": 13000.0,
+            "subtotal": 10400.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tomat",
+            "qty": 0.5,
+            "harga": 20000.0,
+            "subtotal": 10000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Timun",
+            "qty": 3.0,
+            "harga": 11000.0,
+            "subtotal": 33000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kol",
+            "qty": 4.0,
+            "harga": 8000.0,
+            "subtotal": 32000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sawi Hijau",
+            "qty": 1.5,
+            "harga": 11500.0,
+            "subtotal": 17250.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Gula Pasir",
+            "qty": 6.0,
+            "harga": 17500.0,
+            "subtotal": 105000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Beras",
+            "qty": 2.0,
+            "harga": 83000.0,
+            "subtotal": 166000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Minyak",
+            "qty": 4.0,
+            "harga": 21000.0,
+            "subtotal": 84000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Saos",
+            "qty": 1.0,
+            "harga": 5500.0,
+            "subtotal": 5500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kecap",
+            "qty": 4.0,
+            "harga": 15500.0,
+            "subtotal": 62000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tepung Terigu",
+            "qty": 2.0,
+            "harga": 12000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Ayam Penyet",
+            "qty": 21.0,
+            "harga": 5250.0,
+            "subtotal": 110250.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Nugget",
+            "qty": 1.0,
+            "harga": 17500.0,
+            "subtotal": 17500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cireng",
+            "qty": 3.0,
+            "harga": 8000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeru Peras",
+            "qty": 2.0,
+            "harga": 15000.0,
+            "subtotal": 30000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kopi Hitam",
+            "qty": 20.0,
+            "harga": 1000.0,
+            "subtotal": 20000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Good Day Merah",
+            "qty": 10.0,
+            "harga": 1650.0,
+            "subtotal": 16500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Putih",
+            "qty": 6.0,
+            "harga": 1500.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sedotan",
+            "qty": 1.0,
+            "harga": 6000.0,
+            "subtotal": 6000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Es Batu",
+            "qty": 4.0,
+            "harga": 8000.0,
+            "subtotal": 32000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Gas",
+            "qty": 4.0,
+            "harga": 24000.0,
+            "subtotal": 96000.0,
+            "kategori": "Operasional / Non-Bahan"
+          }
+        ]
+      },
+      {
+        "tanggal": "09.09.26",
+        "belanja_dapur": 838450.0,
+        "belanja_minuman": 108500.0,
+        "belanja_operasional": 118000.0,
+        "total_belanja": 1064950.0,
+        "items_count": 26,
+        "details": [
+          {
+            "item": "Bawang Putih",
+            "qty": 0.25,
+            "harga": 36000.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bawang Merah",
+            "qty": 0.25,
+            "harga": 36000.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Daun Bawang",
+            "qty": 1.0,
+            "harga": 13000.0,
+            "subtotal": 13000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tomat",
+            "qty": 0.5,
+            "harga": 20000.0,
+            "subtotal": 10000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Wortel",
+            "qty": 0.25,
+            "harga": 15000.0,
+            "subtotal": 3750.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kol",
+            "qty": 2.0,
+            "harga": 8000.0,
+            "subtotal": 16000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sawi Hijau",
+            "qty": 2.0,
+            "harga": 11500.0,
+            "subtotal": 23000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Beras",
+            "qty": 2.0,
+            "harga": 83000.0,
+            "subtotal": 166000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Minyak",
+            "qty": 4.0,
+            "harga": 21000.0,
+            "subtotal": 84000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kecap",
+            "qty": 2.0,
+            "harga": 15500.0,
+            "subtotal": 31000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tepung Terigu",
+            "qty": 2.0,
+            "harga": 12000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Ayam Penyet",
+            "qty": 21.0,
+            "harga": 5700.0,
+            "subtotal": 119700.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Ayam Suiran",
+            "qty": 1.0,
+            "harga": 39000.0,
+            "subtotal": 39000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bebek",
+            "qty": 10.0,
+            "harga": 21000.0,
+            "subtotal": 210000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Nugget",
+            "qty": 2.0,
+            "harga": 17500.0,
+            "subtotal": 35000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cireng",
+            "qty": 2.0,
+            "harga": 8000.0,
+            "subtotal": 16000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeru Peras",
+            "qty": 2.0,
+            "harga": 15000.0,
+            "subtotal": 30000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kopi Hitam",
+            "qty": 11.0,
+            "harga": 1000.0,
+            "subtotal": 11000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Good Day Merah",
+            "qty": 10.0,
+            "harga": 1650.0,
+            "subtotal": 16500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Putih",
+            "qty": 6.0,
+            "harga": 1500.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Coklat",
+            "qty": 6.0,
+            "harga": 1500.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sirup",
+            "qty": 1.0,
+            "harga": 23000.0,
+            "subtotal": 23000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sedotan",
+            "qty": 1.0,
+            "harga": 6000.0,
+            "subtotal": 6000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Es Batu",
+            "qty": 5.0,
+            "harga": 8000.0,
+            "subtotal": 40000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Air Galon",
+            "qty": 4.0,
+            "harga": 4000.0,
+            "subtotal": 16000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Gas",
+            "qty": 4.0,
+            "harga": 24000.0,
+            "subtotal": 96000.0,
+            "kategori": "Operasional / Non-Bahan"
+          }
+        ]
+      },
+      {
+        "tanggal": "10.09.26",
+        "belanja_dapur": 951450.0,
+        "belanja_minuman": 76500.0,
+        "belanja_operasional": 16000.0,
+        "total_belanja": 1043950.0,
+        "items_count": 24,
+        "details": [
+          {
+            "item": "Bawang Putih",
+            "qty": 1.0,
+            "harga": 36000.0,
+            "subtotal": 36000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bawang Merah",
+            "qty": 0.25,
+            "harga": 36000.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Merah",
+            "qty": 0.5,
+            "harga": 40000.0,
+            "subtotal": 20000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Setan",
+            "qty": 1.0,
+            "harga": 50000.0,
+            "subtotal": 50000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tomat",
+            "qty": 1.0,
+            "harga": 20000.0,
+            "subtotal": 20000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Timun",
+            "qty": 3.0,
+            "harga": 11000.0,
+            "subtotal": 33000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Wortel",
+            "qty": 0.5,
+            "harga": 15000.0,
+            "subtotal": 7500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kol",
+            "qty": 1.0,
+            "harga": 8000.0,
+            "subtotal": 8000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Beras",
+            "qty": 3.0,
+            "harga": 83000.0,
+            "subtotal": 249000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Minyak",
+            "qty": 3.0,
+            "harga": 21000.0,
+            "subtotal": 63000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kecap",
+            "qty": 2.0,
+            "harga": 15500.0,
+            "subtotal": 31000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tepung Terigu",
+            "qty": 2.0,
+            "harga": 12000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tempe",
+            "qty": 5.0,
+            "harga": 6000.0,
+            "subtotal": 30000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Ayam Penyet",
+            "qty": 21.0,
+            "harga": 5700.0,
+            "subtotal": 119700.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Ayam Suiran",
+            "qty": 1.0,
+            "harga": 39000.0,
+            "subtotal": 39000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sayap",
+            "qty": 14.0,
+            "harga": 4625.0,
+            "subtotal": 64750.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Babat",
+            "qty": 1.0,
+            "harga": 100000.0,
+            "subtotal": 100000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Nugget",
+            "qty": 1.0,
+            "harga": 17500.0,
+            "subtotal": 17500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeru Peras",
+            "qty": 2.0,
+            "harga": 15000.0,
+            "subtotal": 30000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kopi Hitam",
+            "qty": 11.0,
+            "harga": 1000.0,
+            "subtotal": 11000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Good Day Coklat",
+            "qty": 10.0,
+            "harga": 1650.0,
+            "subtotal": 16500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Putih",
+            "qty": 6.0,
+            "harga": 1500.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Es Batu",
+            "qty": 5.0,
+            "harga": 8000.0,
+            "subtotal": 40000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Air Galon",
+            "qty": 4.0,
+            "harga": 4000.0,
+            "subtotal": 16000.0,
+            "kategori": "Operasional / Non-Bahan"
+          }
+        ]
+      },
+      {
+        "tanggal": "11.09.26",
+        "belanja_dapur": 734300.0,
+        "belanja_minuman": 150200.0,
+        "belanja_operasional": 130000.0,
+        "total_belanja": 1014500.0,
+        "items_count": 23,
+        "details": [
+          {
+            "item": "Bawang Putih",
+            "qty": 0.5,
+            "harga": 36000.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Setan",
+            "qty": 0.25,
+            "harga": 50000.0,
+            "subtotal": 12500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Daun Bawang",
+            "qty": 1.0,
+            "harga": 13000.0,
+            "subtotal": 13000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tomat",
+            "qty": 0.5,
+            "harga": 20000.0,
+            "subtotal": 10000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kol",
+            "qty": 1.0,
+            "harga": 8000.0,
+            "subtotal": 8000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Gula Pasir",
+            "qty": 4.0,
+            "harga": 17500.0,
+            "subtotal": 70000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Beras",
+            "qty": 1.0,
+            "harga": 83000.0,
+            "subtotal": 83000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Minyak",
+            "qty": 3.0,
+            "harga": 21000.0,
+            "subtotal": 63000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Telor",
+            "qty": 10.0,
+            "harga": 25000.0,
+            "subtotal": 250000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kecap",
+            "qty": 2.0,
+            "harga": 15500.0,
+            "subtotal": 31000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Mie Kwetiaw",
+            "qty": 7.0,
+            "harga": 6000.0,
+            "subtotal": 42000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Ayam Penyet",
+            "qty": 14.0,
+            "harga": 5700.0,
+            "subtotal": 79800.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Ayam Suiran",
+            "qty": 1.0,
+            "harga": 39000.0,
+            "subtotal": 39000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeru Peras",
+            "qty": 1.0,
+            "harga": 15000.0,
+            "subtotal": 15000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kopi Hitam",
+            "qty": 22.0,
+            "harga": 1000.0,
+            "subtotal": 22000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Putih",
+            "qty": 6.0,
+            "harga": 1500.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Soda",
+            "qty": 12.0,
+            "harga": 3350.0,
+            "subtotal": 40200.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sirup",
+            "qty": 1.0,
+            "harga": 23000.0,
+            "subtotal": 23000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sedotan",
+            "qty": 1.0,
+            "harga": 6000.0,
+            "subtotal": 6000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Es Batu",
+            "qty": 7.0,
+            "harga": 8000.0,
+            "subtotal": 56000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Plastik Sampah Hitam",
+            "qty": 1.0,
+            "harga": 8000.0,
+            "subtotal": 8000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Air Galon",
+            "qty": 5.0,
+            "harga": 4000.0,
+            "subtotal": 20000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Gas",
+            "qty": 4.0,
+            "harga": 24000.0,
+            "subtotal": 96000.0,
+            "kategori": "Operasional / Non-Bahan"
+          }
+        ]
+      },
+      {
+        "tanggal": "12.09.26",
+        "belanja_dapur": 1489342.0,
+        "belanja_minuman": 177000.0,
+        "belanja_operasional": 189000.0,
+        "total_belanja": 1855342.0,
+        "items_count": 31,
+        "details": [
+          {
+            "item": "Bawang Putih",
+            "qty": 0.75,
+            "harga": 36000.0,
+            "subtotal": 27000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Merah",
+            "qty": 0.25,
+            "harga": 40000.0,
+            "subtotal": 10000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Daun Bawang",
+            "qty": 1.0,
+            "harga": 13000.0,
+            "subtotal": 13000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tomat",
+            "qty": 1.0,
+            "harga": 20000.0,
+            "subtotal": 20000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Gula Pasir",
+            "qty": 5.0,
+            "harga": 17500.0,
+            "subtotal": 87500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Garam",
+            "qty": 1.0,
+            "harga": 3000.0,
+            "subtotal": 3000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Moto",
+            "qty": 1.0,
+            "harga": 11000.0,
+            "subtotal": 11000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Beras",
+            "qty": 3.0,
+            "harga": 83000.0,
+            "subtotal": 249000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Minyak",
+            "qty": 4.0,
+            "harga": 21000.0,
+            "subtotal": 84000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kecap",
+            "qty": 2.0,
+            "harga": 15500.0,
+            "subtotal": 31000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Mie Kwetiaw",
+            "qty": 20.0,
+            "harga": 6000.0,
+            "subtotal": 120000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tepung Terigu",
+            "qty": 3.0,
+            "harga": 12000.0,
+            "subtotal": 36000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kertas 0",
+            "qty": 1.0,
+            "harga": 20000.0,
+            "subtotal": 20000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Ayam Penyet",
+            "qty": 28.0,
+            "harga": 5700.0,
+            "subtotal": 159600.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sayap",
+            "qty": 14.0,
+            "harga": 4625.0,
+            "subtotal": 64750.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bebek",
+            "qty": 20.0,
+            "harga": 21000.0,
+            "subtotal": 420000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Nugget",
+            "qty": 3.0,
+            "harga": 17500.0,
+            "subtotal": 52500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cireng",
+            "qty": 4.0,
+            "harga": 8000.0,
+            "subtotal": 32000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeru Peras",
+            "qty": 2.0,
+            "harga": 15000.0,
+            "subtotal": 30000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Garang Asem",
+            "qty": 16.0,
+            "harga": 2437.0,
+            "subtotal": 38992.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kopi Hitam",
+            "qty": 22.0,
+            "harga": 1000.0,
+            "subtotal": 22000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Good Day Merah",
+            "qty": 10.0,
+            "harga": 1650.0,
+            "subtotal": 16500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Good Day Coklat",
+            "qty": 10.0,
+            "harga": 1650.0,
+            "subtotal": 16500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Putih",
+            "qty": 12.0,
+            "harga": 1500.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Coklat",
+            "qty": 6.0,
+            "harga": 1500.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sirup",
+            "qty": 1.0,
+            "harga": 23000.0,
+            "subtotal": 23000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Es Batu",
+            "qty": 9.0,
+            "harga": 8000.0,
+            "subtotal": 72000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Tisu",
+            "qty": 10.0,
+            "harga": 3300.0,
+            "subtotal": 33000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Plastik Sampah Hitam",
+            "qty": 1.0,
+            "harga": 8000.0,
+            "subtotal": 8000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Air Galon",
+            "qty": 8.0,
+            "harga": 4000.0,
+            "subtotal": 32000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Gas",
+            "qty": 4.0,
+            "harga": 24000.0,
+            "subtotal": 96000.0,
+            "kategori": "Operasional / Non-Bahan"
+          }
+        ]
+      },
+      {
+        "tanggal": "13.09.26",
+        "belanja_dapur": 1109850.0,
+        "belanja_minuman": 245700.0,
+        "belanja_operasional": 128000.0,
+        "total_belanja": 1483550.0,
+        "items_count": 28,
+        "details": [
+          {
+            "item": "Bawang Putih",
+            "qty": 0.75,
+            "harga": 36000.0,
+            "subtotal": 27000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bawang Merah",
+            "qty": 0.25,
+            "harga": 36000.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Merah",
+            "qty": 0.25,
+            "harga": 40000.0,
+            "subtotal": 10000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Setan",
+            "qty": 0.5,
+            "harga": 50000.0,
+            "subtotal": 25000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Daun Bawang",
+            "qty": 0.75,
+            "harga": 13000.0,
+            "subtotal": 9750.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Timun",
+            "qty": 1.5,
+            "harga": 11000.0,
+            "subtotal": 16500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kol",
+            "qty": 3.0,
+            "harga": 8000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kembang Kol",
+            "qty": 0.5,
+            "harga": 8000.0,
+            "subtotal": 4000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Putren",
+            "qty": 1.0,
+            "harga": 3000.0,
+            "subtotal": 3000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sawi Hijau",
+            "qty": 1.0,
+            "harga": 11500.0,
+            "subtotal": 11500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kangkung",
+            "qty": 2.0,
+            "harga": 3750.0,
+            "subtotal": 7500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Beras",
+            "qty": 3.0,
+            "harga": 83000.0,
+            "subtotal": 249000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Minyak",
+            "qty": 4.0,
+            "harga": 21000.0,
+            "subtotal": 84000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kecap",
+            "qty": 2.0,
+            "harga": 15500.0,
+            "subtotal": 31000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tepung Terigu",
+            "qty": 2.0,
+            "harga": 12000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kertas 0",
+            "qty": 1.0,
+            "harga": 20000.0,
+            "subtotal": 20000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Ayam Penyet",
+            "qty": 98.0,
+            "harga": 5700.0,
+            "subtotal": 558600.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cireng",
+            "qty": 2.0,
+            "harga": 8000.0,
+            "subtotal": 16000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kopi Hitam",
+            "qty": 11.0,
+            "harga": 1000.0,
+            "subtotal": 11000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Good Day Merah",
+            "qty": 10.0,
+            "harga": 1650.0,
+            "subtotal": 16500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Putih",
+            "qty": 6.0,
+            "harga": 1500.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Soda",
+            "qty": 12.0,
+            "harga": 3350.0,
+            "subtotal": 40200.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sirup",
+            "qty": 1.0,
+            "harga": 23000.0,
+            "subtotal": 23000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Teh",
+            "qty": 10.0,
+            "harga": 9000.0,
+            "subtotal": 90000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sedotan",
+            "qty": 1.0,
+            "harga": 6000.0,
+            "subtotal": 6000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Es Batu",
+            "qty": 7.0,
+            "harga": 8000.0,
+            "subtotal": 56000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Plastk Sampah Loreng",
+            "qty": 1.0,
+            "harga": 6000.0,
+            "subtotal": 6000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Gas",
+            "qty": 4.0,
+            "harga": 24000.0,
+            "subtotal": 96000.0,
+            "kategori": "Operasional / Non-Bahan"
+          }
+        ]
+      },
+      {
+        "tanggal": "15.09.26",
+        "belanja_dapur": 991250.0,
+        "belanja_minuman": 127000.0,
+        "belanja_operasional": 144000.0,
+        "total_belanja": 1262250.0,
+        "items_count": 32,
+        "details": [
+          {
+            "item": "Bawang Putih",
+            "qty": 0.5,
+            "harga": 36000.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bawang Merah",
+            "qty": 1.0,
+            "harga": 36000.0,
+            "subtotal": 36000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Rawi/Lalapan",
+            "qty": 0.5,
+            "harga": 60000.0,
+            "subtotal": 30000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Merah",
+            "qty": 0.25,
+            "harga": 40000.0,
+            "subtotal": 10000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Setan",
+            "qty": 0.25,
+            "harga": 50000.0,
+            "subtotal": 12500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Daun Bawang",
+            "qty": 1.0,
+            "harga": 13000.0,
+            "subtotal": 13000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tomat",
+            "qty": 0.5,
+            "harga": 20000.0,
+            "subtotal": 10000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Timun",
+            "qty": 2.0,
+            "harga": 11000.0,
+            "subtotal": 22000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Wortel",
+            "qty": 0.25,
+            "harga": 15000.0,
+            "subtotal": 3750.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kol",
+            "qty": 3.0,
+            "harga": 8000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Putren",
+            "qty": 2.0,
+            "harga": 3000.0,
+            "subtotal": 6000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sawi Hijau",
+            "qty": 1.0,
+            "harga": 11500.0,
+            "subtotal": 11500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeruk Nipis",
+            "qty": 0.25,
+            "harga": 24000.0,
+            "subtotal": 6000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Gula Pasir",
+            "qty": 7.0,
+            "harga": 17500.0,
+            "subtotal": 122500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Beras",
+            "qty": 2.0,
+            "harga": 83000.0,
+            "subtotal": 166000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Minyak",
+            "qty": 5.0,
+            "harga": 21000.0,
+            "subtotal": 105000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Telor",
+            "qty": 10.0,
+            "harga": 25000.0,
+            "subtotal": 250000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tepung Terigu",
+            "qty": 2.0,
+            "harga": 12000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Nugget",
+            "qty": 2.0,
+            "harga": 17500.0,
+            "subtotal": 35000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cireng",
+            "qty": 4.0,
+            "harga": 8000.0,
+            "subtotal": 32000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sosis",
+            "qty": 1.0,
+            "harga": 24000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeru Peras",
+            "qty": 2.0,
+            "harga": 15000.0,
+            "subtotal": 30000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kopi Hitam",
+            "qty": 11.0,
+            "harga": 1000.0,
+            "subtotal": 11000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Good Day Merah",
+            "qty": 10.0,
+            "harga": 1650.0,
+            "subtotal": 16500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Good Day Coklat",
+            "qty": 10.0,
+            "harga": 1650.0,
+            "subtotal": 16500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Putih",
+            "qty": 12.0,
+            "harga": 1500.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Coklat",
+            "qty": 6.0,
+            "harga": 1500.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sedotan",
+            "qty": 1.0,
+            "harga": 6000.0,
+            "subtotal": 6000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Es Batu",
+            "qty": 7.0,
+            "harga": 8000.0,
+            "subtotal": 56000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Plastk Sampah Loreng",
+            "qty": 1.0,
+            "harga": 6000.0,
+            "subtotal": 6000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Air Galon",
+            "qty": 9.0,
+            "harga": 4000.0,
+            "subtotal": 36000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Gas",
+            "qty": 4.0,
+            "harga": 24000.0,
+            "subtotal": 96000.0,
+            "kategori": "Operasional / Non-Bahan"
+          }
+        ]
+      },
+      {
+        "tanggal": "16.09.26",
+        "belanja_dapur": 485550.0,
+        "belanja_minuman": 154780.0,
+        "belanja_operasional": 116000.0,
+        "total_belanja": 756330.0,
+        "items_count": 23,
+        "details": [
+          {
+            "item": "Bawang Putih",
+            "qty": 0.25,
+            "harga": 36000.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Rawi/Lalapan",
+            "qty": 0.25,
+            "harga": 60000.0,
+            "subtotal": 15000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Merah",
+            "qty": 0.25,
+            "harga": 40000.0,
+            "subtotal": 10000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Setan",
+            "qty": 0.25,
+            "harga": 50000.0,
+            "subtotal": 12500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tomat",
+            "qty": 0.5,
+            "harga": 20000.0,
+            "subtotal": 10000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Timun",
+            "qty": 1.0,
+            "harga": 11000.0,
+            "subtotal": 11000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kol",
+            "qty": 2.0,
+            "harga": 8000.0,
+            "subtotal": 16000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kembang Kol",
+            "qty": 0.5,
+            "harga": 8000.0,
+            "subtotal": 4000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sawi Hijau",
+            "qty": 1.0,
+            "harga": 11500.0,
+            "subtotal": 11500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sawi Putih",
+            "qty": 0.5,
+            "harga": 8500.0,
+            "subtotal": 4250.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeruk Nipis",
+            "qty": 0.25,
+            "harga": 24000.0,
+            "subtotal": 6000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Minyak",
+            "qty": 4.0,
+            "harga": 21000.0,
+            "subtotal": 84000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Mie Kwetiaw",
+            "qty": 5.0,
+            "harga": 6000.0,
+            "subtotal": 30000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tepung Terigu",
+            "qty": 2.0,
+            "harga": 12000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Ayam Penyet",
+            "qty": 19.0,
+            "harga": 5700.0,
+            "subtotal": 108300.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Babat",
+            "qty": 1.0,
+            "harga": 100000.0,
+            "subtotal": 100000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeru Peras",
+            "qty": 2.0,
+            "harga": 15000.0,
+            "subtotal": 30000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Uwuh",
+            "qty": 47.0,
+            "harga": 1240.0,
+            "subtotal": 58280.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "White Coffee",
+            "qty": 10.0,
+            "harga": 1750.0,
+            "subtotal": 17500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sirup",
+            "qty": 1.0,
+            "harga": 23000.0,
+            "subtotal": 23000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Es Batu",
+            "qty": 7.0,
+            "harga": 8000.0,
+            "subtotal": 56000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Air Galon",
+            "qty": 5.0,
+            "harga": 4000.0,
+            "subtotal": 20000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Gas",
+            "qty": 4.0,
+            "harga": 24000.0,
+            "subtotal": 96000.0,
+            "kategori": "Operasional / Non-Bahan"
+          }
+        ]
+      },
+      {
+        "tanggal": "17.09.26",
+        "belanja_dapur": 581750.0,
+        "belanja_minuman": 23000.0,
+        "belanja_operasional": 108000.0,
+        "total_belanja": 712750.0,
+        "items_count": 19,
+        "details": [
+          {
+            "item": "Bawang Putih",
+            "qty": 0.75,
+            "harga": 36000.0,
+            "subtotal": 27000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bawang Merah",
+            "qty": 0.75,
+            "harga": 36000.0,
+            "subtotal": 27000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Rawi/Lalapan",
+            "qty": 0.25,
+            "harga": 60000.0,
+            "subtotal": 15000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Merah",
+            "qty": 0.5,
+            "harga": 40000.0,
+            "subtotal": 20000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Setan",
+            "qty": 0.5,
+            "harga": 50000.0,
+            "subtotal": 25000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Daun Bawang",
+            "qty": 1.0,
+            "harga": 13000.0,
+            "subtotal": 13000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tomat",
+            "qty": 1.0,
+            "harga": 20000.0,
+            "subtotal": 20000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Wortel",
+            "qty": 0.25,
+            "harga": 15000.0,
+            "subtotal": 3750.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kol",
+            "qty": 2.0,
+            "harga": 8000.0,
+            "subtotal": 16000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Putren",
+            "qty": 2.0,
+            "harga": 3000.0,
+            "subtotal": 6000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sawi Hijau",
+            "qty": 1.0,
+            "harga": 11500.0,
+            "subtotal": 11500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Gula Pasir",
+            "qty": 5.0,
+            "harga": 17500.0,
+            "subtotal": 87500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Beras",
+            "qty": 2.0,
+            "harga": 83000.0,
+            "subtotal": 166000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Minyak",
+            "qty": 2.0,
+            "harga": 21000.0,
+            "subtotal": 42000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Mie Kwetiaw",
+            "qty": 15.0,
+            "harga": 6000.0,
+            "subtotal": 90000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tepung Terigu",
+            "qty": 1.0,
+            "harga": 12000.0,
+            "subtotal": 12000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sirup",
+            "qty": 1.0,
+            "harga": 23000.0,
+            "subtotal": 23000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Air Galon",
+            "qty": 3.0,
+            "harga": 4000.0,
+            "subtotal": 12000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Gas",
+            "qty": 4.0,
+            "harga": 24000.0,
+            "subtotal": 96000.0,
+            "kategori": "Operasional / Non-Bahan"
+          }
+        ]
+      },
+      {
+        "tanggal": "18.09.26",
+        "belanja_dapur": 1254625.0,
+        "belanja_minuman": 134000.0,
+        "belanja_operasional": 71600.0,
+        "total_belanja": 1460225.0,
+        "items_count": 35,
+        "details": [
+          {
+            "item": "Bawang Putih",
+            "qty": 0.5,
+            "harga": 36000.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bawang Merah",
+            "qty": 0.25,
+            "harga": 36000.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Merah",
+            "qty": 0.25,
+            "harga": 40000.0,
+            "subtotal": 10000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Setan",
+            "qty": 0.5,
+            "harga": 50000.0,
+            "subtotal": 25000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Daun Bawang",
+            "qty": 1.0,
+            "harga": 13000.0,
+            "subtotal": 13000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tomat",
+            "qty": 1.0,
+            "harga": 20000.0,
+            "subtotal": 20000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Timun",
+            "qty": 2.0,
+            "harga": 11000.0,
+            "subtotal": 22000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Wortel",
+            "qty": 0.25,
+            "harga": 15000.0,
+            "subtotal": 3750.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kol",
+            "qty": 2.6,
+            "harga": 8000.0,
+            "subtotal": 20800.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sawi Hijau",
+            "qty": 2.0,
+            "harga": 11500.0,
+            "subtotal": 23000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sawi Putih",
+            "qty": 0.5,
+            "harga": 8500.0,
+            "subtotal": 4250.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeruk Nipis",
+            "qty": 0.5,
+            "harga": 24000.0,
+            "subtotal": 12000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Gula Pasir",
+            "qty": 7.0,
+            "harga": 17500.0,
+            "subtotal": 122500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Beras",
+            "qty": 2.0,
+            "harga": 83000.0,
+            "subtotal": 166000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Minyak",
+            "qty": 5.0,
+            "harga": 21000.0,
+            "subtotal": 105000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kecap",
+            "qty": 4.0,
+            "harga": 15500.0,
+            "subtotal": 62000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tepung Terigu",
+            "qty": 3.0,
+            "harga": 12000.0,
+            "subtotal": 36000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Ayam Penyet",
+            "qty": 21.0,
+            "harga": 5700.0,
+            "subtotal": 119700.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sayap",
+            "qty": 11.0,
+            "harga": 4875.0,
+            "subtotal": 53625.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bebek",
+            "qty": 10.0,
+            "harga": 21000.0,
+            "subtotal": 210000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Nugget",
+            "qty": 2.0,
+            "harga": 17500.0,
+            "subtotal": 35000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cireng",
+            "qty": 4.0,
+            "harga": 8000.0,
+            "subtotal": 32000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sosis",
+            "qty": 1.0,
+            "harga": 24000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeru Peras",
+            "qty": 2.0,
+            "harga": 15000.0,
+            "subtotal": 30000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Garang Asem",
+            "qty": 16.0,
+            "harga": 4875.0,
+            "subtotal": 78000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kopi Hitam",
+            "qty": 11.0,
+            "harga": 1000.0,
+            "subtotal": 11000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Good Day Merah",
+            "qty": 10.0,
+            "harga": 1650.0,
+            "subtotal": 16500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Good Day Coklat",
+            "qty": 10.0,
+            "harga": 1650.0,
+            "subtotal": 16500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Putih",
+            "qty": 12.0,
+            "harga": 1500.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Coklat",
+            "qty": 6.0,
+            "harga": 1500.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sirup",
+            "qty": 1.0,
+            "harga": 23000.0,
+            "subtotal": 23000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sedotan",
+            "qty": 2.0,
+            "harga": 6000.0,
+            "subtotal": 12000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Es Batu",
+            "qty": 5.0,
+            "harga": 8000.0,
+            "subtotal": 40000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Tisu",
+            "qty": 12.0,
+            "harga": 3300.0,
+            "subtotal": 39600.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Air Galon",
+            "qty": 5.0,
+            "harga": 4000.0,
+            "subtotal": 20000.0,
+            "kategori": "Operasional / Non-Bahan"
+          }
+        ]
+      },
+      {
+        "tanggal": "19.09.26",
+        "belanja_dapur": 1191200.0,
+        "belanja_minuman": 81000.0,
+        "belanja_operasional": 128000.0,
+        "total_belanja": 1400200.0,
+        "items_count": 24,
+        "details": [
+          {
+            "item": "Bawang Putih",
+            "qty": 0.5,
+            "harga": 36000.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bawang Merah",
+            "qty": 0.25,
+            "harga": 36000.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Merah",
+            "qty": 0.25,
+            "harga": 40000.0,
+            "subtotal": 10000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Setan",
+            "qty": 0.25,
+            "harga": 50000.0,
+            "subtotal": 12500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Timun",
+            "qty": 2.0,
+            "harga": 11000.0,
+            "subtotal": 22000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kol",
+            "qty": 2.0,
+            "harga": 8000.0,
+            "subtotal": 16000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kembang Kol",
+            "qty": 0.5,
+            "harga": 8000.0,
+            "subtotal": 4000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Gula Pasir",
+            "qty": 3.0,
+            "harga": 17500.0,
+            "subtotal": 52500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Beras",
+            "qty": 1.0,
+            "harga": 83000.0,
+            "subtotal": 83000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Minyak",
+            "qty": 5.0,
+            "harga": 21000.0,
+            "subtotal": 105000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Telor",
+            "qty": 10.0,
+            "harga": 25000.0,
+            "subtotal": 250000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kecap",
+            "qty": 3.0,
+            "harga": 15500.0,
+            "subtotal": 46500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Mie Kwetiaw",
+            "qty": 20.0,
+            "harga": 6000.0,
+            "subtotal": 120000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Ayam Penyet",
+            "qty": 21.0,
+            "harga": 5700.0,
+            "subtotal": 119700.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Ayam Suiran",
+            "qty": 1.0,
+            "harga": 39000.0,
+            "subtotal": 39000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bebek",
+            "qty": 10.0,
+            "harga": 21000.0,
+            "subtotal": 210000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Nugget",
+            "qty": 2.0,
+            "harga": 17500.0,
+            "subtotal": 35000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sosis",
+            "qty": 1.0,
+            "harga": 24000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeru Peras",
+            "qty": 1.0,
+            "harga": 15000.0,
+            "subtotal": 15000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Susu Putih",
+            "qty": 12.0,
+            "harga": 1500.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sirup",
+            "qty": 1.0,
+            "harga": 23000.0,
+            "subtotal": 23000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Es Batu",
+            "qty": 5.0,
+            "harga": 8000.0,
+            "subtotal": 40000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Air Galon",
+            "qty": 8.0,
+            "harga": 4000.0,
+            "subtotal": 32000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Gas",
+            "qty": 4.0,
+            "harga": 24000.0,
+            "subtotal": 96000.0,
+            "kategori": "Operasional / Non-Bahan"
+          }
+        ]
+      },
+      {
+        "tanggal": "20.09.26",
+        "belanja_dapur": 1293000.0,
+        "belanja_minuman": 307700.0,
+        "belanja_operasional": 141600.0,
+        "total_belanja": 1742300.0,
+        "items_count": 33,
+        "details": [
+          {
+            "item": "Bawang Putih",
+            "qty": 0.5,
+            "harga": 36000.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bawang Merah",
+            "qty": 0.25,
+            "harga": 36000.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Rawi/Lalapan",
+            "qty": 0.25,
+            "harga": 60000.0,
+            "subtotal": 15000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Merah",
+            "qty": 0.25,
+            "harga": 40000.0,
+            "subtotal": 10000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Setan",
+            "qty": 0.5,
+            "harga": 50000.0,
+            "subtotal": 25000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Daun Bawang",
+            "qty": 1.0,
+            "harga": 13000.0,
+            "subtotal": 13000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Timun",
+            "qty": 2.0,
+            "harga": 11000.0,
+            "subtotal": 22000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kol",
+            "qty": 5.0,
+            "harga": 8000.0,
+            "subtotal": 40000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sawi Hijau",
+            "qty": 1.0,
+            "harga": 11500.0,
+            "subtotal": 11500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeruk Nipis",
+            "qty": 0.25,
+            "harga": 24000.0,
+            "subtotal": 6000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Gula Pasir",
+            "qty": 7.0,
+            "harga": 17500.0,
+            "subtotal": 122500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Beras",
+            "qty": 3.0,
+            "harga": 83000.0,
+            "subtotal": 249000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Minyak",
+            "qty": 3.0,
+            "harga": 21000.0,
+            "subtotal": 63000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kecap",
+            "qty": 3.0,
+            "harga": 15500.0,
+            "subtotal": 46500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tepung Terigu",
+            "qty": 3.0,
+            "harga": 12000.0,
+            "subtotal": 36000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Ayam Penyet",
+            "qty": 35.0,
+            "harga": 5700.0,
+            "subtotal": 199500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bebek",
+            "qty": 10.0,
+            "harga": 21000.0,
+            "subtotal": 210000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Babat",
+            "qty": 1.0,
+            "harga": 100000.0,
+            "subtotal": 100000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Nugget",
+            "qty": 2.0,
+            "harga": 17500.0,
+            "subtotal": 35000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cireng",
+            "qty": 4.0,
+            "harga": 8000.0,
+            "subtotal": 32000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeru Peras",
+            "qty": 2.0,
+            "harga": 15000.0,
+            "subtotal": 30000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kopi Hitam",
+            "qty": 22.0,
+            "harga": 1000.0,
+            "subtotal": 22000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Good Day Merah",
+            "qty": 10.0,
+            "harga": 1650.0,
+            "subtotal": 16500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Good Day Coklat",
+            "qty": 10.0,
+            "harga": 1650.0,
+            "subtotal": 16500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "White Coffee",
+            "qty": 10.0,
+            "harga": 1750.0,
+            "subtotal": 17500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Putih",
+            "qty": 12.0,
+            "harga": 1500.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Soda",
+            "qty": 12.0,
+            "harga": 3350.0,
+            "subtotal": 40200.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sirup",
+            "qty": 1.0,
+            "harga": 23000.0,
+            "subtotal": 23000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Teh",
+            "qty": 10.0,
+            "harga": 9000.0,
+            "subtotal": 90000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sedotan",
+            "qty": 1.0,
+            "harga": 6000.0,
+            "subtotal": 6000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Es Batu",
+            "qty": 8.0,
+            "harga": 8000.0,
+            "subtotal": 64000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Tisu",
+            "qty": 12.0,
+            "harga": 3300.0,
+            "subtotal": 39600.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Gas",
+            "qty": 4.0,
+            "harga": 24000.0,
+            "subtotal": 96000.0,
+            "kategori": "Operasional / Non-Bahan"
+          }
+        ]
+      },
+      {
+        "tanggal": "21.09.26",
+        "belanja_dapur": 1300700.0,
+        "belanja_minuman": 136000.0,
+        "belanja_operasional": 134000.0,
+        "total_belanja": 1570700.0,
+        "items_count": 33,
+        "details": [
+          {
+            "item": "Bawang Putih",
+            "qty": 0.5,
+            "harga": 36000.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Rawi/Lalapan",
+            "qty": 0.25,
+            "harga": 60000.0,
+            "subtotal": 15000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Merah",
+            "qty": 0.25,
+            "harga": 40000.0,
+            "subtotal": 10000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Setan",
+            "qty": 0.25,
+            "harga": 50000.0,
+            "subtotal": 12500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Daun Bawang",
+            "qty": 1.0,
+            "harga": 13000.0,
+            "subtotal": 13000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Timun",
+            "qty": 2.0,
+            "harga": 11000.0,
+            "subtotal": 22000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kol",
+            "qty": 2.0,
+            "harga": 8000.0,
+            "subtotal": 16000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sawi Hijau",
+            "qty": 1.0,
+            "harga": 11500.0,
+            "subtotal": 11500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sawi Putih",
+            "qty": 1.0,
+            "harga": 8500.0,
+            "subtotal": 8500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeruk Nipis",
+            "qty": 0.25,
+            "harga": 24000.0,
+            "subtotal": 6000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Gula Pasir",
+            "qty": 3.0,
+            "harga": 17500.0,
+            "subtotal": 52500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Beras",
+            "qty": 1.0,
+            "harga": 83000.0,
+            "subtotal": 83000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Minyak",
+            "qty": 3.0,
+            "harga": 21000.0,
+            "subtotal": 63000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Saos",
+            "qty": 1.0,
+            "harga": 5500.0,
+            "subtotal": 5500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kecap",
+            "qty": 3.0,
+            "harga": 15500.0,
+            "subtotal": 46500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Mie Kwetiaw",
+            "qty": 20.0,
+            "harga": 6000.0,
+            "subtotal": 120000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tepung Terigu",
+            "qty": 3.0,
+            "harga": 12000.0,
+            "subtotal": 36000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Ayam Penyet",
+            "qty": 21.0,
+            "harga": 5700.0,
+            "subtotal": 119700.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Ayam Suiran",
+            "qty": 1.0,
+            "harga": 39000.0,
+            "subtotal": 39000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Bebek",
+            "qty": 20.0,
+            "harga": 21000.0,
+            "subtotal": 420000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Nugget",
+            "qty": 2.0,
+            "harga": 17500.0,
+            "subtotal": 35000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cireng",
+            "qty": 4.0,
+            "harga": 8000.0,
+            "subtotal": 32000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kentang",
+            "qty": 2.0,
+            "harga": 31000.0,
+            "subtotal": 62000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sosis",
+            "qty": 1.0,
+            "harga": 24000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeru Peras",
+            "qty": 2.0,
+            "harga": 15000.0,
+            "subtotal": 30000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kopi Hitam",
+            "qty": 22.0,
+            "harga": 1000.0,
+            "subtotal": 22000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Good Day Merah",
+            "qty": 20.0,
+            "harga": 1650.0,
+            "subtotal": 33000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Putih",
+            "qty": 12.0,
+            "harga": 1500.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sirup",
+            "qty": 1.0,
+            "harga": 23000.0,
+            "subtotal": 23000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sedotan",
+            "qty": 1.0,
+            "harga": 6000.0,
+            "subtotal": 6000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Es Batu",
+            "qty": 5.0,
+            "harga": 8000.0,
+            "subtotal": 40000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Air Galon",
+            "qty": 8.0,
+            "harga": 4000.0,
+            "subtotal": 32000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Gas",
+            "qty": 4.0,
+            "harga": 24000.0,
+            "subtotal": 96000.0,
+            "kategori": "Operasional / Non-Bahan"
+          }
+        ]
+      },
+      {
+        "tanggal": "22.09.26",
+        "belanja_dapur": 455900.0,
+        "belanja_minuman": 175200.0,
+        "belanja_operasional": 118000.0,
+        "total_belanja": 749100.0,
+        "items_count": 24,
+        "details": [
+          {
+            "item": "Bawang Merah",
+            "qty": 0.25,
+            "harga": 36000.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Merah",
+            "qty": 0.25,
+            "harga": 40000.0,
+            "subtotal": 10000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Setan",
+            "qty": 0.25,
+            "harga": 50000.0,
+            "subtotal": 12500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tomat",
+            "qty": 1.0,
+            "harga": 20000.0,
+            "subtotal": 20000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Timun",
+            "qty": 2.0,
+            "harga": 11000.0,
+            "subtotal": 22000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Gula Pasir",
+            "qty": 3.0,
+            "harga": 17500.0,
+            "subtotal": 52500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Beras",
+            "qty": 1.0,
+            "harga": 83000.0,
+            "subtotal": 83000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Minyak",
+            "qty": 5.0,
+            "harga": 21000.0,
+            "subtotal": 105000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kecap",
+            "qty": 2.0,
+            "harga": 15500.0,
+            "subtotal": 31000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tepung Terigu",
+            "qty": 1.0,
+            "harga": 12000.0,
+            "subtotal": 12000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Ayam Penyet",
+            "qty": 7.0,
+            "harga": 5700.0,
+            "subtotal": 39900.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Nugget",
+            "qty": 2.0,
+            "harga": 17500.0,
+            "subtotal": 35000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sosis",
+            "qty": 1.0,
+            "harga": 24000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kopi Hitam",
+            "qty": 11.0,
+            "harga": 1000.0,
+            "subtotal": 11000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Good Day Merah",
+            "qty": 10.0,
+            "harga": 1650.0,
+            "subtotal": 16500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "White Coffee",
+            "qty": 10.0,
+            "harga": 1750.0,
+            "subtotal": 17500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Putih",
+            "qty": 12.0,
+            "harga": 1500.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Coklat",
+            "qty": 6.0,
+            "harga": 1500.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Soda",
+            "qty": 12.0,
+            "harga": 3350.0,
+            "subtotal": 40200.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sirup",
+            "qty": 1.0,
+            "harga": 23000.0,
+            "subtotal": 23000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sedotan",
+            "qty": 1.0,
+            "harga": 6000.0,
+            "subtotal": 6000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Es Batu",
+            "qty": 5.0,
+            "harga": 8000.0,
+            "subtotal": 40000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Air Galon",
+            "qty": 4.0,
+            "harga": 4000.0,
+            "subtotal": 16000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Gas",
+            "qty": 4.0,
+            "harga": 24000.0,
+            "subtotal": 96000.0,
+            "kategori": "Operasional / Non-Bahan"
+          }
+        ]
+      },
+      {
+        "tanggal": "23.09.26",
+        "belanja_dapur": 1141230.0,
+        "belanja_minuman": 108500.0,
+        "belanja_operasional": 134000.0,
+        "total_belanja": 1383730.0,
+        "items_count": 33,
+        "details": [
+          {
+            "item": "Bawang Putih",
+            "qty": 0.25,
+            "harga": 36000.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Merah",
+            "qty": 0.25,
+            "harga": 40000.0,
+            "subtotal": 10000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Setan",
+            "qty": 0.25,
+            "harga": 50000.0,
+            "subtotal": 12500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tomat",
+            "qty": 1.0,
+            "harga": 20000.0,
+            "subtotal": 20000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Timun",
+            "qty": 3.0,
+            "harga": 11000.0,
+            "subtotal": 33000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Wortel",
+            "qty": 0.25,
+            "harga": 15000.0,
+            "subtotal": 3750.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kol",
+            "qty": 2.0,
+            "harga": 8000.0,
+            "subtotal": 16000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kembang Kol",
+            "qty": 0.41,
+            "harga": 8000.0,
+            "subtotal": 3280.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Putren",
+            "qty": 2.0,
+            "harga": 3000.0,
+            "subtotal": 6000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sawi Hijau",
+            "qty": 2.0,
+            "harga": 11500.0,
+            "subtotal": 23000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sawi Putih",
+            "qty": 1.0,
+            "harga": 8500.0,
+            "subtotal": 8500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeruk Nipis",
+            "qty": 0.25,
+            "harga": 24000.0,
+            "subtotal": 6000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Gula Pasir",
+            "qty": 5.0,
+            "harga": 17500.0,
+            "subtotal": 87500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Beras",
+            "qty": 2.0,
+            "harga": 83000.0,
+            "subtotal": 166000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Minyak",
+            "qty": 4.0,
+            "harga": 21000.0,
+            "subtotal": 84000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Telor",
+            "qty": 10.0,
+            "harga": 25000.0,
+            "subtotal": 250000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kecap",
+            "qty": 2.0,
+            "harga": 15500.0,
+            "subtotal": 31000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tepung Terigu",
+            "qty": 2.0,
+            "harga": 12000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kertas 0",
+            "qty": 1.0,
+            "harga": 20000.0,
+            "subtotal": 20000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Ayam Penyet",
+            "qty": 21.0,
+            "harga": 5700.0,
+            "subtotal": 119700.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Babat",
+            "qty": 1.0,
+            "harga": 100000.0,
+            "subtotal": 100000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Nugget",
+            "qty": 2.0,
+            "harga": 17500.0,
+            "subtotal": 35000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cireng",
+            "qty": 4.0,
+            "harga": 8000.0,
+            "subtotal": 32000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kentang",
+            "qty": 1.0,
+            "harga": 31000.0,
+            "subtotal": 31000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeru Peras",
+            "qty": 2.0,
+            "harga": 15000.0,
+            "subtotal": 30000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kopi Hitam",
+            "qty": 11.0,
+            "harga": 1000.0,
+            "subtotal": 11000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Good Day Merah",
+            "qty": 10.0,
+            "harga": 1650.0,
+            "subtotal": 16500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Putih",
+            "qty": 12.0,
+            "harga": 1500.0,
+            "subtotal": 18000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sirup",
+            "qty": 1.0,
+            "harga": 23000.0,
+            "subtotal": 23000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sedotan",
+            "qty": 1.0,
+            "harga": 6000.0,
+            "subtotal": 6000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Es Batu",
+            "qty": 5.0,
+            "harga": 8000.0,
+            "subtotal": 40000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Air Galon",
+            "qty": 3.0,
+            "harga": 4000.0,
+            "subtotal": 12000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Gas",
+            "qty": 4.0,
+            "harga": 24000.0,
+            "subtotal": 96000.0,
+            "kategori": "Operasional / Non-Bahan"
+          }
+        ]
+      },
+      {
+        "tanggal": "24.09.26",
+        "belanja_dapur": 600275.0,
+        "belanja_minuman": 235200.0,
+        "belanja_operasional": 118000.0,
+        "total_belanja": 953475.0,
+        "items_count": 31,
+        "details": [
+          {
+            "item": "Bawang Putih",
+            "qty": 0.25,
+            "harga": 36000.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Merah",
+            "qty": 0.25,
+            "harga": 40000.0,
+            "subtotal": 10000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cabai Setan",
+            "qty": 0.25,
+            "harga": 50000.0,
+            "subtotal": 12500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Daun Bawang",
+            "qty": 1.0,
+            "harga": 13000.0,
+            "subtotal": 13000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tomat",
+            "qty": 1.0,
+            "harga": 20000.0,
+            "subtotal": 20000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kol",
+            "qty": 2.0,
+            "harga": 8000.0,
+            "subtotal": 16000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Putren",
+            "qty": 1.0,
+            "harga": 3000.0,
+            "subtotal": 3000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sawi Hijau",
+            "qty": 1.0,
+            "harga": 11500.0,
+            "subtotal": 11500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeruk Nipis",
+            "qty": 0.5,
+            "harga": 24000.0,
+            "subtotal": 12000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Gula Pasir",
+            "qty": 3.0,
+            "harga": 17500.0,
+            "subtotal": 52500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Beras",
+            "qty": 1.0,
+            "harga": 83000.0,
+            "subtotal": 83000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Minyak",
+            "qty": 2.0,
+            "harga": 21000.0,
+            "subtotal": 42000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Saos",
+            "qty": 24.0,
+            "harga": 250.0,
+            "subtotal": 6000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kecap",
+            "qty": 3.0,
+            "harga": 15500.0,
+            "subtotal": 46500.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Tepung Terigu",
+            "qty": 1.0,
+            "harga": 12000.0,
+            "subtotal": 12000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Ayam Penyet",
+            "qty": 7.0,
+            "harga": 5700.0,
+            "subtotal": 39900.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Cireng",
+            "qty": 4.0,
+            "harga": 8000.0,
+            "subtotal": 32000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Kentang",
+            "qty": 2.0,
+            "harga": 31000.0,
+            "subtotal": 62000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Sosis",
+            "qty": 1.0,
+            "harga": 24000.0,
+            "subtotal": 24000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Jeru Peras",
+            "qty": 2.0,
+            "harga": 15000.0,
+            "subtotal": 30000.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Garang Asem",
+            "qty": 13.0,
+            "harga": 4875.0,
+            "subtotal": 63375.0,
+            "kategori": "Belanja Pasar Dapur"
+          },
+          {
+            "item": "Good Day Merah",
+            "qty": 10.0,
+            "harga": 1650.0,
+            "subtotal": 16500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Good Day Coklat",
+            "qty": 10.0,
+            "harga": 1650.0,
+            "subtotal": 16500.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Susu Coklat",
+            "qty": 6.0,
+            "harga": 1500.0,
+            "subtotal": 9000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Soda",
+            "qty": 12.0,
+            "harga": 3350.0,
+            "subtotal": 40200.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sirup",
+            "qty": 1.0,
+            "harga": 23000.0,
+            "subtotal": 23000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Teh",
+            "qty": 10.0,
+            "harga": 9000.0,
+            "subtotal": 90000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Sedotan",
+            "qty": 1.0,
+            "harga": 6000.0,
+            "subtotal": 6000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Es Batu",
+            "qty": 5.0,
+            "harga": 8000.0,
+            "subtotal": 40000.0,
+            "kategori": "Belanja Bahan Minuman"
+          },
+          {
+            "item": "Air Galon",
+            "qty": 4.0,
+            "harga": 4000.0,
+            "subtotal": 16000.0,
+            "kategori": "Operasional / Non-Bahan"
+          },
+          {
+            "item": "Gas",
+            "qty": 4.0,
+            "harga": 24000.0,
+            "subtotal": 96000.0,
+            "kategori": "Operasional / Non-Bahan"
+          }
+        ]
+      }
+    ]
+  }
+}

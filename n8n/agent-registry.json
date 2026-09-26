@@ -1,0 +1,536 @@
+{
+  "schema_version": "1.0",
+  "business": {
+    "name": "Warung Ndelik",
+    "location": "Mranggen, Demak",
+    "operating_baseline": {
+      "currency": "IDR",
+      "total_personnel": 12,
+      "leadership_count": 2,
+      "employees_count": 10,
+      "monthly_payroll_baseline": 26500000,
+      "monthly_electricity_and_water_baseline": 1500000,
+      "monthly_fixed_cost_baseline": 28000000,
+      "annual_fixed_cost_baseline": 336000000,
+      "daily_fixed_cost_allocation": 933333,
+      "status": "MANAGEMENT_AND_STAFF_CONFIRMED",
+      "leadership_roster": [
+        {
+          "id": "MGT-01",
+          "name": "Owner",
+          "base_salary": 5000000,
+          "role": "Owner"
+        },
+        {
+          "id": "MGT-02",
+          "name": "Co-owner",
+          "base_salary": 3000000,
+          "role": "Co-owner"
+        }
+      ],
+      "employee_roster": [
+        {
+          "id": "EMP-01",
+          "name": "Pincuk",
+          "base_salary": 2500000
+        },
+        {
+          "id": "EMP-02",
+          "name": "Dirimu",
+          "base_salary": 2500000
+        },
+        {
+          "id": "EMP-03",
+          "name": "Fika",
+          "base_salary": 2000000
+        },
+        {
+          "id": "EMP-04",
+          "name": "Tatik",
+          "base_salary": 1500000
+        },
+        {
+          "id": "EMP-05",
+          "name": "Wahyu",
+          "base_salary": 2000000
+        },
+        {
+          "id": "EMP-06",
+          "name": "Tyas",
+          "base_salary": 2000000
+        },
+        {
+          "id": "EMP-07",
+          "name": "Alwi",
+          "base_salary": 1500000
+        },
+        {
+          "id": "EMP-08",
+          "name": "Zaki",
+          "base_salary": 1500000
+        },
+        {
+          "id": "EMP-09",
+          "name": "Ping an",
+          "base_salary": 1500000
+        },
+        {
+          "id": "EMP-10",
+          "name": "Amat",
+          "base_salary": 1500000
+        }
+      ]
+    }
+  },
+  "job_lifecycle": [
+    "QUEUED",
+    "RUNNING",
+    "NEEDS_DATA",
+    "NEEDS_APPROVAL",
+    "COMPLETED",
+    "FAILED"
+  ],
+  "data_lifecycle": [
+    "RAW",
+    "VALIDATED",
+    "RECONCILED",
+    "LOCKED"
+  ],
+  "agents": [
+    {
+      "id": "ceo_orchestrator",
+      "title": "CEO / Orchestrator Agent",
+      "schedule": [
+        "owner_command",
+        "event_driven"
+      ],
+      "input_contract": [
+        "authenticated_owner_request",
+        "agent_job_results"
+      ],
+      "output_contract": [
+        "routed_job",
+        "owner_brief",
+        "approval_request"
+      ],
+      "allowed_actions": [
+        "route_job",
+        "aggregate_reports",
+        "create_approval_request"
+      ],
+      "blocked_actions": [
+        "approve_spend",
+        "approve_payroll",
+        "change_prices",
+        "publish_content",
+        "move_money"
+      ],
+      "quality_checks": [
+        "role_verified",
+        "job_id_present",
+        "agent_output_schema_valid"
+      ],
+      "approval_required_for": [
+        "any_external_write",
+        "financial_or_hr_decision"
+      ]
+    },
+    {
+      "id": "finance_controller",
+      "title": "Finance Controller Agent",
+      "schedule": [
+        "daily_06_30",
+        "weekly_monday",
+        "month_end"
+      ],
+      "input_contract": [
+        "validated_payment_events",
+        "completed_orders",
+        "approved_expenses",
+        "refunds_and_voids"
+      ],
+      "output_contract": [
+        "pnl_draft",
+        "cashflow_draft",
+        "variance_report",
+        "reconciliation_exceptions"
+      ],
+      "allowed_actions": [
+        "calculate",
+        "flag_anomaly",
+        "create_draft_report"
+      ],
+      "blocked_actions": [
+        "declare_final_profit_without_reconciliation",
+        "edit_ledger_without_approval",
+        "pay_supplier"
+      ],
+      "quality_checks": [
+        "source_reference_per_amount",
+        "period_complete",
+        "data_status_labeled"
+      ],
+      "approval_required_for": [
+        "ledger_correction",
+        "month_close"
+      ]
+    },
+    {
+      "id": "payroll_people",
+      "title": "Payroll & People Agent",
+      "schedule": [
+        "monthly_draft_after_day_25",
+        "owner_command"
+      ],
+      "input_contract": [
+        "employee_master_private",
+        "approved_attendance",
+        "approved_overtime",
+        "approved_deductions"
+      ],
+      "output_contract": [
+        "payroll_draft_private",
+        "payroll_total",
+        "missing_attendance_list"
+      ],
+      "allowed_actions": [
+        "calculate_draft",
+        "flag_missing_data",
+        "create_private_export"
+      ],
+      "blocked_actions": [
+        "pay_salary",
+        "share_individual_payroll_to_customer_route",
+        "change_bank_details"
+      ],
+      "quality_checks": [
+        "active_employee_count_matches",
+        "period_locked",
+        "two_person_review"
+      ],
+      "approval_required_for": [
+        "payroll_finalization",
+        "payment_file_generation"
+      ]
+    },
+    {
+      "id": "inventory_menu",
+      "title": "Menu, Recipe & Inventory Agent",
+      "schedule": [
+        "per_completed_order",
+        "daily_07_00",
+        "daily_16_00"
+      ],
+      "input_contract": [
+        "menu_master",
+        "recipes",
+        "stock_levels",
+        "completed_orders",
+        "supplier_quotes"
+      ],
+      "output_contract": [
+        "low_stock_alert",
+        "demand_forecast",
+        "menu_margin_draft",
+        "purchase_request_draft"
+      ],
+      "allowed_actions": [
+        "forecast",
+        "flag_stock_risk",
+        "draft_purchase_request"
+      ],
+      "blocked_actions": [
+        "place_purchase_order",
+        "change_menu_price",
+        "disable_menu_without_owner_rule"
+      ],
+      "quality_checks": [
+        "unit_present",
+        "recipe_complete",
+        "stock_threshold_present"
+      ],
+      "approval_required_for": [
+        "purchase_order",
+        "menu_price_or_availability_change"
+      ]
+    },
+    {
+      "id": "marketing_growth",
+      "title": "Marketing Growth Agent",
+      "schedule": [
+        "weekly_tuesday",
+        "owner_command"
+      ],
+      "input_contract": [
+        "approved_brand_rules",
+        "sales_aggregate",
+        "campaign_spend",
+        "channel_metrics",
+        "menu_availability"
+      ],
+      "output_contract": [
+        "campaign_brief",
+        "content_calendar",
+        "caption_draft",
+        "performance_report"
+      ],
+      "allowed_actions": [
+        "analyze",
+        "draft_content",
+        "recommend_budget"
+      ],
+      "blocked_actions": [
+        "publish_post",
+        "spend_ad_budget",
+        "activate_discount"
+      ],
+      "quality_checks": [
+        "price_claim_from_source",
+        "stock_available",
+        "campaign_has_kpi"
+      ],
+      "approval_required_for": [
+        "publication",
+        "budget",
+        "discount"
+      ]
+    },
+    {
+      "id": "competitor_intelligence",
+      "title": "Competitor & Local Market Intelligence Agent",
+      "schedule": [
+        "weekly_wednesday",
+        "owner_command"
+      ],
+      "input_contract": [
+        "approved_target_list",
+        "public_web_sources"
+      ],
+      "output_contract": [
+        "source_backed_observations",
+        "comparison_report",
+        "hypothesis_list"
+      ],
+      "allowed_actions": [
+        "read_public_pages",
+        "compare",
+        "draft_recommendation"
+      ],
+      "blocked_actions": [
+        "login_to_competitor_services",
+        "contact_competitors",
+        "state_inference_as_fact"
+      ],
+      "quality_checks": [
+        "url_present",
+        "observed_at_present",
+        "fact_vs_hypothesis_separated",
+        "confidence_present"
+      ],
+      "approval_required_for": [
+        "price_or_menu_recommendation_execution"
+      ]
+    },
+    {
+      "id": "customer_experience",
+      "title": "Customer Experience & Reputation Agent",
+      "schedule": [
+        "per_incoming_message",
+        "daily_19_00"
+      ],
+      "input_contract": [
+        "consented_customer_messages",
+        "public_reviews",
+        "order_status"
+      ],
+      "output_contract": [
+        "reply_draft",
+        "issue_ticket",
+        "service_quality_summary"
+      ],
+      "allowed_actions": [
+        "classify",
+        "draft_reply",
+        "escalate_issue"
+      ],
+      "blocked_actions": [
+        "promise_refund",
+        "promise_compensation",
+        "disclose_private_data"
+      ],
+      "quality_checks": [
+        "order_context_checked",
+        "sensitive_issue_escalated"
+      ],
+      "approval_required_for": [
+        "refund",
+        "compensation",
+        "public_crisis_response"
+      ]
+    },
+    {
+      "id": "audit_data_steward",
+      "title": "Compliance, Audit & Data Steward Agent",
+      "schedule": [
+        "daily_23_00",
+        "workflow_failure"
+      ],
+      "input_contract": [
+        "workflow_logs",
+        "job_queue",
+        "backup_status",
+        "role_configuration"
+      ],
+      "output_contract": [
+        "audit_checklist",
+        "failure_ticket",
+        "access_risk_report"
+      ],
+      "allowed_actions": [
+        "audit",
+        "create_ticket",
+        "pause_high_risk_workflow"
+      ],
+      "blocked_actions": [
+        "read_secret_values",
+        "delete_finance_or_hr_records"
+      ],
+      "quality_checks": [
+        "audit_event_complete",
+        "backup_verified",
+        "least_privilege_checked"
+      ],
+      "approval_required_for": [
+        "role_change",
+        "retention_deletion"
+      ]
+    },
+    {
+      "id": "ai_waitress",
+      "title": "AI Waitress / Pramusaji (Menu Advisor & Customer Service)",
+      "schedule": [
+        "per_incoming_message",
+        "realtime_customer_chat"
+      ],
+      "input_contract": [
+        "customer_inquiry",
+        "menu_catalog",
+        "dining_preferences"
+      ],
+      "output_contract": [
+        "menu_recommendation",
+        "upselling_pairing",
+        "warm_greeting"
+      ],
+      "allowed_actions": [
+        "recommend_signature_dishes",
+        "explain_spiciness_levels",
+        "upsell_beverages",
+        "answer_opening_hours_and_location",
+        "draft_polite_reply"
+      ],
+      "blocked_actions": [
+        "give_unauthorized_discounts",
+        "modify_menu_pricing",
+        "collect_personal_payment_details"
+      ],
+      "quality_checks": [
+        "warm_polite_tone",
+        "accurate_menu_prices",
+        "cross_sell_drink_or_side"
+      ],
+      "approval_required_for": [
+        "custom_special_request",
+        "complaint_escalation"
+      ]
+    },
+    {
+      "id": "ai_cashier",
+      "title": "AI Kasir (Order POS, Billing, QRIS & Kitchen Dispatch)",
+      "schedule": [
+        "per_customer_order",
+        "realtime_payment_event"
+      ],
+      "input_contract": [
+        "order_items",
+        "table_number_or_takeaway",
+        "payment_method"
+      ],
+      "output_contract": [
+        "digital_receipt",
+        "qris_midtrans_payload",
+        "kitchen_ticket",
+        "sales_ledger_entry"
+      ],
+      "allowed_actions": [
+        "create_draft_order",
+        "calculate_total_bill",
+        "generate_qris_qr_or_link",
+        "confirm_cash_payment",
+        "dispatch_to_kitchen",
+        "log_transaction_to_google_sheets"
+      ],
+      "blocked_actions": [
+        "cancel_paid_order_without_owner",
+        "alter_total_arbitrarily",
+        "override_midtrans_status"
+      ],
+      "quality_checks": [
+        "exact_total_calculation",
+        "table_number_recorded",
+        "kitchen_ticket_dispatched"
+      ],
+      "approval_required_for": [
+        "order_cancellation",
+        "manual_price_override",
+        "cash_refund"
+      ]
+    }
+  ],
+  "owner_approval_categories": [
+    "payroll_finalization",
+    "payment_or_money_movement",
+    "supplier_purchase",
+    "price_or_discount_change",
+    "public_post_or_ad_spend",
+    "ledger_correction_or_month_close",
+    "employee_data_export",
+    "external_connector_enablement"
+  ],
+  "token_and_model_strategy": {
+    "provider": "google_gemini_paid",
+    "monthly_budget_idr": 200000,
+    "monthly_budget_usd": 12.5,
+    "strategy_name": "Dual-Gemini Precision & Creative Architecture",
+    "tiering": {
+      "front_office": {
+        "model": "gemini-1.5-flash",
+        "tier": "paid_pay_as_you_go",
+        "purpose": "WhatsApp Waitress menu recommendations and Kasir POS order taking",
+        "monthly_budget_allocation_idr": 35000
+      },
+      "marketing_social_media": {
+        "model": "gemini-1.5-pro",
+        "tier": "paid_pay_as_you_go",
+        "purpose": "Creative storytelling, TikTok FYP scripts, Instagram aesthetic captions, Facebook community posts",
+        "monthly_budget_allocation_idr": 85000
+      },
+      "market_research": {
+        "model": "gemini-1.5-flash-search-grounded",
+        "tier": "paid_pay_as_you_go",
+        "purpose": "Local commodity price monitoring (cabai, ayam, beras) and competitor benchmarking",
+        "monthly_budget_allocation_idr": 25000
+      },
+      "back_office_executive": {
+        "model": "gemini-1.5-flash",
+        "tier": "paid_pay_as_you_go",
+        "purpose": "Daily closing P&L summaries and CEO morning operational briefings",
+        "monthly_budget_allocation_idr": 15000
+      },
+      "safety_buffer": {
+        "purpose": "Reserve for peak weekend traffic or seasonal promotions",
+        "monthly_budget_allocation_idr": 40000
+      }
+    }
+  }
+}

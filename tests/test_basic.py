@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 
 from app.database import SessionLocal
-from app.main import app
+from app.main import app, handle_whatsapp_text
 from app.models import Stock
 
 
@@ -14,6 +14,30 @@ def test_list_menu():
     data = response.json()
     assert len(data) >= 5
     assert any("Nasi Goreng" in item["name"] for item in data)
+
+
+def test_customer_menu_is_grouped_and_uses_real_newlines():
+    db = SessionLocal()
+    try:
+        landing = handle_whatsapp_text(db, "628199999999", "MENU")
+        food = handle_whatsapp_text(db, "628199999999", "MENU MAKANAN")
+        drink = handle_whatsapp_text(db, "628199999999", "MENU MINUMAN")
+        location = handle_whatsapp_text(db, "628199999999", "LOKASI")
+    finally:
+        db.close()
+
+    assert "*MENU WARUNG NDELIK*" in landing
+    assert "MENU MAKANAN" in landing
+    assert "\n" in landing
+    assert "\\n" not in landing
+    assert "*MENU MAKANAN*" in food
+    assert "Nasi Goreng Telur" in food
+    assert "Teh Es / Panas" not in food
+    assert "*MENU MINUMAN*" in drink
+    assert "Teh Es / Panas" in drink
+    assert "Ketik contoh: *PESAN 1 2*" in food
+    assert "*LOKASI WARUNG NDELIK*" in location
+    assert "https://maps.app.goo.gl/tnFXrux6SU7nGj5x5" in location
 
 
 def test_add_menu_item_owner():

@@ -1,0 +1,12 @@
+[Unit]
+Description=Resto-AI API and Baileys forwarding for n8n on PC Mint
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/bin/ssh -i %h/.ssh/pc_rumah_ed25519 -o IdentitiesOnly=yes -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -o StrictHostKeyChecking=accept-new -N -T -L 172.18.0.1:18081:127.0.0.1:18081 -L 172.18.0.1:18082:127.0.0.1:18082 edukreativ-vps@103.89.5.220
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target

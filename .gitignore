@@ -7,6 +7,7 @@ dist/
 build/
 *.egg-info/
 .env.runtime
+.voice-bridge.runtime
 bridge/session/
 bridge/qr.*
 bridge/status.json

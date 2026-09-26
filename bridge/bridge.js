@@ -2,7 +2,8 @@ const {
   default: makeWASocket,
   useMultiFileAuthState,
   DisconnectReason,
-  fetchLatestBaileysVersion
+  fetchLatestBaileysVersion,
+  downloadMediaMessage
 } = require('@whiskeysockets/baileys');
 const pino = require('pino');
 const path = require('path');
@@ -11,9 +12,12 @@ const http = require('http');
 const { execSync } = require('child_process');
 
 const { Boom } = require('@hapi/boom');
+const { findAudioMessage, transcribeIncomingAudio } = require('./voice');
 
 const SESSION_DIR = path.join(__dirname, 'session');
 const RESTO_API_URL = process.env.RESTO_API_URL || 'http://127.0.0.1:18081/api/chat';
+const RESTO_TRANSCRIBE_URL = process.env.RESTO_TRANSCRIBE_URL || 'http://127.0.0.1:18081/api/voice/transcribe';
+const RESTO_VOICE_BRIDGE_TOKEN = process.env.RESTO_VOICE_BRIDGE_TOKEN || '';
 const PYTHON_BIN = '/home/edukreativ-vps/.hermes/hermes-agent/venv/bin/python';
 
 let sock = null;
@@ -118,13 +122,34 @@ async function startBridge() {
         m.message?.extendedTextMessage?.text ||
         m.message?.imageMessage?.caption ||
         '';
-
-      if (!text || !text.trim()) continue;
+      const hasVoice = Boolean(findAudioMessage(m.message));
+      if ((!text || !text.trim()) && !hasVoice) continue;
 
       const senderNumber = remoteJid.split('@')[0];
       const messageId = m.key.id;
+      let inboundBody = text.trim();
 
-      console.log(`[Resto-AI] Incoming from ${senderNumber}: "${text.trim()}"`);
+      if (!inboundBody && hasVoice) {
+        try {
+          inboundBody = await transcribeIncomingAudio({
+            message: m,
+            downloadMediaMessage,
+            reuploadRequest: async (message) => sock.updateMediaMessage(message),
+            transcribeUrl: RESTO_TRANSCRIBE_URL,
+            authToken: RESTO_VOICE_BRIDGE_TOKEN,
+          });
+        } catch (err) {
+          console.error(`[Resto-AI] Voice transcription failed for ${senderNumber}: ${err.message}`);
+          await sock.sendMessage(remoteJid, {
+            text: 'Maaf, voice note belum dapat diproses. Silakan kirim ulang dengan durasi lebih singkat atau tuliskan pesan Anda.'
+          }, { quoted: m });
+          continue;
+        }
+        if (!inboundBody) continue;
+        console.log(`[Resto-AI] Voice note transcribed from ${senderNumber} (${inboundBody.length} characters)`);
+      } else {
+        console.log(`[Resto-AI] Incoming from ${senderNumber}: "${inboundBody}"`);
+      }
 
       try {
         const response = await fetch(RESTO_API_URL, {
@@ -132,7 +157,10 @@ async function startBridge() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             sender: senderNumber,
-            body: text.trim(),
+            // Preserve the original WhatsApp JID. Some accounts use a LID JID;
+            // routing a reply only by its digits can send to the wrong address.
+            chat_jid: remoteJid,
+            body: inboundBody,
             message_id: messageId
           })
         });

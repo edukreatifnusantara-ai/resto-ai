@@ -14,7 +14,7 @@ from app.agent import (
     customer_cancel_order,
     _execute_tool_call,
 )
-from app.models import MenuItem, OrderStatus, PaymentStatus
+from app.models import MenuItem, Order, OrderStatus, PaymentStatus
 
 
 def test_is_owner():
@@ -88,9 +88,12 @@ def test_customer_ordering_and_security_boundary():
         chk = customer_check_order(db, cust_phone, order_id)
         assert chk["state"] == OrderStatus.DRAFT
 
-        # Confirm payment
+        # A customer statement cannot mark payment as paid; verification is external.
         pay = customer_confirm_payment(db, cust_phone, order_id)
-        assert pay["status"] == "success"
+        assert pay["status"] == "pending_verification"
+        paid_state = db.get(Order, order_id)
+        assert paid_state is not None
+        assert getattr(paid_state, "payment_state") == PaymentStatus.PENDING
 
         # Security boundary: non-owner calling owner tool via dispatcher
         sec_res = _execute_tool_call(

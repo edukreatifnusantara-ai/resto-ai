@@ -1,0 +1,122 @@
+{
+  "id": "resto-ai-operations-control-plane-v1",
+  "name": "Resto-AI - Operations Agent Control Plane (Draft)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "ops-manual-trigger",
+      "name": "Owner Manual Test",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {"id": "ops-task", "name": "task", "value": "finance", "type": "string"},
+            {"id": "ops-period", "name": "period", "value": "daily", "type": "string"},
+            {"id": "ops-requester", "name": "requester_role", "value": "OWNER", "type": "string"},
+            {"id": "ops-mode", "name": "mode", "value": "DRAFT_ONLY", "type": "string"}
+          ]
+        },
+        "options": {}
+      },
+      "id": "ops-sample-request",
+      "name": "Owner Request Sample",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const allowed = new Set(['finance', 'payroll', 'inventory', 'marketing', 'competitor', 'customer_experience', 'audit']);\nconst task = String($json.task || '').trim().toLowerCase();\nconst role = String($json.requester_role || '').trim().toUpperCase();\nif (role !== 'OWNER' && role !== 'ADMIN') throw new Error('OWNER_OR_ADMIN_ROLE_REQUIRED');\nif (!allowed.has(task)) throw new Error('UNSUPPORTED_TASK');\nreturn [{ json: { ...$json, task, job_id: `draft-${task}-${Date.now()}`, status: 'NEEDS_DATA', approval_required: true, safe_mode: 'DRAFT_ONLY' } }];"
+      },
+      "id": "ops-validate-request",
+      "name": "Validate Owner Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 0]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {"conditions": {"options": {"caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 2}, "conditions": [{"leftValue": "={{ $json.task }}", "rightValue": "finance", "operator": {"type": "string", "operation": "equals"}, "id": "finance-rule"}]}, "renameOutput": true, "outputKey": "Finance"},
+            {"conditions": {"options": {"caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 2}, "conditions": [{"leftValue": "={{ $json.task }}", "rightValue": "payroll", "operator": {"type": "string", "operation": "equals"}, "id": "payroll-rule"}]}, "renameOutput": true, "outputKey": "Payroll"},
+            {"conditions": {"options": {"caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 2}, "conditions": [{"leftValue": "={{ $json.task }}", "rightValue": "inventory", "operator": {"type": "string", "operation": "equals"}, "id": "inventory-rule"}]}, "renameOutput": true, "outputKey": "Inventory"},
+            {"conditions": {"options": {"caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 2}, "conditions": [{"leftValue": "={{ $json.task }}", "rightValue": "marketing", "operator": {"type": "string", "operation": "equals"}, "id": "marketing-rule"}]}, "renameOutput": true, "outputKey": "Marketing"},
+            {"conditions": {"options": {"caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 2}, "conditions": [{"leftValue": "={{ $json.task }}", "rightValue": "competitor", "operator": {"type": "string", "operation": "equals"}, "id": "competitor-rule"}]}, "renameOutput": true, "outputKey": "Competitor"},
+            {"conditions": {"options": {"caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 2}, "conditions": [{"leftValue": "={{ $json.task }}", "rightValue": "customer_experience", "operator": {"type": "string", "operation": "equals"}, "id": "cx-rule"}]}, "renameOutput": true, "outputKey": "Customer Experience"},
+            {"conditions": {"options": {"caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 2}, "conditions": [{"leftValue": "={{ $json.task }}", "rightValue": "audit", "operator": {"type": "string", "operation": "equals"}, "id": "audit-rule"}]}, "renameOutput": true, "outputKey": "Audit"}
+          ]
+        },
+        "options": {"fallbackOutput": "none"}
+      },
+      "id": "ops-task-router",
+      "name": "Route to Bounded Agent",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [700, 0]
+    },
+    {
+      "parameters": {"jsCode": "return [{json:{...$json, agent:'Finance Controller', deliverable:'P&L / cashflow draft with source references', required_data:['validated payments','completed orders','approved expenses','refunds/voids'], blocked_actions:['settlement','ledger correction'], next_state:'NEEDS_DATA'}}];"},
+      "id": "ops-finance-agent", "name": "Finance Controller Agent", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [960, -300]
+    },
+    {
+      "parameters": {"jsCode": "return [{json:{...$json, agent:'Payroll & People', deliverable:'Private payroll draft only', required_data:['employee master','approved attendance','overtime','deductions'], blocked_actions:['salary payment','bank detail change'], next_state:'NEEDS_APPROVAL'}}];"},
+      "id": "ops-payroll-agent", "name": "Payroll & People Agent", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [960, -180]
+    },
+    {
+      "parameters": {"jsCode": "return [{json:{...$json, agent:'Menu, Recipe & Inventory', deliverable:'Low-stock alert / forecast / purchase-request draft', required_data:['menu','recipes','stock','supplier quotes'], blocked_actions:['purchase order','price change'], next_state:'NEEDS_DATA'}}];"},
+      "id": "ops-inventory-agent", "name": "Inventory & Menu Agent", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [960, -60]
+    },
+    {
+      "parameters": {"jsCode": "return [{json:{...$json, agent:'Marketing Growth', deliverable:'Campaign/content draft with KPI', required_data:['brand rules','budget','sales aggregate','availability'], blocked_actions:['publish','ad spend','discount activation'], next_state:'NEEDS_APPROVAL'}}];"},
+      "id": "ops-marketing-agent", "name": "Marketing Growth Agent", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [960, 60]
+    },
+    {
+      "parameters": {"jsCode": "return [{json:{...$json, agent:'Competitor Intelligence', deliverable:'Source-backed public observations', required_data:['approved target list','public URLs'], blocked_actions:['login','contact competitor','price change'], next_state:'NEEDS_DATA'}}];"},
+      "id": "ops-competitor-agent", "name": "Competitor Intelligence Agent", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [960, 180]
+    },
+    {
+      "parameters": {"jsCode": "return [{json:{...$json, agent:'Customer Experience', deliverable:'Reply draft / service issue ticket', required_data:['consented message','order context'], blocked_actions:['refund promise','compensation promise'], next_state:'NEEDS_APPROVAL'}}];"},
+      "id": "ops-cx-agent", "name": "Customer Experience Agent", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [960, 300]
+    },
+    {
+      "parameters": {"jsCode": "return [{json:{...$json, agent:'Compliance, Audit & Data Steward', deliverable:'Audit checklist / failure ticket', required_data:['workflow logs','queue state','backup status'], blocked_actions:['read secrets','delete records'], next_state:'NEEDS_DATA'}}];"},
+      "id": "ops-audit-agent", "name": "Audit & Data Steward Agent", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [960, 420]
+    },
+    {
+      "parameters": {"jsCode": "return [{json:{...$json, final_status:'DRAFT_ONLY', owner_action:'Review required data and explicitly approve before any write, payment, publishing, price, payroll, or purchase action.'}}];"},
+      "id": "ops-owner-approval", "name": "Owner Approval Gate", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [1230, 60]
+    }
+  ],
+  "connections": {
+    "Owner Manual Test": {"main": [[{"node": "Owner Request Sample", "type": "main", "index": 0}]]},
+    "Owner Request Sample": {"main": [[{"node": "Validate Owner Request", "type": "main", "index": 0}]]},
+    "Validate Owner Request": {"main": [[{"node": "Route to Bounded Agent", "type": "main", "index": 0}]]},
+    "Route to Bounded Agent": {"main": [
+      [{"node": "Finance Controller Agent", "type": "main", "index": 0}],
+      [{"node": "Payroll & People Agent", "type": "main", "index": 0}],
+      [{"node": "Inventory & Menu Agent", "type": "main", "index": 0}],
+      [{"node": "Marketing Growth Agent", "type": "main", "index": 0}],
+      [{"node": "Competitor Intelligence Agent", "type": "main", "index": 0}],
+      [{"node": "Customer Experience Agent", "type": "main", "index": 0}],
+      [{"node": "Audit & Data Steward Agent", "type": "main", "index": 0}]
+    ]},
+    "Finance Controller Agent": {"main": [[{"node": "Owner Approval Gate", "type": "main", "index": 0}]]},
+    "Payroll & People Agent": {"main": [[{"node": "Owner Approval Gate", "type": "main", "index": 0}]]},
+    "Inventory & Menu Agent": {"main": [[{"node": "Owner Approval Gate", "type": "main", "index": 0}]]},
+    "Marketing Growth Agent": {"main": [[{"node": "Owner Approval Gate", "type": "main", "index": 0}]]},
+    "Competitor Intelligence Agent": {"main": [[{"node": "Owner Approval Gate", "type": "main", "index": 0}]]},
+    "Customer Experience Agent": {"main": [[{"node": "Owner Approval Gate", "type": "main", "index": 0}]]},
+    "Audit & Data Steward Agent": {"main": [[{"node": "Owner Approval Gate", "type": "main", "index": 0}] ]}
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {"executionOrder": "v1"},
+  "versionId": "resto-ai-operations-control-plane-v1",
+  "meta": {"templateCredsSetupCompleted": false},
+  "tags": []
+}

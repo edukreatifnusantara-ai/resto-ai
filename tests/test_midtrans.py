@@ -167,7 +167,30 @@ def test_table_availability_and_reservation_flow():
         assert avail_res["available_count"] >= 10
         assert any(t["table_number"] == "Meja 1" for t in avail_res["available_tables"])
 
-        # 2. Create reservation for Meja 1
+        # 2. An unpaid order cannot reserve a table.
+        unpaid = customer_create_order(
+            db,
+            customer_phone="628133344455",
+            items=[{"name": "Nasi Goreng", "quantity": 1}],
+        )
+        blocked = customer_create_reservation(
+            db,
+            customer_phone="628133344455",
+            customer_name="Pak Ahmad",
+            table_number="Meja 1",
+            reservation_date="2026-09-25",
+            reservation_time="19:00",
+            guest_count=4,
+            payment_order_id=unpaid["order_id"],
+        )
+        assert "belum lunas" in blocked["error"]
+
+        # 3. The same reservation is confirmed only after the linked order is paid.
+        paid_order = db.get(Order, unpaid["order_id"])
+        assert paid_order is not None
+        setattr(paid_order, "payment_state", PaymentStatus.SIMULATED_CONFIRMED)
+        setattr(paid_order, "state", OrderStatus.PAID)
+        db.commit()
         resv_res = customer_create_reservation(
             db,
             customer_phone="628133344455",
@@ -177,12 +200,23 @@ def test_table_availability_and_reservation_flow():
             reservation_time="19:00",
             guest_count=4,
             notes="Dekat jendela jika bisa",
+            payment_order_id=unpaid["order_id"],
         )
         assert resv_res["status"] == "success"
         assert resv_res["table_number"] == "Meja 1"
         assert resv_res["customer_name"] == "Pak Ahmad"
 
-        # 3. Try to book Meja 1 again on the same date -> should return error
+        # 4. A second paid customer still cannot take the same table and date.
+        second_order = customer_create_order(
+            db,
+            customer_phone="628188899900",
+            items=[{"name": "Nasi Goreng", "quantity": 1}],
+        )
+        second_paid_order = db.get(Order, second_order["order_id"])
+        assert second_paid_order is not None
+        setattr(second_paid_order, "payment_state", PaymentStatus.SIMULATED_CONFIRMED)
+        setattr(second_paid_order, "state", OrderStatus.PAID)
+        db.commit()
         resv_conflict = customer_create_reservation(
             db,
             customer_phone="628188899900",
@@ -191,6 +225,7 @@ def test_table_availability_and_reservation_flow():
             reservation_date="2026-09-25",
             reservation_time="19:00",
             guest_count=2,
+            payment_order_id=second_order["order_id"],
         )
         assert "error" in resv_conflict
         assert "sudah direservasi" in resv_conflict["error"]
