@@ -1,6 +1,9 @@
 """Unit tests for Web UI Password Protection ('juara') and JUARA MANAGEMENT ENTERPRISE branding.
 """
 
+import os
+os.environ["RESTO_WEB_AUTH_ENABLED"] = "true"
+
 from fastapi.testclient import TestClient
 from app.main import app
 from app.auth import AUTH_COOKIE_NAME, DEFAULT_WEB_PASSWORD

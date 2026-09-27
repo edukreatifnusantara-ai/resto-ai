@@ -70,7 +70,7 @@ def format_kitchen_ticket(order: Order) -> str:
         lines.append("━━━━━━━━━━━━━━━━━━━━━")
 
     lines.append("Status: *Menunggu Dimasak*")
-    base_url = os.getenv("RESTO_PUBLIC_BASE_URL", "http://103.196.154.67:18081").rstrip("/")
+    base_url = os.getenv("RESTO_PUBLIC_BASE_URL", "http://103.89.5.220:18081").rstrip("/")
     lines.append(f"🖥️ Layar Dapur Web: {base_url}/dapur")
 
     return "\n".join(lines)
@@ -222,7 +222,8 @@ def update_kitchen_order_status(db: Session, order_id: int, new_status: str) -> 
 
 def get_kitchen_kds_html() -> str:
     """Render full Kitchen Display System (KDS) single-page HTML interface."""
-    return """<!DOCTYPE html>
+    from app.auth import is_web_auth_enabled
+    content = """<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
@@ -575,3 +576,10 @@ def get_kitchen_kds_html() -> str:
 </body>
 </html>
 """
+    if not is_web_auth_enabled():
+        content = content.replace(' • <span class="text-amber-400 font-semibold">by JUARA MANAGEMENT ENTERPRISE</span>', '')
+        content = content.replace("""        <!-- Logout Link -->
+        <a href="/logout" title="Kunci Akses" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 transition">
+          🔒 Kunci
+        </a>""", '')
+    return content

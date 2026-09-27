@@ -29,6 +29,7 @@ from app.dashboard import get_dashboard_summary_data, get_dashboard_html_page
 from app.auth import (
     AUTH_COOKIE_NAME,
     get_web_password,
+    is_web_auth_enabled,
     generate_session_token,
     is_authenticated,
     render_login_page,
@@ -66,9 +67,9 @@ async def require_runtime_token(request: Request, call_next):
     }:
         return await call_next(request)
 
-    # Protected Web UI Pages (redirect to /login if unauthenticated)
+    # Protected Web UI Pages (redirect to /login if unauthenticated AND auth is enabled)
     if request.url.path in {"/dashboard", "/dapur", "/kds"}:
-        if not is_authenticated(request):
+        if is_web_auth_enabled() and not is_authenticated(request):
             return RedirectResponse(
                 url=f"/login?next={request.url.path}", status_code=303
             )
@@ -79,7 +80,7 @@ async def require_runtime_token(request: Request, call_next):
         request.url.path in {"/api/dashboard/data", "/api/kitchen/orders"}
         or request.url.path.startswith("/api/kitchen/orders/")
     ):
-        if not is_authenticated(request):
+        if is_web_auth_enabled() and not is_authenticated(request):
             return JSONResponse(
                 {"detail": "Autentikasi diperlukan. Silakan login di /login"},
                 status_code=401,
@@ -123,7 +124,7 @@ def health_check():
 
 @app.get("/login", response_class=HTMLResponse, response_description="Login Screen by JUARA MANAGEMENT ENTERPRISE")
 def login_view(request: Request, next: str = "/dashboard"):
-    if is_authenticated(request):
+    if not is_web_auth_enabled() or is_authenticated(request):
         return RedirectResponse(url=next, status_code=303)
     return HTMLResponse(content=render_login_page(next_path=next))
 

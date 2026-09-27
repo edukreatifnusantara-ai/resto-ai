@@ -534,8 +534,13 @@ def get_dashboard_summary_data(db: Session) -> dict:
 
 def get_dashboard_html_page() -> str:
     from pathlib import Path
+    from app.auth import is_web_auth_enabled
     html_template_path = Path(os.getenv("DASHBOARD_TEMPLATE_PATH", BASE_DIR / "templates" / "dashboard.html"))
     if html_template_path.exists():
         with open(html_template_path, "r", encoding="utf-8") as f:
-            return f.read()
+            content = f.read()
+            if not is_web_auth_enabled():
+                content = content.replace(" • <span class=\"text-orange-600 font-bold\">by JUARA MANAGEMENT ENTERPRISE</span>", "")
+                content = content.replace('<a href="/logout" title="Kunci Akses" class="px-3 py-1.5 rounded-lg border border-rose-200 bg-rose-50 text-xs font-semibold text-rose-600 hover:bg-rose-100 flex items-center gap-1.5 transition">\n          <i data-lucide="lock" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Kunci</span>\n        </a>', "")
+            return content
     return "<h1>Template not found</h1>"
