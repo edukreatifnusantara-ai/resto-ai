@@ -15,6 +15,12 @@ AUTH_COOKIE_NAME = "juara_session"
 DEFAULT_WEB_PASSWORD = "juara"
 
 
+def is_web_auth_enabled() -> bool:
+    """Returns True if web UI password protection is enabled."""
+    val = os.getenv("RESTO_WEB_AUTH_ENABLED", "false").lower().strip()
+    return val in {"true", "1", "yes"}
+
+
 def get_web_password() -> str:
     return os.getenv("RESTO_WEB_PASSWORD", DEFAULT_WEB_PASSWORD)
 
