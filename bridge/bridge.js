@@ -98,6 +98,10 @@ async function startBridge() {
       const statusCode = new Boom(lastDisconnect?.error)?.output?.statusCode;
       const isLoggedOut = statusCode === DisconnectReason.loggedOut;
 
+      if (!sock.authState.creds.registered) {
+        pairingRequested = false;
+      }
+
       // If unregistered and connection closes, reset session for fresh QR
       if (isLoggedOut && !sock.authState.creds.registered) {
         console.log('Unregistered session closed. Resetting session for fresh QR...');
