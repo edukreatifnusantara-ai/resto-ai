@@ -78,6 +78,9 @@
       <button onclick="switchTab('hr')" id="tab-btn-hr" class="py-3 flex items-center gap-1.5 whitespace-nowrap hover:text-slate-800">
         <i data-lucide="users" class="w-4 h-4"></i> SDM & Payroll Ledger
       </button>
+      <button onclick="switchTab('dow')" id="tab-btn-dow" class="py-3 flex items-center gap-1.5 whitespace-nowrap hover:text-slate-800">
+        <i data-lucide="calendar-check-2" class="w-4 h-4 text-orange-600"></i> Hari Ramai & Rekomendasi
+      </button>
       <button onclick="switchTab('research')" id="tab-btn-research" class="py-3 flex items-center gap-1.5 whitespace-nowrap hover:text-slate-800">
         <i data-lucide="search" class="w-4 h-4"></i> Tim Riset & AI Advisory
       </button>
@@ -192,6 +195,56 @@
             <div class="flex justify-between"><span>Gaji Staf (10 Org):</span><b class="text-slate-800">Rp 18.500.000</b></div>
             <div class="flex justify-between"><span>Gaji Manajemen:</span><b class="text-slate-800">Rp 8.000.000</b></div>
             <div class="flex justify-between"><span>Utilitas (Listrik/Air):</span><b class="text-slate-800">Rp 1.500.000</b></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- POLA HARI RAMAI & HIGHLIGHT SARAN OWNER WIDGET -->
+      <div class="bg-gradient-to-r from-orange-500/10 via-amber-500/10 to-emerald-500/10 border border-orange-200 rounded-2xl p-6 shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+          <div>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-orange-700 bg-orange-100 px-2.5 py-0.5 rounded-full inline-block mb-1">
+              Traffic & Demand Intelligence
+            </span>
+            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <i data-lucide="calendar-check-2" class="w-5 h-5 text-orange-600"></i> Pola Hari Paling Ramai & Strategi Owner
+            </h3>
+            <p class="text-xs text-slate-500">Peta distribusi penjualan berdasarkan hari dalam seminggu (Senin s/d Minggu) dari 28 hari riil</p>
+          </div>
+          <button onclick="switchTab('dow')" class="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 shadow-sm transition self-start md:self-auto">
+            Buka Analisis Lengkap & Rekomendasi <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="bg-white p-4 rounded-xl border border-orange-200 shadow-sm">
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Hari Paling Ramai (Peak Day)</span>
+            <div class="flex items-baseline gap-2 mt-1">
+              <h4 id="ov-peak-day" class="text-xl font-extrabold text-orange-600">Minggu</h4>
+              <span class="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">Peringkat 1</span>
+            </div>
+            <p id="ov-peak-stats" class="text-xs text-slate-700 font-semibold mt-1">Rata-rata: Rp 3.464.863 / hari</p>
+            <p class="text-[11px] text-emerald-700 font-medium">Laba: Rp 1.294.012 (Margin 37.3%)</p>
+          </div>
+
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Hari Paling Santai (Low-Tide)</span>
+            <div class="flex items-baseline gap-2 mt-1">
+              <h4 id="ov-slow-day" class="text-xl font-extrabold text-slate-700">Kamis</h4>
+              <span class="text-xs font-bold text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full">Peringkat 7</span>
+            </div>
+            <p id="ov-slow-stats" class="text-xs text-slate-700 font-semibold mt-1">Rata-rata: Rp 2.344.300 / hari</p>
+            <p class="text-[11px] text-slate-500 font-medium">Waktu ideal libur bergilir tim & deep cleaning</p>
+          </div>
+
+          <div class="bg-white p-4 rounded-xl border border-emerald-200 shadow-sm">
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Weekend Surge Factor</span>
+            <div class="flex items-baseline gap-2 mt-1">
+              <h4 id="ov-weekend-lift" class="text-xl font-extrabold text-emerald-600">+24.8%</h4>
+              <span class="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">Weekend Lift</span>
+            </div>
+            <p class="text-xs text-slate-700 font-semibold mt-1">Weekend: Rp 3,25 jt vs Weekday: Rp 2,60 jt</p>
+            <p class="text-[11px] text-indigo-700 font-medium">48.2% total laba bulanan dicetak saat akhir pekan</p>
           </div>
         </div>
       </div>
@@ -661,6 +714,145 @@
       </div>
     </div>
 
+  
+    <!-- ============================================================== -->
+    <!-- TAB: POLA HARI RAMAI & REKOMENDASI OWNER -->
+    <!-- ============================================================== -->
+    <div id="tab-dow" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200 card-shadow p-6 sm:p-8 space-y-6">
+        <div class="border-b border-slate-200 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+              <i data-lucide="calendar-check-2" class="w-5 h-5 text-orange-600"></i> Pola Trafik Mingguan, Hari Paling Ramai & Rekomendasi Owner
+            </h2>
+            <p class="text-xs text-slate-500">Analisis komparasi omzet, pengeluaran belanja pasar, dan laba bersih harian (Senin s/d Minggu) dari 28 hari operasional riil</p>
+          </div>
+          <span class="px-3.5 py-1.5 bg-orange-50 text-orange-700 font-bold text-xs rounded-xl border border-orange-200 flex items-center gap-1.5 self-start sm:self-auto shadow-sm">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Owner Actionable Playbook
+          </span>
+        </div>
+
+        <!-- 3 SUMMARY CARDS -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div class="p-5 rounded-2xl bg-gradient-to-br from-amber-500/10 via-orange-500/10 to-orange-500/5 border border-orange-200 shadow-sm relative overflow-hidden">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-orange-700 bg-orange-100 px-2.5 py-0.5 rounded-full">Puncak Trafik (Peak)</span>
+              <span class="text-2xl">🏆</span>
+            </div>
+            <h3 class="text-2xl font-extrabold text-slate-900 mt-2">Minggu</h3>
+            <div class="mt-2 space-y-1 text-xs text-slate-700">
+              <div class="flex justify-between"><span>Rata-rata Omzet:</span><b class="text-emerald-700 font-extrabold text-sm">Rp 3.464.863</b></div>
+              <div class="flex justify-between"><span>Rata-rata Laba Bersih:</span><b class="text-indigo-700 font-bold">Rp 1.294.012</b></div>
+              <div class="flex justify-between"><span>Margin Bersih:</span><b class="text-orange-700 font-bold">37.3% (Tertinggi)</b></div>
+            </div>
+            <p class="text-[11px] text-orange-950 font-medium mt-3 bg-white/90 p-2.5 rounded-xl border border-orange-200">
+              🔥 <b>Status:</b> Hari paling ramai & paling menguntungkan. Tamu keluarga & rombongan mendominasi. Wajib <i>All-Hands On Deck</i>.
+            </p>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-50 border border-slate-200 shadow-sm relative overflow-hidden">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-600 bg-slate-200 px-2.5 py-0.5 rounded-full">Hari Paling Santai (Low-Tide)</span>
+              <span class="text-2xl">🛑</span>
+            </div>
+            <h3 class="text-2xl font-extrabold text-slate-900 mt-2">Kamis</h3>
+            <div class="mt-2 space-y-1 text-xs text-slate-700">
+              <div class="flex justify-between"><span>Rata-rata Omzet:</span><b class="text-slate-800 font-bold">Rp 2.344.300</b></div>
+              <div class="flex justify-between"><span>Rata-rata Laba Bersih:</span><b class="text-slate-700 font-bold">Rp 449.810</b></div>
+              <div class="flex justify-between"><span>Margin Bersih:</span><b class="text-slate-600 font-bold">19.2% (Terendah)</b></div>
+            </div>
+            <p class="text-[11px] text-slate-800 font-medium mt-3 bg-white p-2.5 rounded-xl border border-slate-200">
+              💡 <b>Status:</b> Hari paling sepi. Waktu terbaik untuk libur bergilir tim, evaluasi SOP, & pembersihan mendalam (deep cleaning) resto.
+            </p>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-emerald-500/5 border border-emerald-200 shadow-sm relative overflow-hidden">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">Weekend Surge Factor</span>
+              <span class="text-2xl">🚀</span>
+            </div>
+            <h3 class="text-2xl font-extrabold text-emerald-700 mt-2">+24.8%</h3>
+            <div class="mt-2 space-y-1 text-xs text-slate-700">
+              <div class="flex justify-between"><span>Rata-rata Akhir Pekan (Jum-Ming):</span><b class="text-emerald-800 font-bold">Rp 3.253.429 / hr</b></div>
+              <div class="flex justify-between"><span>Rata-rata Hari Kerja (Sen-Kam):</span><b class="text-slate-600 font-medium">Rp 2.606.170 / hr</b></div>
+              <div class="flex justify-between"><span>Kontribusi Laba Weekend:</span><b class="text-indigo-700 font-bold">48.2% Total Laba</b></div>
+            </div>
+            <p class="text-[11px] text-emerald-950 font-medium mt-3 bg-white/90 p-2.5 rounded-xl border border-emerald-200">
+              📈 <b>Kesimpulan:</b> Akhir pekan adalah mesin pencetak profit utama. Nyaris separuh laba bulanan dicetak dalam 3 hari ini!
+            </p>
+          </div>
+        </div>
+
+        <!-- CHART: DOW COMPARISON BAR CHART -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 card-shadow">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                <i data-lucide="bar-chart-3" class="w-4 h-4 text-orange-600"></i> Grafik Distribusi Omzet, Belanja & Laba Berdasarkan Hari (Senin - Minggu)
+              </h3>
+              <p class="text-xs text-slate-500">Perbandingan rata-rata harian hasil pembukuan riil Warung Ndelik Mranggen</p>
+            </div>
+            <div class="flex items-center gap-4 text-xs font-semibold">
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-500"></span> Rata-rata Omzet</span>
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-rose-500"></span> Belanja Pasar</span>
+              <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-indigo-600"></span> Laba Bersih</span>
+            </div>
+          </div>
+          <div class="relative h-72 sm:h-80 w-full">
+            <canvas id="dowBarChart"></canvas>
+          </div>
+        </div>
+
+        <!-- TABEL LEADERBOARD PERINGKAT HARI -->
+        <div class="bg-slate-50 rounded-2xl border border-slate-200 p-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                <i data-lucide="trophy" class="w-4 h-4 text-amber-500"></i> Klasemen & Peringkat Hari Operasional (Rank 1 s/d 7)
+              </h3>
+              <p class="text-xs text-slate-500">Urutan hari kerja dari yang paling tinggi omzet dan laba bersihnya</p>
+            </div>
+          </div>
+          <div class="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                <tr>
+                  <th class="py-3 px-4 text-center">Peringkat</th>
+                  <th class="py-3 px-4">Hari</th>
+                  <th class="py-3 px-4 text-right">Rata-rata Omzet</th>
+                  <th class="py-3 px-4 text-right">Rata-rata Belanja</th>
+                  <th class="py-3 px-4 text-right font-bold text-indigo-900">Laba Bersih</th>
+                  <th class="py-3 px-4 text-center">Margin %</th>
+                  <th class="py-3 px-4 text-center">Status Resto</th>
+                  <th class="py-3 px-4">Instruksi Alokasi Staf & Tim</th>
+                </tr>
+              </thead>
+              <tbody id="dow-table-body" class="divide-y divide-slate-100">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 4 ACTIONABLE STRATEGIC DIRECTIVES FOR OWNER -->
+        <div class="space-y-4">
+          <div class="border-b border-slate-200 pb-2 flex items-center justify-between">
+            <div>
+              <h3 class="font-extrabold text-slate-900 text-base flex items-center gap-2">
+                <i data-lucide="compass" class="w-5 h-5 text-orange-600"></i> 4 Rekomendasi Taktis & Saran Strategis untuk Owner
+              </h3>
+              <p class="text-xs text-slate-500">Instruksi konkret operasional berbasis pola data riil untuk memaksimalkan laba kas resto</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5" id="dow-recommendations-container">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+
   </main>
 
   <!-- MODAL DETAIL BELANJAAN PER TANGGAL -->
@@ -707,6 +899,7 @@
     let menuRankingChartInstance = null;
     let topSpendingChartInstance = null;
     let purchasingDonutChartInstance = null;
+    let dowChartInstance = null;
 
     function formatRp(val) {
       return 'Rp ' + Number(val || 0).toLocaleString('id-ID');
@@ -891,8 +1084,102 @@
         `;
       });
 
-      // 7. Initialize Charts
-      renderCharts(charts);
+      // 7. Day of Week Analytics Tab & Overview Banner
+      const dow = data.day_of_week_analytics || {};
+      const peakDay = dow.peak_day || {};
+      const slowDay = dow.slowest_day || {};
+      const dowRecords = dow.records || [];
+
+      // Overview Banner elements
+      const ovPeakDayEl = document.getElementById('ov-peak-day');
+      if (ovPeakDayEl) {
+        ovPeakDayEl.innerText = peakDay.day || 'Minggu';
+        document.getElementById('ov-peak-stats').innerText = 'Rata-rata: ' + formatRp(peakDay.avg_omzet) + ' / hari';
+        document.getElementById('ov-slow-day').innerText = slowDay.day || 'Kamis';
+        document.getElementById('ov-slow-stats').innerText = 'Rata-rata: ' + formatRp(slowDay.avg_omzet) + ' / hari';
+        document.getElementById('ov-weekend-lift').innerText = '+' + (dow.weekend_lift_percent || 24.8) + '%';
+      }
+
+      // Populate DOW Leaderboard Table
+      const dowTbody = document.getElementById('dow-table-body');
+      if (dowTbody) {
+        dowTbody.innerHTML = '';
+        const sortedDOW = [...dowRecords].sort((a, b) => b.avg_omzet - a.avg_omzet);
+        sortedDOW.forEach((r, idx) => {
+          let rankBadge = 'bg-slate-100 text-slate-700 border-slate-200';
+          let rankIcon = '#' + (idx + 1);
+          if (idx === 0) { rankBadge = 'bg-amber-100 text-amber-900 border-amber-300 font-extrabold'; rankIcon = '🥇 Juara 1'; }
+          else if (idx === 1) { rankBadge = 'bg-slate-200 text-slate-800 border-slate-300 font-bold'; rankIcon = '🥈 Juara 2'; }
+          else if (idx === 2) { rankBadge = 'bg-orange-100 text-orange-800 border-orange-300 font-bold'; rankIcon = '🥉 Juara 3'; }
+
+          let statusBadge = 'bg-slate-100 text-slate-700 border-slate-200';
+          let staffAdvice = 'Operasional Reguler Standar';
+          if (r.day === 'Minggu') {
+            statusBadge = 'bg-emerald-100 text-emerald-800 border-emerald-300 font-bold';
+            staffAdvice = 'Wajib 100% Personil Hadir (All-Hands On Deck), Meja Tambahan & Fast Turnover';
+          } else if (r.day === 'Sabtu') {
+            statusBadge = 'bg-orange-100 text-orange-800 border-orange-300 font-bold';
+            staffAdvice = 'Puncak Kulakan Pasar (Rp 1,54jt). Tim Kitchen Siap Stok Porsi Ganda';
+          } else if (r.day === 'Jumat') {
+            statusBadge = 'bg-blue-100 text-blue-800 border-blue-300 font-bold';
+            staffAdvice = 'Trafik Makan Siang & Malam Melonjak. Briefing Kasir & Waitress';
+          } else if (r.day === 'Kamis') {
+            statusBadge = 'bg-rose-100 text-rose-800 border-rose-300 font-bold';
+            staffAdvice = 'Jadwal Libur Bergilir Staf & Jalankan Promo "Kamis Manis"';
+          } else if (r.day === 'Senin') {
+            statusBadge = 'bg-amber-100 text-amber-800 border-amber-300 font-medium';
+            staffAdvice = 'Hari Santai. Opsi Libur Shift & Evaluasi Stok Mingguan';
+          }
+
+          dowTbody.innerHTML += `
+            <tr class="hover:bg-slate-50 transition">
+              <td class="py-3 px-4 text-center">
+                <span class="px-2.5 py-1 rounded-full text-[11px] border ${rankBadge}">${rankIcon}</span>
+              </td>
+              <td class="py-3 px-4 font-bold text-slate-900 text-sm">${r.day}</td>
+              <td class="py-3 px-4 text-right font-extrabold text-emerald-700">${formatRp(r.avg_omzet)}</td>
+              <td class="py-3 px-4 text-right font-medium text-rose-700">${formatRp(r.avg_belanja)}</td>
+              <td class="py-3 px-4 text-right font-extrabold text-indigo-700">${formatRp(r.avg_laba)}</td>
+              <td class="py-3 px-4 text-center font-bold text-slate-800">${r.margin_percent}%</td>
+              <td class="py-3 px-4 text-center">
+                <span class="px-2.5 py-0.5 rounded text-[10px] border ${statusBadge}">${r.status}</span>
+              </td>
+              <td class="py-3 px-4 text-slate-600 font-medium text-[11px]">${staffAdvice}</td>
+            </tr>
+          `;
+        });
+      }
+
+      // Populate Recommendations
+      const dowRecContainer = document.getElementById('dow-recommendations-container');
+      if (dowRecContainer) {
+        dowRecContainer.innerHTML = '';
+        const recs = dow.recommendations || [];
+        const colors = [
+          'border-blue-200 bg-blue-50/40',
+          'border-amber-200 bg-amber-50/40',
+          'border-rose-200 bg-rose-50/40',
+          'border-emerald-200 bg-emerald-50/40'
+        ];
+        recs.forEach((rec, idx) => {
+          const col = colors[idx % colors.length];
+          dowRecContainer.innerHTML += `
+            <div class="p-5 rounded-2xl border ${col} space-y-2 card-shadow bg-white">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                  ${rec.category}
+                </span>
+                <span class="text-xs font-bold text-orange-600">Instruksi #${idx + 1}</span>
+              </div>
+              <h4 class="font-extrabold text-slate-900 text-sm">${rec.title}</h4>
+              <p class="text-xs text-slate-600 leading-relaxed">${rec.action}</p>
+            </div>
+          `;
+        });
+      }
+
+      // 8. Initialize Charts
+      renderCharts(charts, dow);
 
       // Re-trigger lucide icons
       lucide.createIcons();
@@ -935,7 +1222,9 @@
       }
     }
 
-    function renderCharts(charts) {
+    function renderCharts(charts, dow) {
+      // Render Day of Week Bar Chart
+      if (dow) renderDowChart(dow);
       // 1. Trend Line Chart
       const ctxTrend = document.getElementById('trendChart').getContext('2d');
       if (trendChartInstance) trendChartInstance.destroy();
@@ -1204,6 +1493,57 @@
       fetchData();
       lucide.createIcons();
     });
+  
+    function renderDowChart(dow) {
+      const records = dow.records || [];
+      const labels = records.map(r => r.day);
+      const omzetData = records.map(r => r.avg_omzet);
+      const belanjaData = records.map(r => r.avg_belanja);
+      const labaData = records.map(r => r.avg_laba);
+
+      const ctx = document.getElementById('dowBarChart');
+      if (!ctx) return;
+      if (dowChartInstance) dowChartInstance.destroy();
+
+      dowChartInstance = new Chart(ctx.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Rata-rata Omzet',
+              data: omzetData,
+              backgroundColor: '#10b981',
+              borderRadius: 6
+            },
+            {
+              label: 'Belanja Pasar',
+              data: belanjaData,
+              backgroundColor: '#f43f5e',
+              borderRadius: 6
+            },
+            {
+              label: 'Laba Bersih',
+              data: labaData,
+              backgroundColor: '#6366f1',
+              borderRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'top', labels: { font: { family: 'Plus Jakarta Sans', size: 11 } } },
+            tooltip: { callbacks: { label: function(c) { return c.dataset.label + ': ' + formatRp(c.raw); } } }
+          },
+          scales: {
+            y: { ticks: { callback: function(val) { return 'Rp ' + (val/1000000).toFixed(1) + ' jt'; } } }
+          }
+        }
+      });
+    }
+
   </script>
 </body>
 </html>
