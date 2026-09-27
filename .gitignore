@@ -12,5 +12,6 @@ bridge/session/
 bridge/session_backup*/
 bridge/qr.*
 bridge/status.json
+bridge/pairing_code.txt
 qris_cache/
 
