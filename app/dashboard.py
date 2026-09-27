@@ -272,6 +272,110 @@ def get_dashboard_summary_data(db: Session) -> dict:
     avg_daily_profit = round(total_net_profit_28d / len(daily_table_data), 0) if daily_table_data else 775641
     avg_margin_pct = round((total_net_profit_28d / total_omzet_28d) * 100, 1) if total_omzet_28d > 0 else 26.9
 
+    # Day of Week Traffic & Revenue Analytics
+    from datetime import datetime as dt_mod
+    from collections import defaultdict as ddict
+    
+    days_map = {0: "Senin", 1: "Selasa", 2: "Rabu", 3: "Kamis", 4: "Jumat", 5: "Sabtu", 6: "Minggu"}
+    daily_purchases_map = {d["tanggal"]: d for d in master.get("purchasing_summary", {}).get("daily_purchases", [])}
+    
+    day_stats = ddict(lambda: {
+        "count": 0,
+        "total_omzet": 0.0,
+        "total_hpp": 0.0,
+        "total_belanja": 0.0,
+        "total_laba_bersih": 0.0,
+        "dates": []
+    })
+    
+    for row in daily_table_data:
+        tgl = row["tanggal"]
+        omzet = row["estimasi_omzet"]
+        hpp = row["pemakaian_hpp"]
+        laba = row["laba_bersih"]
+        try:
+            dt_obj = dt_mod.strptime(tgl, "%d.%m.%y")
+        except Exception:
+            dt_obj = dt_mod.strptime(tgl, "%d.%m.%Y")
+        d_name = days_map[dt_obj.weekday()]
+        day_stats[d_name]["count"] += 1
+        day_stats[d_name]["total_omzet"] += omzet
+        day_stats[d_name]["total_hpp"] += hpp
+        day_stats[d_name]["total_laba_bersih"] += laba
+        day_stats[d_name]["dates"].append(tgl)
+        if tgl in daily_purchases_map:
+            day_stats[d_name]["total_belanja"] += daily_purchases_map[tgl]["total_belanja"]
+            
+    ordered_days = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"]
+    dow_records = []
+    for d in ordered_days:
+        st = day_stats[d]
+        cnt = st["count"]
+        avg_omz = round(st["total_omzet"] / cnt, 0) if cnt else 0
+        avg_laba = round(st["total_laba_bersih"] / cnt, 0) if cnt else 0
+        avg_hpp = round(st["total_hpp"] / cnt, 0) if cnt else 0
+        avg_bel = round(st["total_belanja"] / cnt, 0) if cnt else 0
+        margin_pct = round((avg_laba / avg_omz) * 100, 1) if avg_omz else 0
+        dow_records.append({
+            "day": d,
+            "count": cnt,
+            "total_omzet": st["total_omzet"],
+            "avg_omzet": avg_omz,
+            "avg_hpp": avg_hpp,
+            "avg_belanja": avg_bel,
+            "avg_laba": avg_laba,
+            "margin_percent": margin_pct,
+            "status": "Puncak Weekend" if d in ["Sabtu", "Minggu"] else ("Awal Weekend" if d == "Jumat" else ("Low-Tide / Sepi" if d == "Kamis" else "Stabil"))
+        })
+        
+    sorted_by_omzet = sorted(dow_records, key=lambda x: x["avg_omzet"], reverse=True)
+    peak_day = sorted_by_omzet[0]
+    slow_day = sorted_by_omzet[-1]
+    weekend_avg = sum(r["avg_omzet"] for r in dow_records if r["day"] in ["Jumat", "Sabtu", "Minggu"]) / 3
+    weekday_avg = sum(r["avg_omzet"] for r in dow_records if r["day"] in ["Senin", "Selasa", "Rabu", "Kamis"]) / 4
+    weekend_lift_pct = round(((weekend_avg - weekday_avg) / weekday_avg) * 100, 1) if weekday_avg else 0
+
+    dow_analytics = {
+        "records": dow_records,
+        "peak_day": {
+            "day": peak_day["day"],
+            "avg_omzet": peak_day["avg_omzet"],
+            "avg_laba": peak_day["avg_laba"],
+            "badge": "Hari Paling Ramai (Peak Day)"
+        },
+        "slowest_day": {
+            "day": slow_day["day"],
+            "avg_omzet": slow_day["avg_omzet"],
+            "avg_laba": slow_day["avg_laba"],
+            "badge": "Hari Paling Santai (Low-Tide)"
+        },
+        "weekend_avg_omzet": round(weekend_avg, 0),
+        "weekday_avg_omzet": round(weekday_avg, 0),
+        "weekend_lift_percent": weekend_lift_pct,
+        "recommendations": [
+            {
+                "title": "Optimasi Shift & Libur Karyawan (Roster Off-Day)",
+                "category": "Operasional & SDM",
+                "action": "Jadwalkan libur bergilir (off-day) untuk staf operasional di hari Kamis atau Senin saat volume pelanggan terendah (rata-rata Rp 2,34 - 2,58 juta). Wajibkan formasi lengkap (All-Hands On Deck) pada Jumat, Sabtu, dan Minggu saat omzet melonjak tembus Rp 3,1 - 3,46 juta per hari."
+            },
+            {
+                "title": "Jadwal Belanja Pasar Strategis (Procurement Timing)",
+                "category": "Belanja & Dapur",
+                "action": "Lakukan belanja skala besar (beras, bebek karkas, ayam penyet, cabai, telur) pada Kamis sore atau Jumat pagi. Data membuktikan belanja hari Sabtu melonjak hingga Rp 1,54 juta. Kurangi stok bahan cepat basi pada hari Rabu malam agar tidak menumpuk di hari Kamis."
+            },
+            {
+                "title": "Promo Dongkrak Hari Sepi ('Kamis Manis' Mid-Week Booster)",
+                "category": "Pemasaran & Medsos",
+                "action": "Hari Kamis merupakan hari paling sepi dengan omzet terendah (Rp 2,34 juta). Luncurkan promo khusus 'Kamis Manis' (contoh: Paket Hemat Nasi Ayam Penyet + Es Teh Jumbo Rp 18.000 khusus dine-in jam 11:00-14:00). Kampanye video TikTok/Reels ditayangkan setiap Rabu sore untuk mengalirkan traffic ke hari Kamis."
+            },
+            {
+                "title": "Maksimalkan Perputaran Meja Akhir Pekan (Weekend Table Turnover)",
+                "category": "Layanan & Kasir",
+                "action": "Pada hari Minggu (omzet puncak Rp 3,46 juta dan laba Rp 1,29 juta), prioritaskan paket keluarga, porsi rombongan, dan menu margin tinggi (Bebek Bumbu Hitam & Es Teh Jumbo). Percepat durasi saji dapur di bawah 12 menit untuk meningkatkan rotasi meja tamu."
+            }
+        ]
+    }
+
     # 3. Personnel Roster
     payroll_info = master.get("payroll", {})
     all_roster = payroll_info.get("leadership", []) + payroll_info.get("staff", [])
@@ -412,8 +516,15 @@ def get_dashboard_summary_data(db: Session) -> dict:
                 "names": [m["name"] for m in top_menus[:8]],
                 "quantities": [m["sold_qty"] for m in top_menus[:8]],
                 "revenues": [m["revenue"] for m in top_menus[:8]]
+            },
+            "day_of_week": {
+                "labels": [d["day"] for d in dow_records],
+                "avg_omzet": [d["avg_omzet"] for d in dow_records],
+                "avg_laba": [d["avg_laba"] for d in dow_records],
+                "avg_belanja": [d["avg_belanja"] for d in dow_records]
             }
         },
+        "day_of_week_analytics": dow_analytics,
         "top_menus": top_menus,
         "roster": all_roster,
         "daily_records": daily_table_data

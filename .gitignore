@@ -9,6 +9,7 @@ build/
 .env.runtime
 .voice-bridge.runtime
 bridge/session/
+bridge/session_backup*/
 bridge/qr.*
 bridge/status.json
 qris_cache/

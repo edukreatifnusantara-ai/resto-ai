@@ -20,8 +20,15 @@ const RESTO_TRANSCRIBE_URL = process.env.RESTO_TRANSCRIBE_URL || 'http://127.0.0
 const RESTO_VOICE_BRIDGE_TOKEN = process.env.RESTO_VOICE_BRIDGE_TOKEN || '';
 const PYTHON_BIN = '/home/edukreativ-vps/.hermes/hermes-agent/venv/bin/python';
 
+let rawPhone = (process.env.RESTO_WA_PHONE || '').replace(/[^0-9]/g, '');
+if (rawPhone.startsWith('0')) {
+  rawPhone = '62' + rawPhone.slice(1);
+}
+const PHONE_NUMBER = rawPhone;
+
 let sock = null;
 let reconnectTimer = null;
+let pairingRequested = false;
 
 function scheduleReconnect(delayMs = 3000) {
   if (reconnectTimer) clearTimeout(reconnectTimer);
@@ -71,6 +78,19 @@ async function startBridge() {
       } catch (err) {
         console.error('Error generating QR PNG:', err.message);
       }
+
+      if (PHONE_NUMBER && !sock.authState?.creds?.registered && !pairingRequested) {
+        pairingRequested = true;
+        try {
+          console.log(`Requesting pairing code for ${PHONE_NUMBER}...`);
+          const code = await sock.requestPairingCode(PHONE_NUMBER);
+          console.log(`PAIRING_CODE: ${code}`);
+          fs.writeFileSync(path.join(__dirname, 'pairing_code.txt'), code);
+        } catch (err) {
+          console.error('Error requesting pairing code:', err.message);
+          pairingRequested = false;
+        }
+      }
     }
 
     if (connection === 'close') {
@@ -97,13 +117,16 @@ async function startBridge() {
       }
     } else if (connection === 'open') {
       console.log('WhatsApp connection established successfully! Resto-AI Bot is online.');
+      pairingRequested = false;
       try {
         if (fs.existsSync(path.join(__dirname, 'qr.png'))) fs.unlinkSync(path.join(__dirname, 'qr.png'));
         if (fs.existsSync(path.join(__dirname, 'qr.txt'))) fs.unlinkSync(path.join(__dirname, 'qr.txt'));
+        if (fs.existsSync(path.join(__dirname, 'pairing_code.txt'))) fs.unlinkSync(path.join(__dirname, 'pairing_code.txt'));
       } catch {}
       fs.writeFileSync(path.join(__dirname, 'status.json'), JSON.stringify({
         status: 'connected',
         user: sock.user?.id || null,
+        phone: PHONE_NUMBER,
         connected_at: new Date().toISOString()
       }));
     }

@@ -670,6 +670,10 @@ def owner_confirm_cash_payment(
         ).replace(",", ".")
         send_whatsapp_bridge_message(cust_phone, cust_msg)
 
+    # Notify kitchen via WhatsApp
+    from app.kitchen import notify_kitchen_order
+    notify_kitchen_order(db, order)
+
     return {
         "status": "success",
         "order_id": order.id,

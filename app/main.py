@@ -49,7 +49,20 @@ async def require_runtime_token(request: Request, call_next):
     # and mutation endpoints require the staging token.
     # Meta calls the webhook without the internal API token. It is protected
     # independently by the verify token and X-Hub-Signature-256.
-    if request.url.path in {"/", "/webhooks/whatsapp", "/api/chat", "/webhooks/midtrans", "/dashboard", "/api/dashboard/data"}:
+    if (
+        request.url.path in {
+            "/",
+            "/webhooks/whatsapp",
+            "/api/chat",
+            "/webhooks/midtrans",
+            "/dashboard",
+            "/api/dashboard/data",
+            "/dapur",
+            "/kds",
+            "/api/kitchen/orders",
+        }
+        or request.url.path.startswith("/api/kitchen/orders/")
+    ):
         return await call_next(request)
     supplied = request.headers.get("X-RESTO-API-TOKEN", "")
     if request.url.path == "/api/voice/transcribe":
@@ -97,6 +110,32 @@ def dashboard_view():
 @app.get("/api/dashboard/data", response_description="Dashboard data feed")
 def dashboard_data_api(db: Session = Depends(get_db)):
     return get_dashboard_summary_data(db)
+
+
+@app.get("/dapur", response_class=HTMLResponse, response_description="Web UI Kitchen Display System (KDS)")
+@app.get("/kds", response_class=HTMLResponse, response_description="Web UI Kitchen Display System (KDS)")
+def kitchen_kds_view():
+    from app.kitchen import get_kitchen_kds_html
+    return HTMLResponse(content=get_kitchen_kds_html())
+
+
+@app.get("/api/kitchen/orders", response_description="Active orders for Kitchen Display")
+def kitchen_orders_api(db: Session = Depends(get_db)):
+    from app.kitchen import get_kitchen_active_orders
+    return get_kitchen_active_orders(db)
+
+
+class KitchenStatusUpdate(BaseModel):
+    status: str = Field(..., description="Target status: PREPARING, READY, COMPLETED")
+
+
+@app.post("/api/kitchen/orders/{order_id}/status", response_description="Update order status from Kitchen Display")
+def kitchen_update_status_api(order_id: int, payload: KitchenStatusUpdate, db: Session = Depends(get_db)):
+    from app.kitchen import update_kitchen_order_status
+    result = update_kitchen_order_status(db, order_id, payload.status)
+    if "error" in result:
+        raise HTTPException(status_code=400, detail=result["error"])
+    return result
 
 
 def transition_order(order: OrderModel, new_state: str) -> None:
@@ -631,6 +670,10 @@ async def midtrans_webhook(request: Request, db: Session = Depends(get_db)):
             for op in os.getenv("OWNER_PHONE_NUMBERS", "").split(","):
                 if op.strip():
                     send_whatsapp_bridge_message(op.strip(), owner_msg)
+
+            # 3. Notify Kitchen via WhatsApp Bridge
+            from app.kitchen import notify_kitchen_order
+            notify_kitchen_order(db, order)
     elif transaction_status in {"cancel", "deny", "expire"}:
         setattr(order, "payment_state", PaymentStatus.FAILED)
         db.commit()
@@ -869,6 +912,8 @@ def send_to_kitchen(order_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=409, detail=f"Order sudah berubah state: {order.state}")
 
     deduct_order_stock(db, order)
+    from app.kitchen import notify_kitchen_order
+    notify_kitchen_order(db, order)
     return {
         "id": order.id,
         "state": order.state,
