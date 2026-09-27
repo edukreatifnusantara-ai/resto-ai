@@ -18,7 +18,8 @@ const SESSION_DIR = path.join(__dirname, 'session');
 const RESTO_API_URL = process.env.RESTO_API_URL || 'http://127.0.0.1:18081/api/chat';
 const RESTO_TRANSCRIBE_URL = process.env.RESTO_TRANSCRIBE_URL || 'http://127.0.0.1:18081/api/voice/transcribe';
 const RESTO_VOICE_BRIDGE_TOKEN = process.env.RESTO_VOICE_BRIDGE_TOKEN || '';
-const PYTHON_BIN = '/home/edukreativ-vps/.hermes/hermes-agent/venv/bin/python';
+const localVenvPy = path.resolve(__dirname, '../.venv/bin/python');
+const PYTHON_BIN = process.env.PYTHON_BIN || (fs.existsSync(localVenvPy) ? localVenvPy : 'python3');
 
 let rawPhone = (process.env.RESTO_WA_PHONE || '').replace(/[^0-9]/g, '');
 if (rawPhone.startsWith('0')) {

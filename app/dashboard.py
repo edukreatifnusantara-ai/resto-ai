@@ -6,7 +6,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.models import Order as OrderModel, OrderStatus, Stock, MenuItem
 
-MASTER_DATA_PATH = Path("/home/edukreativ-vps/resto-ai/data/warung_ndelik_master_data.json")
+BASE_DIR = Path(__file__).resolve().parent.parent
+MASTER_DATA_PATH = Path(os.getenv("MASTER_DATA_PATH", BASE_DIR / "data" / "warung_ndelik_master_data.json"))
 
 
 def load_master_data() -> dict:
@@ -533,7 +534,7 @@ def get_dashboard_summary_data(db: Session) -> dict:
 
 def get_dashboard_html_page() -> str:
     from pathlib import Path
-    html_template_path = Path("/home/edukreativ-vps/resto-ai/templates/dashboard.html")
+    html_template_path = Path(os.getenv("DASHBOARD_TEMPLATE_PATH", BASE_DIR / "templates" / "dashboard.html"))
     if html_template_path.exists():
         with open(html_template_path, "r", encoding="utf-8") as f:
             return f.read()

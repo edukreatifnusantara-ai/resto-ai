@@ -6,9 +6,11 @@ import secrets
 from datetime import datetime, timedelta
 from math import isfinite
 from threading import Lock
+from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv("/home/edukreativ-vps/resto-ai/.env.runtime")
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(os.getenv("RESTO_ENV_FILE", BASE_DIR / ".env.runtime"))
 load_dotenv()
 
 from fastapi import FastAPI, HTTPException, Depends, Request, Query

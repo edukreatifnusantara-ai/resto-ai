@@ -13,7 +13,8 @@ import requests
 
 logger = logging.getLogger("resto-ai.midtrans")
 
-QRIS_CACHE_DIR = Path("/home/edukreativ-vps/resto-ai/qris_cache")
+BASE_DIR = Path(__file__).resolve().parent.parent
+QRIS_CACHE_DIR = Path(os.getenv("QRIS_CACHE_DIR", BASE_DIR / "qris_cache"))
 QRIS_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 
