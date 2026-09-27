@@ -14,17 +14,25 @@ load_dotenv(os.getenv("RESTO_ENV_FILE", BASE_DIR / ".env.runtime"))
 load_dotenv()
 
 from fastapi import FastAPI, HTTPException, Depends, Request, Query
-from fastapi.responses import JSONResponse, PlainTextResponse, HTMLResponse
+from fastapi.responses import JSONResponse, PlainTextResponse, HTMLResponse, RedirectResponse
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import or_, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from typing import List, Any
+from urllib.parse import parse_qs
 
 from app.database import init_db, SessionLocal
 from app.agent import run_ai_agent, is_owner, customer_request_qris
 from app.voice import VoiceTranscriptionError, transcribe_audio
 from app.dashboard import get_dashboard_summary_data, get_dashboard_html_page
+from app.auth import (
+    AUTH_COOKIE_NAME,
+    get_web_password,
+    generate_session_token,
+    is_authenticated,
+    render_login_page,
+)
 from app.models import (
     Base, MenuItem, Recipe, Stock, Order,
     OrderStatus, PaymentStatus, WhatsAppEvent,
@@ -47,30 +55,48 @@ _stock_lock = Lock()
 
 @app.middleware("http")
 async def require_runtime_token(request: Request, call_next):
-    # Health is intentionally public for local process supervision. All data
-    # and mutation endpoints require the staging token.
-    # Meta calls the webhook without the internal API token. It is protected
-    # independently by the verify token and X-Hub-Signature-256.
+    # Public endpoints that bypass authentication
+    if request.url.path in {
+        "/",
+        "/webhooks/whatsapp",
+        "/api/chat",
+        "/webhooks/midtrans",
+        "/login",
+        "/logout",
+    }:
+        return await call_next(request)
+
+    # Protected Web UI Pages (redirect to /login if unauthenticated)
+    if request.url.path in {"/dashboard", "/dapur", "/kds"}:
+        if not is_authenticated(request):
+            return RedirectResponse(
+                url=f"/login?next={request.url.path}", status_code=303
+            )
+        return await call_next(request)
+
+    # Protected Web API endpoints used by Dashboard & Dapur
     if (
-        request.url.path in {
-            "/",
-            "/webhooks/whatsapp",
-            "/api/chat",
-            "/webhooks/midtrans",
-            "/dashboard",
-            "/api/dashboard/data",
-            "/dapur",
-            "/kds",
-            "/api/kitchen/orders",
-        }
+        request.url.path in {"/api/dashboard/data", "/api/kitchen/orders"}
         or request.url.path.startswith("/api/kitchen/orders/")
     ):
+        if not is_authenticated(request):
+            return JSONResponse(
+                {"detail": "Autentikasi diperlukan. Silakan login di /login"},
+                status_code=401,
+            )
         return await call_next(request)
+
+    # Scoped voice transcription token
     supplied = request.headers.get("X-RESTO-API-TOKEN", "")
     if request.url.path == "/api/voice/transcribe":
         bridge_token = os.getenv("RESTO_VOICE_BRIDGE_TOKEN", "")
         if bridge_token and supplied and secrets.compare_digest(supplied, bridge_token):
             return await call_next(request)
+
+    # Check session cookie or X-RESTO-API-TOKEN for all other endpoints
+    if is_authenticated(request):
+        return await call_next(request)
+
     expected = os.getenv("RESTO_API_TOKEN")
     if not expected:
         return JSONResponse(
@@ -93,6 +119,68 @@ def health_check():
         "status": "ok",
         "environment": "DATA DUMMY / SIMULASI",
     }
+
+
+@app.get("/login", response_class=HTMLResponse, response_description="Login Screen by JUARA MANAGEMENT ENTERPRISE")
+def login_view(request: Request, next: str = "/dashboard"):
+    if is_authenticated(request):
+        return RedirectResponse(url=next, status_code=303)
+    return HTMLResponse(content=render_login_page(next_path=next))
+
+
+@app.post("/login", response_description="Process login with password juara")
+async def login_process(request: Request):
+    content_type = request.headers.get("content-type", "")
+    password = ""
+    next_path = "/dashboard"
+
+    if "application/json" in content_type:
+        try:
+            body_json = await request.json()
+            password = str(body_json.get("password", "")).strip()
+            next_path = str(body_json.get("next", "/dashboard")).strip()
+        except Exception:
+            pass
+    else:
+        try:
+            body_bytes = await request.body()
+            form_data = parse_qs(body_bytes.decode("utf-8", errors="ignore"))
+            password = form_data.get("password", [""])[0].strip()
+            next_path = form_data.get("next", ["/dashboard"])[0].strip()
+        except Exception:
+            pass
+
+    if not next_path or not next_path.startswith("/"):
+        next_path = "/dashboard"
+
+    expected_pw = get_web_password()
+    if secrets.compare_digest(password, expected_pw):
+        response = RedirectResponse(url=next_path, status_code=303)
+        token = generate_session_token()
+        response.set_cookie(
+            key=AUTH_COOKIE_NAME,
+            value=token,
+            max_age=30 * 86400,
+            httponly=True,
+            samesite="lax",
+            path="/",
+        )
+        return response
+
+    return HTMLResponse(
+        content=render_login_page(
+            next_path=next_path,
+            error_msg="Password salah. Silakan coba lagi dengan kata sandi yang valid.",
+        ),
+        status_code=401,
+    )
+
+
+@app.get("/logout", response_description="Logout and lock screen")
+def logout_view():
+    response = RedirectResponse(url="/login", status_code=303)
+    response.delete_cookie(key=AUTH_COOKIE_NAME, path="/")
+    return response
 
 
 # Dependency

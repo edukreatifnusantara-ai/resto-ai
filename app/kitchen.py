@@ -70,7 +70,8 @@ def format_kitchen_ticket(order: Order) -> str:
         lines.append("━━━━━━━━━━━━━━━━━━━━━")
 
     lines.append("Status: *Menunggu Dimasak*")
-    lines.append("🖥️ Layar Dapur Web: http://103.89.5.220:18081/dapur")
+    base_url = os.getenv("RESTO_PUBLIC_BASE_URL", "http://103.196.154.67:18081").rstrip("/")
+    lines.append(f"🖥️ Layar Dapur Web: {base_url}/dapur")
 
     return "\n".join(lines)
 
@@ -253,7 +254,7 @@ def get_kitchen_kds_html() -> str:
             <h1 class="text-lg font-bold text-white tracking-tight">Layar Dapur (KDS)</h1>
             <span class="px-2 py-0.5 text-[10px] font-bold bg-amber-500 text-slate-950 rounded-full uppercase">Warung Ndelik</span>
           </div>
-          <p class="text-xs text-slate-400">Kitchen Display System — Antrean Pesanan Realtime</p>
+          <p class="text-xs text-slate-400">Kitchen Display System — Antrean Pesanan Realtime • <span class="text-amber-400 font-semibold">by JUARA MANAGEMENT ENTERPRISE</span></p>
         </div>
       </div>
 
@@ -274,6 +275,11 @@ def get_kitchen_kds_html() -> str:
         <!-- Dashboard Link -->
         <a href="/dashboard" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">
           📊 Dashboard
+        </a>
+
+        <!-- Logout Link -->
+        <a href="/logout" title="Kunci Akses" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 transition">
+          🔒 Kunci
         </a>
       </div>
     </div>
