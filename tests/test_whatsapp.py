@@ -5,8 +5,9 @@ import json
 from fastapi.testclient import TestClient
 
 from app.database import SessionLocal
+from app.agent import _CUSTOMER_SESSIONS
 from app.main import app
-from app.models import Order, WhatsAppEvent
+from app.models import CustomerProfile, Order, WhatsAppEvent
 
 
 client = TestClient(app)
@@ -218,3 +219,26 @@ def test_unsigned_webhook_is_rejected_without_app_secret(monkeypatch):
     monkeypatch.delenv("WHATSAPP_APP_SECRET", raising=False)
     monkeypatch.setenv("WHATSAPP_ALLOW_UNSIGNED_WEBHOOKS", "true")
     assert whatsapp.verify_signature(b"{}", None) is False
+
+
+def test_command_order_is_kept_in_customer_session(monkeypatch):
+    sender = "628155555555"
+    body, headers = signed_payload(
+        message_id="wamid.session-order", sender=sender, text="PESAN 1"
+    )
+    try:
+        response = client.post("/webhooks/whatsapp", content=body, headers=headers)
+        assert response.status_code == 200
+
+        db = SessionLocal()
+        try:
+            order = db.query(Order).filter_by(source_message_id="wamid.session-order").one()
+            profile = db.query(CustomerProfile).filter_by(phone=sender).one()
+            session = _CUSTOMER_SESSIONS[sender]
+            assert session.active_order_id == order.id
+            assert profile.last_table == order.table_number
+            assert profile.last_order_type == "TAKEAWAY"
+        finally:
+            db.close()
+    finally:
+        _CUSTOMER_SESSIONS.pop(sender, None)

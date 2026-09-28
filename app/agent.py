@@ -15,10 +15,11 @@ import re
 import urllib.error
 import urllib.request
 from collections import defaultdict, deque
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from typing import Any
 
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 from app.models import (
     MenuItem,
@@ -28,6 +29,7 @@ from app.models import (
     Stock,
     DiningTable,
     Reservation,
+    CustomerProfile,
 )
 
 logger = logging.getLogger(__name__)
@@ -48,8 +50,232 @@ def _natural_customer_reply(text: str) -> str:
     return text.strip()
 
 
-# Conversation memory per sender phone (last 10 turns)
+# Global conversation memory fallback (Owner / default)
 _CONVERSATION_HISTORY: dict[str, deque[dict[str, str]]] = defaultdict(lambda: deque(maxlen=10))
+
+
+class CustomerSession:
+    """Active customer session with 6-hour memory window for re-ordering, additions, and preferences."""
+
+    def __init__(self, phone: str):
+        self.phone = phone
+        self.created_at = datetime.utcnow()
+        self.last_activity = datetime.utcnow()
+        self.history: deque[dict[str, str]] = deque(maxlen=12)
+        self.active_order_id: int | None = None
+        self.active_order_items: list[dict[str, Any]] = []
+        self.table_number: str | None = None
+        self.order_type: str | None = None
+        self.dining_preference_known: bool = False
+        self.customer_name: str | None = None
+
+    def is_expired(self, max_age_hours: float = 6.0) -> bool:
+        return (datetime.utcnow() - self.last_activity) > timedelta(hours=max_age_hours)
+
+    def touch(self):
+        self.last_activity = datetime.utcnow()
+
+
+_CUSTOMER_SESSIONS: dict[str, CustomerSession] = {}
+
+
+def cleanup_expired_sessions(max_age_hours: float = 6.0) -> int:
+    """Prune customer in-memory sessions that have been idle for more than 6 hours."""
+    expired_phones = [
+        phone for phone, sess in _CUSTOMER_SESSIONS.items()
+        if sess.is_expired(max_age_hours)
+    ]
+    for phone in expired_phones:
+        del _CUSTOMER_SESSIONS[phone]
+    return len(expired_phones)
+
+
+def get_customer_session(phone: str, db: Session) -> CustomerSession:
+    """Retrieve or create an active 6-hour customer session, syncing with persistent CustomerProfile."""
+    cleanup_expired_sessions(6.0)
+    cleaned_phone = re.sub(r"\D", "", phone)
+
+    profile = db.query(CustomerProfile).filter(CustomerProfile.phone == cleaned_phone).one_or_none()
+
+    if cleaned_phone not in _CUSTOMER_SESSIONS:
+        session = CustomerSession(cleaned_phone)
+        if profile:
+            session.customer_name = profile.name
+            now = datetime.utcnow()
+            preference_is_recent = bool(
+                profile.last_seen
+                and (now - profile.last_seen) <= timedelta(hours=6)
+            )
+            if profile.last_seen and not preference_is_recent:
+                profile.visit_count = (profile.visit_count or 1) + 1
+                # Name and visit history are durable; table/order preference is
+                # deliberately ephemeral and expires with the six-hour session.
+                profile.last_table = None
+                profile.last_order_type = None
+            elif profile.last_table or profile.last_order_type:
+                session.table_number = profile.last_table
+                session.order_type = profile.last_order_type
+                session.dining_preference_known = True
+            profile.last_seen = now
+            try:
+                db.commit()
+            except Exception:
+                db.rollback()
+        _CUSTOMER_SESSIONS[cleaned_phone] = session
+    else:
+        session = _CUSTOMER_SESSIONS[cleaned_phone]
+        session.touch()
+        if profile:
+            profile.last_seen = datetime.utcnow()
+            if not session.customer_name and profile.name:
+                session.customer_name = profile.name
+            try:
+                db.commit()
+            except Exception:
+                db.rollback()
+
+    return session
+
+
+def format_customer_title(name: str | None) -> str:
+    """Format customer name into a natural polite Indonesian title without doubling honorifics."""
+    if not name or not name.strip():
+        return "Kakak"
+    clean = name.strip()
+    first_word = clean.split(maxsplit=1)[0].casefold().rstrip(".,!?")
+    if first_word in {"kak", "kakak", "mas", "mbak", "pak", "bapak", "bu", "ibu"}:
+        return clean
+    return f"Kak {clean}"
+
+
+def save_or_update_customer_name(db: Session, phone: str, name: str) -> None:
+    """Save customer name persistently into database and active session."""
+    if not name or not name.strip():
+        return
+    cleaned_phone = re.sub(r"\D", "", phone)
+    clean_name = name.strip()
+
+    if cleaned_phone in _CUSTOMER_SESSIONS:
+        _CUSTOMER_SESSIONS[cleaned_phone].customer_name = clean_name
+
+    profile = db.query(CustomerProfile).filter(CustomerProfile.phone == cleaned_phone).one_or_none()
+    if profile:
+        profile.name = clean_name
+        profile.last_seen = datetime.utcnow()
+    else:
+        profile = CustomerProfile(
+            phone=cleaned_phone,
+            name=clean_name,
+            visit_count=1,
+            last_seen=datetime.utcnow(),
+            created_at=datetime.utcnow(),
+        )
+        db.add(profile)
+    try:
+        db.commit()
+    except Exception:
+        db.rollback()
+
+
+def save_customer_preference(
+    db: Session,
+    phone: str,
+    table_number: str | None = None,
+    order_type: str | None = None,
+) -> CustomerSession:
+    """Remember a customer's recent dining choice for the active six-hour session."""
+    if table_number is None and order_type is None:
+        return get_customer_session(phone, db)
+
+    session = get_customer_session(phone, db)
+    if table_number is not None:
+        session.table_number = table_number.strip() or None
+    if order_type is not None:
+        normalized_type = order_type.strip().upper()
+        if normalized_type in {"DINE_IN", "TAKEAWAY"}:
+            session.order_type = normalized_type
+    if session.table_number and not session.order_type:
+        session.order_type = "DINE_IN"
+    session.dining_preference_known = True
+
+    cleaned_phone = re.sub(r"\D", "", phone)
+    now = datetime.utcnow()
+    profile = db.query(CustomerProfile).filter(CustomerProfile.phone == cleaned_phone).one_or_none()
+    if profile is None:
+        profile = CustomerProfile(
+            phone=cleaned_phone,
+            name=session.customer_name,
+            visit_count=1,
+            last_seen=now,
+            created_at=now,
+        )
+        db.add(profile)
+    else:
+        profile.last_seen = now
+        if session.customer_name and not profile.name:
+            profile.name = session.customer_name
+    profile.last_table = session.table_number
+    profile.last_order_type = session.order_type
+    try:
+        db.commit()
+    except Exception:
+        db.rollback()
+    return session
+
+
+def _extract_customer_preference(
+    text: str,
+    db: Session,
+) -> tuple[str | None, str | None]:
+    """Extract an explicit takeaway/table choice without guessing from vague text."""
+    lowered = " ".join((text or "").casefold().split())
+    if re.search(r"\b(?:bawa\s+pulang|dibawa\s+pulang|dibungkus|bungkus|take\s*away)\b", lowered):
+        return "Bawa Pulang / Takeaway", "TAKEAWAY"
+
+    table_match = re.search(r"\b(?:meja|table)\s*(?:nomor|no\.?)?\s*0*(\d+)\b", lowered)
+    if table_match:
+        requested = f"Meja {int(table_match.group(1))}"
+        table = db.query(DiningTable).filter(DiningTable.table_number.ilike(requested)).first()
+        if table:
+            return str(table.table_number), "DINE_IN"
+
+    lesehan_match = re.search(r"\blesehan\s*0*(\d+)\b", lowered)
+    if lesehan_match:
+        requested = f"Lesehan {int(lesehan_match.group(1))}"
+        table = db.query(DiningTable).filter(DiningTable.table_number.ilike(requested)).first()
+        if table:
+            return str(table.table_number), "DINE_IN"
+
+    if re.search(r"\b(?:ruang\s+vip|makan\s+di\s+(?:tempat|sini)|dine\s*[- ]?in)\b", lowered):
+        return None, "DINE_IN"
+    return None, None
+
+
+def remember_customer_order(db: Session, phone: str, order_id: int) -> CustomerSession:
+    """Attach an order created by the deterministic WhatsApp path to six-hour memory."""
+    order = db.query(Order).filter(Order.id == int(order_id)).one_or_none()
+    session = get_customer_session(phone, db)
+    if order is None:
+        return session
+
+    table_number = str(getattr(order, "table_number", "") or "")
+    order_type = str(getattr(order, "order_type", "") or "DINE_IN").upper()
+    if any(term in table_number.casefold() for term in ("bawa pulang", "takeaway", "bungkus")):
+        order_type = "TAKEAWAY"
+    session = save_customer_preference(
+        db,
+        phone,
+        table_number=table_number or None,
+        order_type=order_type,
+    )
+    session.active_order_id = order.id
+    session.active_order_items = (
+        order.items_json.get("items", []) if isinstance(order.items_json, dict) else []
+    )
+    session.touch()
+    return session
+
+
 
 
 def get_owner_phones() -> set[str]:
@@ -208,8 +434,6 @@ def owner_set_menu_status(db: Session, name_or_id: str, is_active: bool) -> dict
 def owner_get_report(db: Session) -> dict[str, Any]:
     today_start = datetime.combine(date.today(), datetime.min.time())
     today_orders = db.query(Order).filter(Order.created_at >= today_start).all()
-    all_orders = db.query(Order).all()
-
     total_sales = sum(float(getattr(o, "total", 0.0)) for o in today_orders if getattr(o, "payment_state", "") == PaymentStatus.SIMULATED_CONFIRMED)
     paid_count = sum(1 for o in today_orders if getattr(o, "payment_state", "") == PaymentStatus.SIMULATED_CONFIRMED)
     draft_count = sum(1 for o in today_orders if getattr(o, "state", "") == OrderStatus.DRAFT)
@@ -218,7 +442,8 @@ def owner_get_report(db: Session) -> dict[str, Any]:
     cogs_70 = total_sales * 0.70
     profit_30 = total_sales * 0.30
 
-    all_sales = sum(float(getattr(o, "total", 0.0)) for o in all_orders if getattr(o, "payment_state", "") == PaymentStatus.SIMULATED_CONFIRMED)
+    all_sales_scalar = db.query(func.sum(Order.total)).filter(Order.payment_state == PaymentStatus.SIMULATED_CONFIRMED).scalar()
+    all_sales = float(all_sales_scalar or 0.0)
     all_cogs_70 = all_sales * 0.70
     all_profit_30 = all_sales * 0.30
 
@@ -314,17 +539,42 @@ def customer_get_menu(db: Session) -> list[dict[str, Any]]:
     return res
 
 
+def customer_save_name(
+    db: Session,
+    customer_phone: str,
+    customer_name: str,
+) -> dict[str, Any]:
+    """Menyimpan nama pelanggan/pemesan ke memori dan database."""
+    if not customer_name or not customer_name.strip():
+        return {"error": "Nama pemesan tidak boleh kosong."}
+    clean_name = customer_name.strip()
+    save_or_update_customer_name(db, customer_phone, clean_name)
+    return {
+        "status": "success",
+        "customer_name": clean_name,
+        "message": f"Nama {clean_name} berhasil dicatat dan diingat.",
+    }
+
+
 def customer_create_order(
     db: Session,
     customer_phone: str,
     items: list[dict[str, Any]],
-    table_number: str = "Bawa Pulang / Takeaway",
+    table_number: str = "",
     payment_method: str = "QRIS",
     order_type: str = "DINE_IN",
     notes: str = "",
+    customer_name: str = "",
 ) -> dict[str, Any]:
     if not items:
         return {"error": "Pesanan tidak boleh kosong."}
+
+    session = get_customer_session(customer_phone, db)
+    if customer_name and customer_name.strip():
+        save_or_update_customer_name(db, customer_phone, customer_name.strip())
+        session.customer_name = customer_name.strip()
+    elif not customer_name and session.customer_name:
+        customer_name = session.customer_name
 
     order_items = []
     total_amount = 0.0
@@ -352,13 +602,26 @@ def customer_create_order(
             "subtotal": subtotal,
         })
 
-    clean_table = table_number.strip() if table_number else "Bawa Pulang / Takeaway"
+    remembered_table = session.table_number
+    if table_number and table_number.strip():
+        clean_table = table_number.strip()
+    elif remembered_table:
+        clean_table = remembered_table
+    elif session.order_type == "DINE_IN":
+        clean_table = "Makan di tempat"
+    else:
+        clean_table = "Bawa Pulang / Takeaway"
+    if "bawa pulang" in clean_table.lower() or "takeaway" in clean_table.lower() or "bungkus" in clean_table.lower():
+        order_type = "TAKEAWAY"
+    elif remembered_table and not table_number and session.order_type:
+        order_type = session.order_type
+
     pay_method = payment_method.strip().upper() if payment_method else "QRIS"
     if pay_method not in {"CASH", "QRIS"}:
         pay_method = "QRIS"
 
     order = Order(
-        items_json={"items": order_items, "notes": notes},
+        items_json={"items": order_items, "notes": notes, "customer_name": customer_name or ""},
         total=round(float(total_amount), 2),
         table_number=clean_table,
         order_type=order_type,
@@ -370,6 +633,39 @@ def customer_create_order(
     db.add(order)
     db.commit()
     db.refresh(order)
+
+    # Update active 6-hour session
+    session.active_order_id = order.id
+    session.active_order_items = order_items
+    session.table_number = clean_table
+    session.order_type = order_type
+    session.dining_preference_known = True
+
+    # Persist the name and recent dining preference. A profile is created even
+    # when the customer has not told us their name yet, so the same phone can
+    # still be recognized during the six-hour session.
+    cleaned_p = re.sub(r"\D", "", customer_phone)
+    p_rec = db.query(CustomerProfile).filter(CustomerProfile.phone == cleaned_p).one_or_none()
+    now = datetime.utcnow()
+    if p_rec is None:
+        p_rec = CustomerProfile(
+            phone=cleaned_p,
+            name=customer_name or None,
+            visit_count=1,
+            last_seen=now,
+            created_at=now,
+        )
+        db.add(p_rec)
+    else:
+        p_rec.last_seen = now
+        if customer_name:
+            p_rec.name = customer_name
+    p_rec.last_table = clean_table
+    p_rec.last_order_type = order_type
+    try:
+        db.commit()
+    except Exception:
+        db.rollback()
 
     from app.midtrans import send_whatsapp_bridge_message
 
@@ -399,7 +695,7 @@ def customer_create_order(
             "qr_image_path": "",
             "queue_number": None,
             "message": f"Pesanan #{order.id} untuk {clean_table} berhasil dicatat dengan metode Bayar Tunai (Cash). Total: Rp{float(order.total):,.0f}.".replace(",", "."),
-            "next_step": f"Silakan lakukan pembayaran tunai sebesar Rp{float(order.total):,.0f} di kasir Warung Ndelik dengan menunjukkan ID Pesanan #{order.id}. Nomor antrean pesanan akan otomatis terbit begitu kasir mengonfirmasi pembayaran.".replace(",", "."),
+            "next_step": f"Silakan lakukan pembayaran tunai sebesar Rp{float(order.total):,.0f} di kasir Warung Ndelik dengan menyebutkan ID Pesanan #{order.id}. Setelah pembayaran cash diterima dan dikonfirmasi kasir, menu pesanan baru akan langsung disiapkan oleh dapur beserta penerbitan nomor antrean.".replace(",", "."),
         }
 
     # Otherwise QRIS
@@ -407,7 +703,7 @@ def customer_create_order(
     qris_info = create_qris_charge(
         order_id=order.id,
         gross_amount=float(order.total),
-        customer_name="Pelanggan",
+        customer_name=customer_name or "Pelanggan",
         customer_phone=customer_phone,
     )
 
@@ -603,6 +899,11 @@ def customer_create_reservation(
     db.commit()
     db.refresh(resv)
 
+    if customer_name and customer_name.strip():
+        save_or_update_customer_name(db, customer_phone, customer_name.strip())
+        session = get_customer_session(customer_phone, db)
+        session.customer_name = customer_name.strip()
+
     from app.midtrans import send_whatsapp_bridge_message
     owner_msg = (
         "*RESERVASI MEJA DIKONFIRMASI*\n"
@@ -631,7 +932,8 @@ def customer_create_reservation(
         "payment_order_id": paid_order.id,
         "message": (
             f"Reservasi {matched_tbl_number} untuk {customer_name} pada {reservation_date}, "
-            f"pukul {reservation_time} WIB sudah dikonfirmasi. Pembayaran Pesanan #{paid_order.id} telah lunas."
+            f"pukul {reservation_time} WIB sudah dikonfirmasi. Pembayaran Pesanan #{paid_order.id} telah lunas. "
+            f"Menu pesanan akan disiapkan hangat tepat sesuai jam reservasi saat Anda tiba."
         ),
     }
 
@@ -851,8 +1153,26 @@ CUSTOMER_TOOLS_SCHEMA = [
                         "description": "Metode pembayaran: 'QRIS' untuk bayar otomatis via barcode QRIS, atau 'CASH' untuk bayar tunai di kasir",
                     },
                     "notes": {"type": "string", "description": "Catatan khusus pesanan, misal: pedas sedang, es sedikit"},
+                    "customer_name": {"type": "string", "description": "Nama pelanggan (pemesan). Tanyakan atas nama siapa jika belum diketahui."},
                 },
                 "required": ["items"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "customer_save_name",
+            "description": "Menyimpan nama pelanggan/pemesan ke memori dan database jika pelanggan menyebutkan namanya saat ditanya atau memperkenalkan diri.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "customer_name": {
+                        "type": "string",
+                        "description": "Nama panggilan atau nama lengkap pelanggan (pemesan)",
+                    },
+                },
+                "required": ["customer_name"],
             },
         },
     },
@@ -977,9 +1297,16 @@ def _execute_tool_call(db: Session, sender: str, is_owner_role: bool, func_name:
             db,
             sender,
             args.get("items", []),
-            table_number=args.get("table_number", "Bawa Pulang / Takeaway"),
+            table_number=args.get("table_number", ""),
             payment_method=args.get("payment_method", "QRIS"),
             notes=args.get("notes", ""),
+            customer_name=args.get("customer_name", ""),
+        )
+    elif func_name == "customer_save_name":
+        return customer_save_name(
+            db,
+            customer_phone=sender,
+            customer_name=args.get("customer_name", ""),
         )
     elif func_name == "customer_check_order":
         return customer_check_order(db, sender, int(args.get("order_id", 0)))
@@ -1038,30 +1365,145 @@ def run_ai_agent(db: Session, sender: str, user_message: str) -> dict[str, Any]:
             "Gaya bicara: Hormat, sopan, natural, panggil 'Bos' atau 'Bapak'. Berikan konfirmasi jelas setiap ada perubahan data."
         )
         tools = OWNER_TOOLS_SCHEMA
+        history = _CONVERSATION_HISTORY[sender]
+        session = None
     else:
+        session = get_customer_session(sender, db)
+        history = session.history
+
+        # Build dynamic customer context
+        cleaned_phone = re.sub(r"\D", "", sender)
+        profile = db.query(CustomerProfile).filter(CustomerProfile.phone == cleaned_phone).one_or_none()
+
+        # Heuristic check if user mentioned their name in the message
+        name_match = re.search(
+            r"(?:nama saya|namaku|nama ku|panggil saya|panggil saja|atas nama|dengan kak|dengan mas|dengan mbak|dengan ibu|dengan pak)\s+([A-Za-z\s]{2,25})",
+            user_message,
+            re.IGNORECASE,
+        )
+        if name_match:
+            raw_tokens = re.findall(r"[A-Za-zÀ-ÖØ-öø-ÿ]+", name_match.group(1))
+            stop_words = {
+                "untuk", "makan", "pesan", "pesanan", "order", "menu", "di", "meja",
+                "bawa", "pulang", "dibawa", "dibungkus", "bungkus", "cash", "qris",
+                "dan", "saya", "mau", "ingin", "yang", "tolong",
+            }
+            name_tokens = []
+            for token in raw_tokens:
+                if token.casefold() in stop_words:
+                    break
+                name_tokens.append(token)
+                if len(name_tokens) >= 4:
+                    break
+            cand = " ".join(name_tokens).strip()
+            cand_l = cand.casefold()
+            if cand and not any(w in cand_l for w in ["pesan", "order", "makan", "menu", "bayar", "qris", "cash", "meja", "bawa", "pulang"]):
+                save_or_update_customer_name(db, sender, cand)
+                session.customer_name = cand
+                profile = db.query(CustomerProfile).filter(CustomerProfile.phone == cleaned_phone).one_or_none()
+
+        preference_table, preference_type = _extract_customer_preference(user_message, db)
+        if preference_type:
+            session = save_customer_preference(
+                db,
+                sender,
+                table_number=preference_table,
+                order_type=preference_type,
+            )
+            profile = db.query(CustomerProfile).filter(CustomerProfile.phone == cleaned_phone).one_or_none()
+
+        saved_name = session.customer_name or (profile.name if profile else None)
+        disp_name = format_customer_title(saved_name)
+        is_returning = bool(profile and (profile.visit_count or 0) > 1 and saved_name)
+
+        ctx_parts = []
+        ctx_parts.append("\n\n--- KONTEKS KHUSUS PELANGGAN SAAT INI ---")
+        ctx_parts.append(f"Nomor WhatsApp: {sender}")
+
+        if is_returning and profile:
+            v_cnt = profile.visit_count or 2
+            ctx_parts.append(f"Status: PELANGGAN SETIA (Kunjungan ke-{v_cnt}).")
+            ctx_parts.append(f"Nama Pelanggan: {disp_name}")
+            ctx_parts.append(
+                "SAPAAN WAJIB PELANGGAN SETIA: Wajib awali balasan dengan sapaan hangat dan ramah: "
+                f"'Selamat datang kembali di Warung Ndelik, {disp_name}!' (atau variasi kalimat alami yang senada). "
+                "Tunjukkan bahwa resto mengenali dan senang melayani pelanggan kembali. "
+                "Karena nama pelanggan sudah tersimpan di sistem, JANGAN tanyakan namanya lagi dari nol."
+            )
+        elif saved_name:
+            ctx_parts.append(f"Nama Pelanggan: {disp_name}")
+            ctx_parts.append("Nama pelanggan sudah tercatat. Jangan menanyakan nama lagi.")
+        else:
+            ctx_parts.append("Status: Pelanggan Baru (belum ada nama tersimpan).")
+            ctx_parts.append(
+                "ATURAN NAMA PEMESAN: Saat pelanggan memesan atau berinteraksi, tanyakan nama pemesan secara ramah dan santun "
+                "('Boleh tahu atas nama siapa pemesanannya, Kak?' atau 'Boleh tahu dengan Kakak siapa?'). "
+                "Jika pelanggan sudah menyebutkan nama, gunakan nama tersebut dan panggil fungsi customer_create_order atau customer_save_name."
+            )
+
+        if session.dining_preference_known or session.table_number:
+            pref_lbl = session.table_number or ("Makan di tempat" if session.order_type == "DINE_IN" else "Bawa Pulang / Takeaway")
+            ctx_parts.append(
+                f"Preferensi Makan di Tempat / Takeaway: SUDAH DIKETAHUI ({pref_lbl}).\n"
+                "ATURAN MUTLAK: JANGAN PERNAH MENANYAKAN LAGI apakah makan di tempat atau dibawa pulang! "
+                f"Gunakan langsung preferensi ini ({pref_lbl}) untuk setiap pesanan baru atau pesanan tambahan."
+            )
+            if session.order_type == "DINE_IN" and not session.table_number:
+                ctx_parts.append(
+                    "Pelanggan sudah memilih makan di tempat, tetapi nomor meja belum diketahui. "
+                    "Tanyakan nomor meja saja; jangan mengulang pertanyaan makan di tempat atau takeaway."
+                )
+        else:
+            ctx_parts.append(
+                "Preferensi Makan di Tempat / Takeaway: Belum ditentukan.\n"
+                "Tanyakan apakah makan di tempat (makan di meja berapa) atau dibawa pulang HANYA SEKALI saat pelanggan memesan. "
+                "Begitu pelanggan menjawab, JANGAN PERNAH mengulang pertanyaan ini lagi di percakapan berikutnya."
+            )
+
+        if session.active_order_id:
+            active_ord = db.query(Order).filter(Order.id == session.active_order_id).one_or_none()
+            items_desc = ""
+            if active_ord and active_ord.items_json:
+                itms = active_ord.items_json.get("items", [])
+                items_desc = ", ".join(f"{it.get('name')} x{it.get('quantity')}" for it in itms)
+            ctx_parts.append(
+                f"MEMORI AKTIF (Dalam 6 Jam Terakhir):\n"
+                f"- Ada pesanan aktif sebelumnya: Order #{session.active_order_id}\n"
+                f"- Menu yang sudah dipesan: {items_desc or 'Pesanan sebelumnya'}\n"
+                f"- Meja / Lokasi: {session.table_number or 'Makan di tempat'}\n"
+                "- KEMUNGKINAN MENAMBAH PESANAN: Pelanggan mungkin ingin MENAMBAH PESANAN (misal: tambah es teh, tambah porsi, dll). "
+                f"Jika pelanggan mengatakan ingin menambah pesanan, langsung layani sebagai pesanan tambahan untuk meja {session.table_number or ''} "
+                f"atas nama {disp_name} tanpa menanyakan ulang makan di tempat/takeaway atau menanyakan nama lagi."
+            )
+
+        customer_context_str = "\n".join(ctx_parts)
+
         system_prompt = (
-            "Kamu adalah AI Agent pelayan restoran Warung Ndelik yang ramah, sopan, dan hangat melayani pelanggan via WhatsApp.\n"
+            "Kamu adalah AI Agent pelayan restoran Warung Ndelik yang ramah, sopan, hangat, dan komunikatif melayani pelanggan via WhatsApp.\n"
             "Tugasmu:\n"
             "- Menjawab pertanyaan seputar menu makanan dan minuman khas Warung Ndelik secara ramah dan menggugah selera.\n"
             "- Jika pelanggan menanyakan menu atau ingin tahu apa saja yang dijual, gunakan fungsi customer_get_menu.\n"
             "- Menu favorit / best seller kami antara lain: Nasi Bebek Ndelik 1/2 (Bumbu Hitam), Nasi Goreng Ceplok, Kwetiau Ndelik, dan Nasi Garang Asem.\n"
             "- Saat pelanggan memesan:\n"
-            "  * Tanyakan atau pastikan apakah makan di tempat (makan di meja berapa) atau dibawa pulang / dibungkus.\n"
+            "  * Tanyakan atas nama siapa pemesanannya jika belum diketahui ('Boleh tahu atas nama siapa, Kak?'). Jika sudah diketahui, jangan tanyakan lagi.\n"
+            "  * Tanyakan apakah makan di tempat (di meja berapa) atau dibawa pulang / dibungkus HANYA SEKALI. Jika sudah diketahui dari percakapan sebelumnya atau memori aktif, JANGAN PERNAH mengulang pertanyaan tersebut.\n"
             "  * Tanyakan atau pastikan metode pembayaran: QRIS otomatis (scan barcode) atau Bayar Tunai (Cash di kasir).\n"
-            "  * Panggil customer_create_order dengan mengisi table_number dan payment_method ('QRIS' atau 'CASH').\n"
-            "- Nomor Antrean (Queue Number) hanya diterbitkan otomatis SETELAH pembayaran lunas (setelah scan QRIS berhasil, atau setelah bayar cash diterima di kasir).\n"
-            "- Jika pelanggan memilih QRIS, beri tahu bahwa barcode QRIS otomatis dikirimkan ke chat dan nomor antrean terbit saat pembayaran terverifikasi.\n"
-            "- Jika pelanggan memilih CASH, beri tahu ID pesanan dan arahkan untuk membayar tunai di kasir. Nomor antrean terbit setelah kasir mengonfirmasi.\n"
-            "- Reservasi Meja & Info Meja Kosong:\n"
+            "  * Panggil customer_create_order dengan mengisi customer_name, table_number, dan payment_method ('QRIS' atau 'CASH').\n"
+            "- Ketentuan Pembayaran & Kesiapan Menu Dapur:\n"
+            "  * Dapur Warung Ndelik baru mulai memproses dan menyiapkan menu setelah pembayaran lunas atau terkonfirmasi.\n"
+            "  * Jika pelanggan bertanya apakah harus bayar dulu apa nanti (misal: 'harus bayar dulu apa nanti?', 'bisa bayar belakangan?', 'bayar sekarang atau pas makan?'): jawab dengan ramah, santun, dan luwes bahwa menu baru akan disiapkan dan diproses oleh dapur setelah pembayaran lunas. Jadi jika ingin menu segera disiapkan, disarankan untuk membayar terlebih dahulu.\n"
+            "  * Jika pelanggan memilih bayar tunai (Cash di kasir): tetap layani dan perbolehkan dengan senang hati, namun sampaikan secara sopan dan natural bahwa pesanan baru akan mulai disiapkan oleh dapur setelah pelanggan tiba di restoran dan menyelesaikan pembayaran tunai di kasir.\n"
+            "  * Jika pelanggan memilih QRIS: barcode QRIS otomatis dikirimkan ke chat, dan begitu pembayaran terkonfirmasi, dapur langsung menyiapkan pesanan tanpa perlu antre di kasir.\n"
+            "- Reservasi Meja & Penyiapan Menu Sesuai Jam Permintaan:\n"
             "  * Jika pelanggan ingin melihat meja yang tersedia, gunakan customer_check_available_tables dan sampaikan hasilnya secara ringkas.\n"
-            "  * Reservasi hanya boleh dikonfirmasi apabila pelanggan memiliki pesanan terkait yang sudah LUNAS dan terverifikasi. Minta nomor pesanan lunas tersebut, lalu panggil customer_create_reservation dengan payment_order_id.\n"
-            "  * Jangan pernah menyatakan meja dipesan, diamankan, atau reservasi berhasil sebelum fungsi customer_create_reservation mengembalikan konfirmasi sukses. Jika pembayaran belum lunas, jelaskan dengan singkat bahwa reservasi akan dilayani setelah pembayaran terverifikasi.\n"
+            "  * Reservasi meja hanya boleh dikonfirmasi apabila pelanggan memiliki pesanan terkait yang sudah LUNAS dan terverifikasi. Minta nomor pesanan lunas tersebut, lalu panggil customer_create_reservation dengan payment_order_id.\n"
+            "  * Jangan pernah menyatakan meja dipesan, diamankan, atau reservasi berhasil sebelum fungsi customer_create_reservation mengembalikan konfirmasi sukses. Jika pembayaran belum lunas, jelaskan secara natural bahwa reservasi diproses setelah pembayaran terverifikasi.\n"
+            "  * Apabila pelanggan sudah membayar lunas pada saat reservasi: jelaskan secara hangat bahwa menu pesanan akan disiapkan fresh dan hangat tepat sesuai jam kedatangan/permintaan yang direservasi, sehingga saat tiba di resto hidangan sudah siap langsung dinikmati tanpa perlu menunggu lama.\n"
             "- Jangan pernah membuka informasi rahasia omset resto, modal HPP, atau mengubah harga/menu untuk pelanggan umum.\n\n"
-            "Gaya bicara: Berbahasa Indonesia yang hangat, sopan, dan alami seperti staf Warung Ndelik yang benar-benar sedang membantu pelanggan. Sesuaikan jawaban dengan pertanyaan dan percakapan sebelumnya; jangan memakai kalimat template berulang atau gaya chatbot. Jangan gunakan emoji maupun emotikon. Gunakan daftar hanya ketika menyampaikan menu, pilihan, atau langkah yang memang perlu dirapikan."
+            "Gaya bicara: Berbahasa Indonesia yang hangat, sopan, luwes, dan alami layaknya staf Warung Ndelik yang ramah melayani tamu. Pahami pertanyaan pelanggan dan jawab secara mengalir; jangan menggunakan template kalimat kaku atau gaya chatbot robotik. Dilarang keras menggunakan emoji maupun emotikon dalam bentuk apa pun. Gunakan daftar hanya ketika menyajikan menu atau pilihan yang butuh kerapian."
+            + customer_context_str
         )
         tools = CUSTOMER_TOOLS_SCHEMA
-
-    history = _CONVERSATION_HISTORY[sender]
 
     messages: list[dict[str, Any]] = [{"role": "system", "content": system_prompt}]
     for h in history:
@@ -1132,6 +1574,8 @@ def run_ai_agent(db: Session, sender: str, user_message: str) -> dict[str, Any]:
     if final_reply:
         history.append({"role": "user", "content": user_message})
         history.append({"role": "assistant", "content": final_reply})
+        if session:
+            session.touch()
 
     return {
         "reply": final_reply,

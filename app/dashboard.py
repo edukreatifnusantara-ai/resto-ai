@@ -459,6 +459,9 @@ def get_dashboard_summary_data(db: Session) -> dict:
         "net_margin_percent": avg_margin_pct
     }
 
+    monthly_growth = master.get("monthly_growth_history", [])
+    six_mo_sum = master.get("six_month_summary", {})
+
     return {
         "business": {
             "name": master.get("business_name", "Warung Ndelik"),
@@ -478,10 +481,16 @@ def get_dashboard_summary_data(db: Session) -> dict:
             "avg_margin_percent": avg_margin_pct,
             "total_inventory_value": total_inventory_value,
             "live_sales_db": live_total_sales,
-            "live_orders_count": live_completed_count
+            "live_orders_count": live_completed_count,
+            "total_6mo_omzet": six_mo_sum.get("total_revenue", 412088471.0),
+            "total_6mo_net_profit": six_mo_sum.get("total_net_profit", 110765888.0),
+            "avg_mom_growth": six_mo_sum.get("average_monthly_growth", 7.0),
+            "total_6mo_orders": live_completed_count
         },
         "income_statement": income_statement,
         "purchasing": purchasing,
+        "monthly_growth": monthly_growth,
+        "six_month_summary": six_mo_sum,
         "inventory": {
             "total_items": len(inventory_items),
             "total_valuation": total_inventory_value,
@@ -492,6 +501,14 @@ def get_dashboard_summary_data(db: Session) -> dict:
             "daily_omzet": [d["estimasi_omzet"] for d in daily_table_data],
             "daily_hpp": [d["pemakaian_hpp"] for d in daily_table_data],
             "daily_net_profit": [d["laba_bersih"] for d in daily_table_data],
+            "monthly_growth": {
+                "labels": [m["month_name"] for m in monthly_growth],
+                "omzet": [m["omzet"] for m in monthly_growth],
+                "hpp": [m["hpp"] for m in monthly_growth],
+                "net_profit": [m["laba_bersih"] for m in monthly_growth],
+                "growth_rates": [m["growth_percent"] for m in monthly_growth],
+                "orders_count": [m.get("total_orders", 0) for m in monthly_growth]
+            },
             "cost_breakdown": {
                 "labels": ["Gaji Staf (10 Org)", "Gaji Manajemen (Owner & Co)", "HPP Bahan Riil (Bulanan)", "Utilitas (Listrik/Air)", "Ops Gas & Perlengkapan"],
                 "values": [18500000, 8000000, round(avg_daily_hpp * 30, 0), 1500000, 3161200]

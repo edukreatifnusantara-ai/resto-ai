@@ -23,7 +23,7 @@ from typing import List, Any
 from urllib.parse import parse_qs
 
 from app.database import init_db, SessionLocal
-from app.agent import run_ai_agent, is_owner, customer_request_qris
+from app.agent import run_ai_agent, is_owner, customer_request_qris, remember_customer_order
 from app.voice import VoiceTranscriptionError, transcribe_audio
 from app.dashboard import get_dashboard_summary_data, get_dashboard_html_page
 from app.auth import (
@@ -472,7 +472,7 @@ def handle_whatsapp_text(
         return "Halo, selamat datang di Warung Ndelik.\n\n" + _chatbot_help()
 
     upper = text.upper()
-    if upper in {"HALO", "HI", "HAI", "HELP", "BANTUAN", "MULAI"}:
+    if upper in {"HELP", "BANTUAN"}:
         return "Halo, selamat datang di Warung Ndelik.\n\n" + _chatbot_help()
     if upper in {"LOKASI", "ALAMAT", "MAP", "MAPS", "GOOGLE MAPS"}:
         return _chatbot_location()
@@ -510,6 +510,7 @@ def handle_whatsapp_text(
             )
         except HTTPException as exc:
             return f"Order belum dapat dibuat: {exc.detail}"
+        remember_customer_order(db, sender, result["id"])
         return (
             f"*ORDER #{result['id']} BERHASIL DIBUAT*\n"
             f"Total: *Rp{result['total']:,.0f}*".replace(",", ".")

@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import Session, sessionmaker
 
-from app.models import Base, MenuItem, Recipe, Stock, Order, DiningTable, Reservation
+from app.models import Base, MenuItem, Recipe, Stock, Order, DiningTable, Reservation, CustomerProfile
 
 
 DATABASE_URL = os.getenv("RESTO_DATABASE_URL", "sqlite:///./resto.db")

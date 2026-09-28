@@ -152,3 +152,16 @@ class Reservation(Base):
     payment_order_id = Column(Integer, ForeignKey("orders.id"), nullable=True, index=True)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
 
+
+class CustomerProfile(Base):
+    __tablename__ = "customer_profiles"
+
+    id = Column(Integer, primary_key=True)
+    phone = Column(String(32), unique=True, index=True, nullable=False)
+    name = Column(String(100), nullable=True)
+    visit_count = Column(Integer, nullable=False, default=1)
+    last_table = Column(String(50), nullable=True)
+    last_order_type = Column(String(30), nullable=True)
+    notes = Column(String(255), nullable=True)
+    last_seen = Column(DateTime, nullable=False, default=datetime.utcnow)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
