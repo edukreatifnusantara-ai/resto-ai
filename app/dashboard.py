@@ -334,6 +334,12 @@ def get_dashboard_summary_data(db: Session) -> dict:
     ops_28 = total_ops_28d
     daily_fixed_cost = round(tetap_total / n_days, 2)
 
+    # Beban tetap bulanan DINAMIS: roster gaji riil + utilitas riil (bukan angka hardcode master)
+    _payroll_info = master.get("payroll", {})
+    _roster_all = _payroll_info.get("leadership", []) + _payroll_info.get("staff", [])
+    _payroll_monthly = sum(p.get("base_salary", 0) for p in _roster_all)
+    _dyn_monthly_fixed = _payroll_monthly + (master.get("fixed_costs", {}).get("monthly_electricity_and_water", 1400000))
+
     # Day of Week Traffic & Revenue Analytics
     from datetime import datetime as dt_mod
     from collections import defaultdict as ddict
@@ -561,7 +567,7 @@ def get_dashboard_summary_data(db: Session) -> dict:
             "avg_daily_omzet": avg_daily_omzet,
             "total_hpp_bahan": total_hpp_28d,
             "avg_daily_hpp": avg_daily_hpp,
-            "monthly_fixed_cost": master.get("fixed_costs", {}).get("total_monthly_fixed_cost", 28000000),
+            "monthly_fixed_cost": round(_dyn_monthly_fixed),
             "daily_fixed_cost": daily_fixed_cost,
             "total_net_profit": total_net_profit_28d,
             "avg_daily_profit": avg_daily_profit,

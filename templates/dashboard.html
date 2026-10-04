@@ -118,8 +118,8 @@
           </div>
           <div>
             <span class="text-xs uppercase tracking-wider text-slate-400 font-medium">Beban Tetap Bulanan</span>
-            <h3 id="hero-fixed-cost" class="text-2xl sm:text-3xl font-extrabold mt-1 text-orange-400">Rp 28.000.000</h3>
-            <p class="text-xs text-slate-300 mt-1">Gaji 12 Org (26,5jt) + Utilitas (1,5jt)</p>
+            <h3 id="hero-fixed-cost" class="text-2xl sm:text-3xl font-extrabold mt-1 text-orange-400">Rp 0</h3>
+            <p id="hero-fixed-note" class="text-xs text-slate-300 mt-1">…</p>
           </div>
           <div>
             <span class="text-xs uppercase tracking-wider text-slate-400 font-medium">Laba Bersih Akumulasi</span>
@@ -142,33 +142,33 @@
           <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">HPP Bahan Baku</span>
           <h4 id="ov-hpp" class="text-lg font-extrabold text-slate-900 mt-1">Rp 0</h4>
           <span class="text-[10px] text-amber-600 font-medium flex items-center gap-1 mt-1">
-            <i data-lucide="pie-chart" class="w-3 h-3"></i> ~40.8% Food Cost
+            <i data-lucide="pie-chart" class="w-3 h-3"></i> <span id="ov-hpp-ratio">…</span>
           </span>
         </div>
         <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow">
           <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Beban Tetap Harian</span>
-          <h4 id="ov-fixed" class="text-lg font-extrabold text-slate-900 mt-1">Rp 933.333</h4>
+          <h4 id="ov-fixed" class="text-lg font-extrabold text-slate-900 mt-1">Rp 0</h4>
           <span class="text-[10px] text-blue-600 font-medium flex items-center gap-1 mt-1">
-            <i data-lucide="users" class="w-3 h-3"></i> 12 Personil + Utilitas
+            <i data-lucide="users" class="w-3 h-3"></i> <span id="ov-fixed-note">…</span>
           </span>
         </div>
         <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow">
           <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Laba Bersih Harian</span>
           <h4 id="ov-profit" class="text-lg font-extrabold text-slate-900 mt-1">Rp 0</h4>
           <span class="text-[10px] text-purple-600 font-medium flex items-center gap-1 mt-1">
-            <i data-lucide="award" class="w-3 h-3"></i> Margin 26.9%
+            <i data-lucide="award" class="w-3 h-3"></i> <span id="ov-margin-note">…</span>
           </span>
         </div>
         <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow">
           <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Laju Pertumbuhan</span>
-          <h4 class="text-lg font-extrabold text-emerald-600 mt-1">+7,0% MoM</h4>
+          <h4 id="ov-growth" class="text-lg font-extrabold text-emerald-600 mt-1">…</h4>
           <span class="text-[10px] text-emerald-700 font-medium flex items-center gap-1 mt-1">
-            <i data-lucide="trending-up" class="w-3 h-3"></i> Stabil 5 Bulan
+            <i data-lucide="trending-up" class="w-3 h-3"></i> Rata-rata 5 Bulan Historis
           </span>
         </div>
         <div class="bg-white p-4 rounded-xl border border-slate-200 card-shadow">
           <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Omzet 6 Bulan</span>
-          <h4 id="ov-alltime" class="text-lg font-extrabold text-indigo-900 mt-1">Rp 412,1 Juta</h4>
+          <h4 id="ov-alltime" class="text-lg font-extrabold text-indigo-900 mt-1">…</h4>
           <span class="text-[10px] text-indigo-600 font-medium flex items-center gap-1 mt-1">
             <i data-lucide="check-circle" class="w-3 h-3"></i> Produk Siap Jual
           </span>
@@ -180,8 +180,8 @@
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-5">
           <div>
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1.5">
-                <i data-lucide="trending-up" class="w-3.5 h-3.5 text-emerald-600"></i> Pertumbuhan Stabil +7,0% MoM
+              <span id="growth-badge-mom" class="px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1.5">
+                <i data-lucide="trending-up" class="w-3.5 h-3.5 text-emerald-600"></i> Pertumbuhan <span id="growth-badge-val">…</span> MoM
               </span>
               <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-orange-100 text-orange-800 border border-orange-200">
                 ⭐ Demo Produk Siap Jual
@@ -191,24 +191,24 @@
               </span>
             </div>
             <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 mt-2 flex items-center gap-2">
-              <i data-lucide="bar-chart-2" class="w-5 h-5 text-orange-600"></i> Tren Pertumbuhan Finansial 6 Bulan (MoM +7,0% Konsisten)
+              <i data-lucide="bar-chart-2" class="w-5 h-5 text-orange-600"></i> Tren Pertumbuhan Finansial 6 Bulan (MoM rata-rata <span id="growth-title-mom">…</span>)
             </h3>
             <p class="text-xs text-slate-500 mt-1">
-              Rekam jejak performa finansial resto dengan pertumbuhan terukur 7% setiap bulannya, membuktikan validasi produk Resto-AI siap diadopsi multi-cabang.
+              Rekam jejak performa finansial resto berdasarkan data riil, membuktikan validasi produk Resto-AI siap diadopsi multi-cabang.
             </p>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-right">
             <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
               <span class="text-[10px] text-slate-500 font-bold uppercase block">Akumulasi Omzet 6 Bln</span>
-              <span id="six-mo-omzet" class="text-sm sm:text-base font-extrabold text-emerald-700">Rp 412.088.471</span>
+              <span id="six-mo-omzet" class="text-sm sm:text-base font-extrabold text-emerald-700">…</span>
             </div>
             <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
               <span class="text-[10px] text-slate-500 font-bold uppercase block">Akumulasi Laba Bersih</span>
-              <span id="six-mo-profit" class="text-sm sm:text-base font-extrabold text-indigo-700">Rp 110.765.888</span>
+              <span id="six-mo-profit" class="text-sm sm:text-base font-extrabold text-indigo-700">…</span>
             </div>
             <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 col-span-2 sm:col-span-1">
               <span class="text-[10px] text-slate-500 font-bold uppercase block">Laju MoM Teruji</span>
-              <span class="text-sm sm:text-base font-extrabold text-orange-600">+7,0% / Bulan</span>
+              <span id="six-mo-mom-badge" class="text-sm sm:text-base font-extrabold text-orange-600">…</span>
             </div>
           </div>
         </div>
@@ -231,23 +231,23 @@
               <div class="flex items-center gap-2 text-emerald-900 font-extrabold text-sm">
                 <i data-lucide="sparkles" class="w-4 h-4 text-emerald-600"></i> Insight Kinerja Produk Siap Jual
               </div>
-              <p class="text-xs text-emerald-800 leading-relaxed">
-                Melalui implementasi sistem otomatisasi Resto-AI (Waitress AI WhatsApp, KDS Dapur Real-time, dan Kontrol Food Cost Bahan Baku), restoran membukukan tren pertumbuhan omzet <b>stabil +7,0% setiap bulan</b>, dari <b>Rp 57,6 Juta</b> (April baseline) melonjak menjadi <b>Rp 80,8 Juta</b> (September data riil).
+              <p class="text-xs text-emerald-800 leading-relaxed" id="insight-narrative">
+                …
               </p>
               <div class="pt-2 border-t border-emerald-200/60 flex justify-between text-xs text-emerald-950 font-bold">
-                <span>Peningkatan Laba Bersih:</span>
-                <span class="text-emerald-700 font-extrabold">+40,2% (Rp 15,5jt → Rp 21,7jt)</span>
+                <span>Peningkatan Laba Bersih April → September:</span>
+                <span class="text-emerald-700 font-extrabold" id="insight-laba-delta">…</span>
               </div>
             </div>
 
             <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 text-xs space-y-2.5">
               <div class="font-bold text-slate-800 flex items-center justify-between">
                 <span>Rata-rata Margin Bersih:</span>
-                <span class="text-indigo-700 font-extrabold text-sm">26,9% Konsisten</span>
+                <span class="text-indigo-700 font-extrabold text-sm" id="six-mo-margin">…</span>
               </div>
               <div class="font-bold text-slate-800 flex items-center justify-between">
                 <span>Food Cost HPP:</span>
-                <span class="text-amber-800 font-extrabold text-sm">40,8% (Terkontrol Ketat)</span>
+                <span class="text-amber-800 font-extrabold text-sm" id="six-mo-foodcost">…</span>
               </div>
               <div class="font-bold text-slate-800 flex items-center justify-between">
                 <span>Total Pesanan Sukses (DB):</span>
@@ -311,9 +311,9 @@
             </div>
           </div>
           <div class="mt-4 pt-3 border-t border-slate-100 text-xs space-y-1 text-slate-600">
-            <div class="flex justify-between"><span>Gaji Staf (10 Org):</span><b class="text-slate-800">Rp 18.500.000</b></div>
-            <div class="flex justify-between"><span>Gaji Manajemen:</span><b class="text-slate-800">Rp 8.000.000</b></div>
-            <div class="flex justify-between"><span>Utilitas (Listrik/Air):</span><b class="text-slate-800">Rp 1.500.000</b></div>
+            <div class="flex justify-between"><span>Gaji Staf Operasional (28 hari):</span><b class="text-slate-800" id="cs-staff">…</b></div>
+            <div class="flex justify-between"><span>Gaji Manajemen (28 hari):</span><b class="text-slate-800" id="cs-mgmt">…</b></div>
+            <div class="flex justify-between"><span>Utilitas (Listrik/Air, 28 hari):</span><b class="text-slate-800" id="cs-util">…</b></div>
           </div>
         </div>
       </div>
@@ -342,8 +342,8 @@
               <h4 id="ov-peak-day" class="text-xl font-extrabold text-orange-600">Minggu</h4>
               <span class="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">Peringkat 1</span>
             </div>
-            <p id="ov-peak-stats" class="text-xs text-slate-700 font-semibold mt-1">Rata-rata: Rp 3.464.863 / hari</p>
-            <p class="text-[11px] text-emerald-700 font-medium">Laba: Rp 1.294.012 (Margin 37.3%)</p>
+            <p id="ov-peak-stats" class="text-xs text-slate-700 font-semibold mt-1">…</p>
+            <p id="ov-peak-laba" class="text-[11px] text-emerald-700 font-medium">…</p>
           </div>
 
           <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
@@ -352,7 +352,7 @@
               <h4 id="ov-slow-day" class="text-xl font-extrabold text-slate-700">Kamis</h4>
               <span class="text-xs font-bold text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full">Peringkat 7</span>
             </div>
-            <p id="ov-slow-stats" class="text-xs text-slate-700 font-semibold mt-1">Rata-rata: Rp 2.344.300 / hari</p>
+            <p id="ov-slow-stats" class="text-xs text-slate-700 font-semibold mt-1">…</p>
             <p class="text-[11px] text-slate-500 font-medium">Waktu ideal libur bergilir tim & deep cleaning</p>
           </div>
 
@@ -392,11 +392,11 @@
           <div>
             <div class="flex justify-between font-extrabold text-slate-900 border-b border-slate-300 pb-1.5 text-sm">
               <span>1. PENDAPATAN OPERASIONAL (REVENUE)</span>
-              <span id="pnl-rev-total" class="text-emerald-700">Rp 80.798.533</span>
+              <span id="pnl-rev-total" class="text-emerald-700">…</span>
             </div>
             <div class="pl-4 pt-2 space-y-1.5 text-slate-600">
-              <div class="flex justify-between"><span>Penjualan Makanan (proporsional belanja dapur)</span><span id="pnl-rev-food">Rp 58.174.944</span></div>
-              <div class="flex justify-between"><span>Penjualan Minuman & Aneka Snack (proporsional belanja minuman)</span><span id="pnl-rev-drink">Rp 22.623.589</span></div>
+              <div class="flex justify-between"><span>Penjualan Makanan (proporsional belanja dapur)</span><span id="pnl-rev-food">…</span></div>
+              <div class="flex justify-between"><span>Penjualan Minuman & Aneka Snack (proporsional belanja minuman)</span><span id="pnl-rev-drink">…</span></div>
             </div>
           </div>
 
@@ -404,33 +404,28 @@
           <div>
             <div class="flex justify-between font-extrabold text-slate-900 border-b border-slate-300 pb-1.5 text-sm">
               <span>2. HARGA POKOK PENJUALAN (HPP / COGS)</span>
-              <span id="pnl-cogs-total" class="text-amber-800">Rp 32.947.239</span>
+              <span id="pnl-cogs-total" class="text-amber-800">…</span>
             </div>
             <div class="pl-4 pt-2 space-y-1.5 text-slate-600">
-              <div class="flex justify-between"><span>Bahan Baku Dapur (Beras, Ayam, Bebek, Minyak, Sayur)</span><span id="pnl-cogs-food">Rp 26.038.717</span></div>
-              <div class="flex justify-between"><span>Bahan Baku Minuman (Es Batu, Kopi, Susu, Teh, Sirup)</span><span id="pnl-cogs-bev">Rp 3.952.380</span></div>
-              <div class="flex justify-between font-semibold text-amber-900"><span>Rasio Food Cost</span><span id="pnl-cogs-ratio">40.8% dari Omzet</span></div>
+              <div class="flex justify-between"><span>Bahan Baku Dapur (Beras, Ayam, Bebek, Minyak, Sayur)</span><span id="pnl-cogs-food">…</span></div>
+              <div class="flex justify-between"><span>Bahan Baku Minuman (Es Batu, Kopi, Susu, Teh, Sirup)</span><span id="pnl-cogs-bev">…</span></div>
+              <div class="flex justify-between font-semibold text-amber-900"><span>Rasio Food Cost</span><span id="pnl-cogs-ratio">…</span></div>
             </div>
           </div>
 
           <!-- 3. LABA KOTOR -->
           <div class="p-3 bg-emerald-50 rounded-lg border border-emerald-200 flex justify-between font-extrabold text-emerald-900 text-sm">
             <span>3. LABA KOTOR (GROSS PROFIT)</span>
-            <span id="pnl-gross-profit">Rp 47.851.294 (59.2%)</span>
+            <span id="pnl-gross-profit">…</span>
           </div>
 
           <!-- 4. BEBAN OPERASIONAL -->
           <div>
             <div class="flex justify-between font-extrabold text-slate-900 border-b border-slate-300 pb-1.5 text-sm">
               <span>4. BEBAN OPERASIONAL & BIAYA TETAP (OPEX)</span>
-              <span id="pnl-opex-total" class="text-rose-800">Rp 29.333.933</span>
+              <span id="pnl-opex-total" class="text-rose-800">…</span>
             </div>
-            <div class="pl-4 pt-2 space-y-1.5 text-slate-600">
-              <div class="flex justify-between"><span>Gaji 10 Staf Karyawan (Alokasi 28 Hari)</span><span id="pnl-opex-staff">Rp 17.266.667</span></div>
-              <div class="flex justify-between"><span>Gaji Manajemen (Owner 5jt + Co-owner 3jt, 28 Hari)</span><span id="pnl-opex-mgmt">Rp 7.466.667</span></div>
-              <div class="flex justify-between"><span>Utilitas (Listrik & Air, 28 Hari)</span><span id="pnl-opex-util">Rp 1.400.000</span></div>
-              <div class="flex justify-between"><span>Gas Elpiji, Air Galon, Tisu, Plastik & Perlengkapan (Pemakaian Riil)</span><span id="pnl-opex-ops">Rp 3.200.600</span></div>
-            </div>
+            <div id="pnl-opex-items" class="pl-4 pt-2 space-y-1.5 text-slate-600"></div>
           </div>
 
           <!-- 5. LABA BERSIH -->
@@ -439,7 +434,7 @@
               <span>5. LABA BERSIH OPERASIONAL (NET PROFIT)</span>
               <p class="text-[10px] text-indigo-600 font-normal mt-0.5">Keuntungan bersih setelah seluruh gaji manajemen, staf, dan pengeluaran</p>
             </div>
-            <span id="pnl-net-profit" class="text-right">Rp 21.717.961<br><span class="text-xs text-emerald-700 font-bold">Margin Bersih: 26.9%</span></span>
+            <span id="pnl-net-profit" class="text-right">…</span>
           </div>
         </div>
 
@@ -484,8 +479,8 @@
             </h2>
             <p class="text-xs text-slate-500">Arus kas keluar: Pasar dapur, minuman, serta operasional non-bahan (Gas, Galon, Tisu, Nota, Plastik)</p>
           </div>
-          <span class="px-3 py-1 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-lg border border-indigo-200">
-            Total Belanja 28 Hari: Rp 33.152.297
+          <span id="belanja-badge" class="px-3 py-1 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-lg border border-indigo-200">
+            Total Belanja 28 Hari: …
           </span>
         </div>
 
@@ -493,23 +488,23 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
             <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Total Belanja Masuk</span>
-            <h4 class="text-lg font-bold text-slate-900 mt-1">Rp 33.152.297</h4>
-            <span class="text-[10px] text-slate-400">Rata-rata Rp 1.184.010 / hari</span>
+            <h4 id="pur-total" class="text-lg font-bold text-slate-900 mt-1">…</h4>
+            <span id="pur-avg" class="text-[10px] text-slate-400">…</span>
           </div>
           <div class="p-4 rounded-xl bg-amber-50 border border-amber-200">
             <span class="text-[11px] font-semibold text-amber-700 uppercase tracking-wider block">1. Belanja Pasar Dapur</span>
-            <h4 class="text-lg font-bold text-amber-900 mt-1">Rp 26.038.717</h4>
-            <span class="text-[10px] text-amber-600 font-medium">78.5% • Beras, Bebek, Ayam, Sayur, Bumbu</span>
+            <h4 id="pur-dapur" class="text-lg font-bold text-amber-900 mt-1">…</h4>
+            <span id="pur-dapur-note" class="text-[10px] text-amber-600 font-medium">…</span>
           </div>
           <div class="p-4 rounded-xl bg-blue-50 border border-blue-200">
             <span class="text-[11px] font-semibold text-blue-700 uppercase tracking-wider block">2. Belanja Bahan Minuman</span>
-            <h4 class="text-lg font-bold text-blue-900 mt-1">Rp 3.952.380</h4>
-            <span class="text-[10px] text-blue-600 font-medium">11.9% • Es Batu, Kopi, Susu, Good Day, Sirup</span>
+            <h4 id="pur-minuman" class="text-lg font-bold text-blue-900 mt-1">…</h4>
+            <span id="pur-minuman-note" class="text-[10px] text-blue-600 font-medium">…</span>
           </div>
           <div class="p-4 rounded-xl bg-rose-50 border border-rose-200">
             <span class="text-[11px] font-semibold text-rose-700 uppercase tracking-wider block">3. Belanja Ops & Perlengkapan</span>
-            <h4 class="text-lg font-bold text-rose-900 mt-1">Rp 3.161.200</h4>
-            <span class="text-[10px] text-rose-600 font-medium">9.5% • Gas Elpiji, Air Galon, Tisu, Nota, Plastik</span>
+            <h4 id="pur-ops" class="text-lg font-bold text-rose-900 mt-1">…</h4>
+            <span id="pur-ops-note" class="text-[10px] text-rose-600 font-medium">…</span>
           </div>
         </div>
 
@@ -535,9 +530,9 @@
               </div>
             </div>
             <div class="pt-3 border-t border-slate-200 text-[11px] space-y-1 text-slate-600">
-              <div class="flex justify-between"><span>Pasar Dapur:</span><b class="text-amber-800">Rp 26.038.717 (78.5%)</b></div>
-              <div class="flex justify-between"><span>Bahan Minuman:</span><b class="text-blue-800">Rp 3.952.380 (11.9%)</b></div>
-              <div class="flex justify-between"><span>Ops (Gas/Galon/Tisu/Nota):</span><b class="text-rose-800">Rp 3.161.200 (9.5%)</b></div>
+              <div class="flex justify-between"><span>Pasar Dapur:</span><b class="text-amber-800" id="pur-dapur-legend">…</b></div>
+              <div class="flex justify-between"><span>Bahan Minuman:</span><b class="text-blue-800" id="pur-minuman-legend">…</b></div>
+              <div class="flex justify-between"><span>Ops (Gas/Galon/Tisu/Nota):</span><b class="text-rose-800" id="pur-ops-legend">…</b></div>
             </div>
           </div>
         </div>
@@ -736,15 +731,15 @@
             </h2>
             <p class="text-xs text-slate-500">Struktur gaji tetap manajemen dan staf operasional Warung Ndelik Mranggen</p>
           </div>
-          <span class="px-3 py-1 bg-orange-50 text-orange-700 text-xs font-bold rounded-lg border border-orange-200">
-            Total Anggaran Payroll: Rp 26.500.000 / bulan
+          <span id="hr-payroll-badge" class="px-3 py-1 bg-orange-50 text-orange-700 text-xs font-bold rounded-lg border border-orange-200">
+            Total Anggaran Payroll: …
           </span>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div class="lg:col-span-2 bg-slate-50 p-5 rounded-xl border border-slate-200">
-            <h3 class="font-bold text-slate-800 text-sm mb-1">Roster Gaji Personalia (12 Orang)</h3>
-            <p class="text-[11px] text-slate-500 mb-3">Owner (5jt), Co-owner (3jt), dan 10 Staf Operasional (18,5jt)</p>
+            <h3 id="hr-roster-title" class="font-bold text-slate-800 text-sm mb-1">Roster Gaji Personalia</h3>
+            <p id="hr-roster-sub" class="text-[11px] text-slate-500 mb-3">Struktur gaji tetap dari data riil</p>
             <div class="relative h-64 w-full">
               <canvas id="rosterChart"></canvas>
             </div>
@@ -754,16 +749,16 @@
               <h3 class="font-bold text-slate-800 text-sm mb-2">Ringkasan Beban SDM</h3>
               <div class="space-y-2.5 text-xs text-slate-600">
                 <div class="p-3 bg-white rounded-lg border border-slate-200 flex justify-between items-center">
-                  <span>Subtotal Manajemen (2 Org):</span>
-                  <b class="text-orange-700 font-extrabold">Rp 8.000.000</b>
+                  <span id="hr-sub-mgmt-label">Subtotal Manajemen:</span>
+                  <b class="text-orange-700 font-extrabold" id="hr-sub-mgmt">…</b>
                 </div>
                 <div class="p-3 bg-white rounded-lg border border-slate-200 flex justify-between items-center">
-                  <span>Subtotal Staf (10 Org):</span>
-                  <b class="text-blue-700 font-extrabold">Rp 18.500.000</b>
+                  <span id="hr-sub-staff-label">Subtotal Staf Operasional:</span>
+                  <b class="text-blue-700 font-extrabold" id="hr-sub-staff">…</b>
                 </div>
                 <div class="p-3 bg-white rounded-lg border border-slate-200 flex justify-between items-center">
                   <span>Alokasi Beban Harian:</span>
-                  <b class="text-slate-800 font-extrabold">Rp 883.333 / hari</b>
+                  <b class="text-slate-800 font-extrabold" id="hr-daily-alloc">…</b>
                 </div>
               </div>
             </div>
@@ -882,9 +877,9 @@
             </div>
             <h3 class="text-2xl font-extrabold text-slate-900 mt-2">Minggu</h3>
             <div class="mt-2 space-y-1 text-xs text-slate-700">
-              <div class="flex justify-between"><span>Rata-rata Omzet:</span><b class="text-emerald-700 font-extrabold text-sm">Rp 3.464.863</b></div>
-              <div class="flex justify-between"><span>Rata-rata Laba Bersih:</span><b class="text-indigo-700 font-bold">Rp 1.294.012</b></div>
-              <div class="flex justify-between"><span>Margin Bersih:</span><b class="text-orange-700 font-bold">37.3% (Tertinggi)</b></div>
+              <div class="flex justify-between"><span>Rata-rata Omzet:</span><b class="text-emerald-700 font-extrabold text-sm" id="dow-peak-omzet">…</b></div>
+              <div class="flex justify-between"><span>Rata-rata Laba Bersih:</span><b class="text-indigo-700 font-bold" id="dow-peak-laba">…</b></div>
+              <div class="flex justify-between"><span>Margin Bersih:</span><b class="text-orange-700 font-bold" id="dow-peak-margin">…</b></div>
             </div>
             <p class="text-[11px] text-orange-950 font-medium mt-3 bg-white/90 p-2.5 rounded-xl border border-orange-200">
               🔥 <b>Status:</b> Hari paling ramai & paling menguntungkan. Tamu keluarga & rombongan mendominasi. Wajib <i>All-Hands On Deck</i>.
@@ -898,9 +893,9 @@
             </div>
             <h3 class="text-2xl font-extrabold text-slate-900 mt-2">Kamis</h3>
             <div class="mt-2 space-y-1 text-xs text-slate-700">
-              <div class="flex justify-between"><span>Rata-rata Omzet:</span><b class="text-slate-800 font-bold">Rp 2.344.300</b></div>
-              <div class="flex justify-between"><span>Rata-rata Laba Bersih:</span><b class="text-slate-700 font-bold">Rp 449.810</b></div>
-              <div class="flex justify-between"><span>Margin Bersih:</span><b class="text-slate-600 font-bold">19.2% (Terendah)</b></div>
+              <div class="flex justify-between"><span>Rata-rata Omzet:</span><b class="text-slate-800 font-bold" id="dow-slow-omzet">…</b></div>
+              <div class="flex justify-between"><span>Rata-rata Laba Bersih:</span><b class="text-slate-700 font-bold" id="dow-slow-laba">…</b></div>
+              <div class="flex justify-between"><span>Margin Bersih:</span><b class="text-slate-600 font-bold" id="dow-slow-margin">…</b></div>
             </div>
             <p class="text-[11px] text-slate-800 font-medium mt-3 bg-white p-2.5 rounded-xl border border-slate-200">
               💡 <b>Status:</b> Hari paling sepi. Waktu terbaik untuk libur bergilir tim, evaluasi SOP, & pembersihan mendalam (deep cleaning) resto.
@@ -1172,11 +1167,21 @@
         document.getElementById('pnl-cogs-bev').innerText = formatRp(income.cogs.beverage_ingredients);
         document.getElementById('pnl-cogs-ratio').innerText = income.cogs.cogs_percentage + '% dari Omzet';
         document.getElementById('pnl-gross-profit').innerText = formatRp(income.gross_profit) + ' (' + (100 - income.cogs.cogs_percentage).toFixed(1) + '%)';
-        if (document.getElementById('pnl-opex-total')) document.getElementById('pnl-opex-total').innerText = formatRp(opex.total_operating_expenses || 0);
-        if (document.getElementById('pnl-opex-staff')) document.getElementById('pnl-opex-staff').innerText = formatRp(opex.staff_payroll || 0);
-        if (document.getElementById('pnl-opex-mgmt')) document.getElementById('pnl-opex-mgmt').innerText = formatRp(opex.management_payroll || 0);
-        if (document.getElementById('pnl-opex-util')) document.getElementById('pnl-opex-util').innerText = formatRp(opex.utilities_water_electricity || 0);
-        if (document.getElementById('pnl-opex-ops')) document.getElementById('pnl-opex-ops').innerText = formatRp(opex.gas_fuel_and_supplies || 0);
+        const opexTotalEl = document.getElementById('pnl-opex-total');
+        if (opexTotalEl) opexTotalEl.innerText = formatRp(opex.total_operating_expenses || 0);
+        // Komposisi OPEX dirender DINAMIS dari data API (tanpa angka statis apa pun)
+        const opexItems = document.getElementById('pnl-opex-items');
+        if (opexItems) {
+          const opexRows = [
+            ['Gaji Staf Operasional (prorata periode berjalan)', opex.staff_payroll],
+            ['Gaji Manajemen / Owner & Co-owner (prorata periode berjalan)', opex.management_payroll],
+            ['Utilitas Listrik & Air (prorata periode berjalan)', opex.utilities_water_electricity],
+            ['Pemakaian Operasional Non-Bahan riil (gas, galon, tisu, plastik, dll dari nota)', opex.gas_fuel_and_supplies]
+          ].filter(r => r[1]);
+          opexItems.innerHTML = opexRows.map(r =>
+            '<div class="flex justify-between"><span>' + r[0] + '</span><span>' + formatRp(r[1] || 0) + '</span></div>'
+          ).join('');
+        }
         document.getElementById('pnl-net-profit').innerHTML = formatRp(income.net_profit) + '<br><span class="text-xs text-emerald-700 font-bold">Margin Bersih: ' + income.net_margin_percent + '%</span>';
       }
 
@@ -1203,6 +1208,70 @@
       // 3. Purchasing Tab
       const belanjaTbody = document.getElementById('belanja-table-body');
       belanjaTbody.innerHTML = '';
+      // Kartu ringkasan belanja + legend donut: DINAMIS dari purchasing.breakdown
+      const pbr = purchasing.breakdown || {};
+      const bDapur = (pbr.dapur_pasar && pbr.dapur_pasar.total) || 0;
+      const bMinum = (pbr.minuman && pbr.minuman.total) || 0;
+      const bOps = (pbr.operasional_perlengkapan && pbr.operasional_perlengkapan.total) || 0;
+      const purTotal = purchasing.total_purchases || (bDapur + bMinum + bOps);
+      const pct = v => purTotal ? (v / purTotal * 100).toFixed(1) + '%' : '0%';
+      const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.innerText = v; };
+      setTxt('pur-total', formatRp(purTotal));
+      setTxt('pur-avg', 'Rata-rata ' + formatRp(purchasing.avg_daily_purchase || 0) + ' / hari');
+      setTxt('pur-dapur', formatRp(bDapur));
+      setTxt('pur-dapur-note', pct(bDapur) + ' • Beras, Bebek, Ayam, Sayur, Bumbu');
+      setTxt('pur-minuman', formatRp(bMinum));
+      setTxt('pur-minuman-note', pct(bMinum) + ' • Es Batu, Kopi, Susu, Good Day, Sirup');
+      setTxt('pur-ops', formatRp(bOps));
+      setTxt('pur-ops-note', pct(bOps) + ' • Gas Elpiji, Air Galon, Tisu, Nota, Plastik');
+      setTxt('pur-dapur-legend', formatRp(bDapur) + ' (' + pct(bDapur) + ')');
+      setTxt('pur-minuman-legend', formatRp(bMinum) + ' (' + pct(bMinum) + ')');
+      setTxt('pur-ops-legend', formatRp(bOps) + ' (' + pct(bOps) + ')');
+      // Ringkasan 6 bulan: margin & food cost dinamis
+      const sixMoRatio = sixMo.total_revenue ? Math.round(sixMo.total_cogs / sixMo.total_revenue * 1000) / 10 : 0;
+      setTxt('six-mo-margin', (sixMo.average_net_margin || 0) + '% Konsisten');
+      setTxt('six-mo-foodcost', sixMoRatio + '% (Terkontrol Ketat)');
+      // Kartu Overview: food cost, catatan beban tetap, margin
+      setTxt('ov-hpp-ratio', '~' + (income.cogs ? income.cogs.cogs_percentage : 0) + '% Food Cost');
+      setTxt('ov-fixed-note', roster.length + ' Personil + Utilitas');
+      setTxt('ov-margin-note', 'Margin ' + (kpi.avg_margin_percent || 0) + '%');
+      // Beban tetap & pertumbuhan (hero + overview) dari API — self-contained
+      const _opexEarly = (income && income.operating_expenses) || {};
+      const _mgtT = roster.filter(p => p.id && p.id.startsWith('MGT')).reduce((s, p) => s + (p.base_salary || 0), 0);
+      const _stfT = roster.filter(p => p.id && p.id.startsWith('EMP')).reduce((s, p) => s + (p.base_salary || 0), 0);
+      setTxt('hero-fixed-note', formatRp(_mgtT + _stfT) + ' (Gaji ' + roster.length + ' Org) + Utilitas ' + formatRp(_opexEarly.utilities_water_electricity || 0) + ' / 28 hari');
+      const _kpiFixed = kpi.monthly_fixed_cost || (_mgtT + _stfT + (_opexEarly.utilities_water_electricity || 0) * 30 / 28);
+      document.getElementById('hero-fixed-cost').innerText = formatRp(Math.round(_kpiFixed));
+      setTxt('ov-growth', (kpi.avg_mom_growth >= 0 ? '+' : '') + kpi.avg_mom_growth + '% MoM');
+      setTxt('growth-title-mom', (kpi.avg_mom_growth >= 0 ? '+' : '') + kpi.avg_mom_growth + '%');
+      setTxt('six-mo-mom-badge', (kpi.avg_mom_growth >= 0 ? '+' : '') + kpi.avg_mom_growth + '% / Bulan');
+      // Insight naratif 6 bulan dari data riil (dinamis)
+      const mg = data.monthly_growth || [];
+      const _m0 = mg[0], _mLast = mg[mg.length - 1];
+      if (_m0 && _mLast) {
+        const _f = v => (v / 1000000).toFixed(1).replace('.', ',') + ' Juta';
+        const _om0 = _m0.omzet || 0, _omL = _mLast.omzet || 0, _lb0 = _m0.laba_bersih || 0, _lbL = _mLast.laba_bersih || 0;
+        const _deltaPct = _lb0 ? Math.round((_lbL - _lb0) / _lb0 * 1000) / 10 : 0;
+        setTxt('insight-narrative', 'Melalui implementasi sistem otomatisasi Resto-AI (Waitress AI WhatsApp, KDS Dapur Real-time, dan Kontrol Food Cost Bahan Baku), restoran membukukan omzet dari ' + _f(_om0) + ' (' + (_m0.month_name || _m0.month_key) + ') menjadi ' + _f(_omL) + ' (' + (_mLast.month_name || _mLast.month_key) + ', data riil). Pertumbuhan rata-rata ' + (kpi.avg_mom_growth >= 0 ? '+' : '') + kpi.avg_mom_growth + '% MoM.');
+        setTxt('insight-laba-delta', (_deltaPct >= 0 ? '+' : '') + _deltaPct + '% (' + _f(_lb0) + ' → ' + _f(_lbL) + ')');
+      }
+      // Kartu peak day (overview + tab analitik) dari API — self-contained
+      const _dowEarly = data.day_of_week_analytics || {};
+      const _peak = _dowEarly.peak_day || {};
+      setTxt('ov-peak-stats', 'Rata-rata: ' + formatRp(_peak.avg_omzet || 0) + ' / hari');
+      setTxt('ov-peak-laba', 'Laba: ' + formatRp(_peak.avg_laba || 0) + ' (Margin ' + (_peak.avg_omzet ? Math.round((_peak.avg_laba || 0) / _peak.avg_omzet * 1000) / 10 : 0) + '%)');
+      setTxt('dow-peak-omzet', formatRp(_peak.avg_omzet || 0));
+      setTxt('dow-peak-laba', formatRp(_peak.avg_laba || 0));
+      setTxt('dow-peak-margin', (_peak.avg_omzet ? Math.round((_peak.avg_laba || 0) / _peak.avg_omzet * 1000) / 10 : 0) + '% (Tertinggi)');
+      // Kartu slow day & weekend + badge pertumbuhan dari API — self-contained
+      const _slow = _dowEarly.slowest_day || {};
+      setTxt('ov-slow-stats', 'Rata-rata: ' + formatRp(_slow.avg_omzet || 0) + ' / hari');
+      setTxt('dow-slow-omzet', formatRp(_slow.avg_omzet || 0));
+      setTxt('dow-slow-laba', formatRp(_slow.avg_laba || 0));
+      setTxt('dow-slow-margin', (_slow.margin_percent || 0) + '% (Terendah)');
+      const _badgeEl = document.getElementById('growth-badge-val');
+      if (_badgeEl) _badgeEl.innerText = (kpi.avg_mom_growth >= 0 ? '+' : '') + kpi.avg_mom_growth + '%';
+      setTxt('belanja-badge', 'Total Belanja 28 Hari: ' + formatRp(purTotal));
       const dailyPurchases = purchasing.daily_purchases || [];
       dailyPurchases.forEach((dp, idx) => {
         const isClosed = !dp.total_belanja;
@@ -1287,6 +1356,35 @@
       // 6. HR Roster Table
       const rosterTbody = document.getElementById('roster-table-body');
       rosterTbody.innerHTML = '';
+      // Ringkasan SDM & label roster dihitung DINAMIS dari data roster API
+      const mgtList = roster.filter(p => p.id && p.id.startsWith('MGT'));
+      const staffList = roster.filter(p => p.id && p.id.startsWith('EMP'));
+      const mgtTotal = mgtList.reduce((s, p) => s + (p.base_salary || 0), 0);
+      const staffTotal = staffList.reduce((s, p) => s + (p.base_salary || 0), 0);
+      const hrBadge = document.getElementById('hr-payroll-badge');
+      if (hrBadge) hrBadge.innerText = 'Total Anggaran Payroll: ' + formatRp(mgtTotal + staffTotal) + ' / bulan';
+      const hrTitle = document.getElementById('hr-roster-title');
+      if (hrTitle) hrTitle.innerText = 'Roster Gaji Personalia (' + roster.length + ' Orang)';
+      const hrSub = document.getElementById('hr-roster-sub');
+      if (hrSub) hrSub.innerText = 'Manajemen ' + mgtList.length + ' org (' + formatRp(mgtTotal) + '/bln) dan Staf Operasional ' + staffList.length + ' org (' + formatRp(staffTotal) + '/bln)';
+      const hrMgmt = document.getElementById('hr-sub-mgmt');
+      if (hrMgmt) hrMgmt.innerText = formatRp(mgtTotal);
+      const hrMgmtLabel = document.getElementById('hr-sub-mgmt-label');
+      if (hrMgmtLabel) hrMgmtLabel.innerText = 'Subtotal Manajemen (' + mgtList.length + ' Org):';
+      const hrStaff = document.getElementById('hr-sub-staff');
+      if (hrStaff) hrStaff.innerText = formatRp(staffTotal);
+      const hrStaffLabel = document.getElementById('hr-sub-staff-label');
+      if (hrStaffLabel) hrStaffLabel.innerText = 'Subtotal Staf Operasional (' + staffList.length + ' Org):';
+      const hrDaily = document.getElementById('hr-daily-alloc');
+      if (hrDaily) hrDaily.innerText = formatRp(Math.round((mgtTotal + staffTotal) / 30)) + ' / hari';
+      // Kartu ringkasan biaya (di bawah chart cost breakdown)
+      const _opexHr = (income && income.operating_expenses) || {};
+      const csStaff = document.getElementById('cs-staff');
+      if (csStaff) csStaff.innerText = formatRp(_opexHr.staff_payroll || 0);
+      const csMgmt = document.getElementById('cs-mgmt');
+      if (csMgmt) csMgmt.innerText = formatRp(_opexHr.management_payroll || 0);
+      const csUtil = document.getElementById('cs-util');
+      if (csUtil) csUtil.innerText = formatRp(_opexHr.utilities_water_electricity || 0);
       roster.forEach((p, idx) => {
         const isMgt = (p.name === 'Owner' || p.name === 'Co-owner');
         const badgeColor = isMgt ? 'bg-orange-100 text-orange-800 border-orange-200' : 'bg-slate-100 text-slate-700 border-slate-200';
