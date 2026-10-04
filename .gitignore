@@ -19,3 +19,7 @@ bridge/status.json
 bridge/pairing_code.txt
 qris_cache/
 
+*.bak
+*.bak2
+*.log
+*.db.bak
