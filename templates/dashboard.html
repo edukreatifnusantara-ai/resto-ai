@@ -1110,16 +1110,16 @@
       const sixMo = data.six_month_summary || {};
       const monthlyGrowth = data.monthly_growth || [];
       if (document.getElementById('six-mo-omzet')) {
-        document.getElementById('six-mo-omzet').innerText = formatRp(sixMo.total_revenue || 412088471);
+        document.getElementById('six-mo-omzet').innerText = formatRp(sixMo.total_revenue || 0);
       }
       if (document.getElementById('six-mo-profit')) {
-        document.getElementById('six-mo-profit').innerText = formatRp(sixMo.total_net_profit || 110765888);
+        document.getElementById('six-mo-profit').innerText = formatRp(sixMo.total_net_profit || 0);
       }
       if (document.getElementById('six-mo-orders')) {
-        document.getElementById('six-mo-orders').innerText = (kpi.live_orders_count ? Number(kpi.live_orders_count).toLocaleString('id-ID') : '12.608') + ' Transaksi';
+        document.getElementById('six-mo-orders').innerText = (kpi.live_orders_count ? Number(kpi.live_orders_count).toLocaleString('id-ID') : (sixMo.total_orders ? Number(sixMo.total_orders).toLocaleString('id-ID') : '0')) + ' Transaksi';
       }
       if (document.getElementById('ov-alltime')) {
-        document.getElementById('ov-alltime').innerText = formatRp(sixMo.total_revenue || 412088471);
+        document.getElementById('ov-alltime').innerText = formatRp(sixMo.total_revenue || 0);
       }
 
       // Populate 6-Month Growth Table

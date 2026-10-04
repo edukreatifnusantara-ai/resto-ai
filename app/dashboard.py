@@ -575,9 +575,9 @@ def get_dashboard_summary_data(db: Session) -> dict:
             "total_inventory_value": total_inventory_value,
             "live_sales_db": live_total_sales,
             "live_orders_count": live_completed_count,
-            "total_6mo_omzet": six_mo_sum.get("total_revenue", 412088471.0),
-            "total_6mo_net_profit": six_mo_sum.get("total_net_profit", 110765888.0),
-            "avg_mom_growth": six_mo_sum.get("average_monthly_growth", 7.0),
+            "total_6mo_omzet": six_mo_sum.get("total_revenue", 0.0),
+            "total_6mo_net_profit": six_mo_sum.get("total_net_profit", 0.0),
+            "avg_mom_growth": six_mo_sum.get("average_monthly_growth", 0.0),
             "total_6mo_orders": live_completed_count
         },
         "income_statement": income_statement,
