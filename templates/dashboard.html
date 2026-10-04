@@ -408,8 +408,8 @@
               <span id="pnl-cogs-total" class="text-amber-800">…</span>
             </div>
             <div class="pl-4 pt-2 space-y-1.5 text-slate-600">
-              <div class="flex justify-between"><span>Bahan Baku Dapur (Beras, Ayam, Bebek, Minyak, Sayur)</span><span id="pnl-cogs-food">…</span></div>
-              <div class="flex justify-between"><span>Bahan Baku Minuman (Es Batu, Kopi, Susu, Teh, Sirup)</span><span id="pnl-cogs-bev">…</span></div>
+              <div class="flex justify-between"><span>Bahan Baku Makanan</span><span id="pnl-cogs-food">…</span></div>
+              <div class="flex justify-between"><span>Bahan Baku Minuman</span><span id="pnl-cogs-bev">…</span></div>
               <div class="flex justify-between font-semibold text-amber-900"><span>Rasio Food Cost</span><span id="pnl-cogs-ratio">…</span></div>
             </div>
           </div>
@@ -1220,11 +1220,11 @@
       setTxt('pur-total', formatRp(purTotal));
       setTxt('pur-avg', 'Rata-rata ' + formatRp(purchasing.avg_daily_purchase || 0) + ' / hari');
       setTxt('pur-dapur', formatRp(bDapur));
-      setTxt('pur-dapur-note', pct(bDapur) + ' • Beras, Bebek, Ayam, Sayur, Bumbu');
+      setTxt('pur-dapur-note', pct(bDapur));
       setTxt('pur-minuman', formatRp(bMinum));
-      setTxt('pur-minuman-note', pct(bMinum) + ' • Es Batu, Kopi, Susu, Good Day, Sirup');
+      setTxt('pur-minuman-note', pct(bMinum));
       setTxt('pur-ops', formatRp(bOps));
-      setTxt('pur-ops-note', pct(bOps) + ' • Gas Elpiji, Air Galon, Tisu, Nota, Plastik');
+      setTxt('pur-ops-note', pct(bOps));
       setTxt('pur-dapur-legend', formatRp(bDapur) + ' (' + pct(bDapur) + ')');
       setTxt('pur-minuman-legend', formatRp(bMinum) + ' (' + pct(bMinum) + ')');
       setTxt('pur-ops-legend', formatRp(bOps) + ' (' + pct(bOps) + ')');
