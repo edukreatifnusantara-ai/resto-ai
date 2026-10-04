@@ -6,7 +6,11 @@ __pycache__/
 dist/
 build/
 *.egg-info/
-.env.runtime
+
+# Local credentials/settings; keep only the non-secret template trackable.
+.env
+.env.*
+!.env.example
 .voice-bridge.runtime
 bridge/session/
 bridge/session_backup*/

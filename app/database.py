@@ -16,11 +16,12 @@ engine = create_engine(
 
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
-# Buku Menu Warung Ndelik 2026 v3 (57 menu)
+# Buku Menu Warung Ndelik 2026 v3 (58 menu)
 _MENU = [
     # Makanan Utama & Nasi
     ("Nasi Goreng Telur", 16000, "Nasi goreng spesial khas Warung Ndelik dengan telur"),
     ("Nasi Putih", 4000, "Nasi putih pulen"),
+    ("Nasi Sambel Tumpabg", 15000, "Nasi dengan sambel tumpabg"),
     ("Nasi Soto Ayam", 8000, "Nasi soto ayam segar khas Ndelik"),
     ("Nasi Tahu Tempe Penyet", 12000, "Nasi dengan tahu tempe penyet sambal khas"),
     ("Nasi Telur Penyet", 15000, "Nasi telur penyet sambal mantap"),
@@ -112,6 +113,8 @@ def _get_recipe_ingredients(menu_name: str) -> list[tuple[str, float]]:
         return [("nasi", 1.0), ("tempe", 1.0), ("sambal", 0.2)]
     if "nasi putih" in name_l:
         return [("nasi", 1.0)]
+    if "nasi sambel" in name_l:
+        return [("nasi", 1.0), ("sambal", 0.2)]
     if "steak sapi" in name_l:
         return [("daging_sapi", 1.0), ("saus_steak", 1.0)]
     if "steak ayam" in name_l:
@@ -323,7 +326,7 @@ def seed_db():
 
 
 def reset_menu_to_warung_ndelik():
-    """Full clean reset: remove old placeholder menus and seed 57 Warung Ndelik items."""
+    """Full clean reset: remove old placeholder menus and seed 58 Warung Ndelik items."""
     ensure_schema()
     session = SessionLocal()
     try:

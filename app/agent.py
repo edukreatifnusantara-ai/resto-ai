@@ -296,6 +296,19 @@ def is_owner(sender: str) -> bool:
     return cleaned in owners
 
 
+def _normalize_food_query(query: str) -> str:
+    """Normalize common Indonesian food slang, joined words, and abbreviations."""
+    q = query.lower().strip()
+    q = re.sub(r"\besteh\b", "es teh", q)
+    q = re.sub(r"\besjeruk\b", "es jeruk", q)
+    q = re.sub(r"\bnasgor\b", "nasi goreng", q)
+    q = re.sub(r"\b(miegoreng|migor)\b", "mie goreng", q)
+    q = re.sub(r"\b(mierebus|mirebus)\b", "mie rebus", q)
+    q = re.sub(r"\bkwetiaw\b", "kwetiau", q)
+    q = re.sub(r"\bteh manis\b", "teh", q)
+    return q
+
+
 def _find_menu_item(db: Session, identifier: Any) -> MenuItem | None:
     if identifier is None:
         return None
@@ -305,7 +318,7 @@ def _find_menu_item(db: Session, identifier: Any) -> MenuItem | None:
         if item:
             return item
 
-    clean_q = raw_str.lower()
+    clean_q = _normalize_food_query(raw_str)
     # 1. Exact match first
     item = db.query(MenuItem).filter(MenuItem.name.ilike(clean_q)).first()
     if item:
@@ -1335,15 +1348,127 @@ def _execute_tool_call(db: Session, sender: str, is_owner_role: bool, func_name:
     return {"error": f"Fungsi '{func_name}' tidak diizinkan atau tidak ditemukan."}
 
 
+def _call_gemini_completion(
+    gemini_client: Any,
+    model: str,
+    messages: list[dict[str, Any]],
+    tools: list[dict[str, Any]],
+) -> dict[str, Any]:
+    res = gemini_client.chat.completions.create(
+        model=model,
+        messages=messages,
+        tools=tools,
+        tool_choice="auto",
+        temperature=0.55,
+    )
+    choice = res.choices[0]
+    msg_obj = choice.message
+    msg: dict[str, Any] = {
+        "role": getattr(msg_obj, "role", "assistant"),
+        "content": getattr(msg_obj, "content", None),
+    }
+    tc_list = getattr(msg_obj, "tool_calls", None)
+    if tc_list:
+        msg["tool_calls"] = [
+            {
+                "id": tc.id,
+                "type": getattr(tc, "type", "function"),
+                "function": {"name": tc.function.name, "arguments": tc.function.arguments},
+                **({"extra_content": getattr(tc, "extra_content", None)} if getattr(tc, "extra_content", None) else {})
+            }
+            for tc in tc_list
+        ]
+    return msg
+
+
+def _call_openai_completion(
+    api_key: str,
+    model: str,
+    messages: list[dict[str, Any]],
+    tools: list[dict[str, Any]],
+    timeout: int = 20,
+    base_url: str | None = None,
+) -> dict[str, Any]:
+    cleaned_messages = []
+    for m in messages:
+        c_m = dict(m)
+        if "tool_calls" in c_m and isinstance(c_m["tool_calls"], list):
+            cleaned_tcs = []
+            for tc in c_m["tool_calls"]:
+                c_tc = {
+                    "id": tc.get("id"),
+                    "type": tc.get("type", "function"),
+                    "function": tc.get("function"),
+                }
+                cleaned_tcs.append(c_tc)
+            c_m["tool_calls"] = cleaned_tcs
+        cleaned_messages.append(c_m)
+
+    payload = {
+        "model": model,
+        "messages": cleaned_messages,
+        "tools": tools,
+        "tool_choice": "auto",
+        "temperature": 0.55,
+    }
+    raw_base_url = (base_url or os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")).strip().rstrip("/")
+    if not raw_base_url.endswith("/chat/completions"):
+        endpoint_url = f"{raw_base_url}/chat/completions"
+    else:
+        endpoint_url = raw_base_url
+
+    req = urllib.request.Request(
+        endpoint_url,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+            "User-Agent": "Claude-Code/1.0",
+        },
+    )
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
+        result = json.loads(resp.read().decode("utf-8"))
+    choice = result["choices"][0]
+    return choice.get("message", {})
+
+
 def run_ai_agent(db: Session, sender: str, user_message: str) -> dict[str, Any]:
     """Main entry point for two-way AI agent processing."""
-    api_key = os.getenv("OPENAI_API_KEY", "").strip()
-    if not api_key:
-        logger.warning("OPENAI_API_KEY not found; cannot invoke AI agent.")
+    provider_env = os.getenv("LLM_PROVIDER", "").strip().lower()
+    gemini_key = os.getenv("GEMINI_API_KEY", "").strip()
+    openai_key = os.getenv("OPENAI_API_KEY", "").strip()
+
+    if openai_key == "test-key":
+        primary_provider = "openai"
+    elif provider_env == "openai" and openai_key:
+        primary_provider = "openai"
+    elif provider_env == "gemini" and gemini_key:
+        primary_provider = "gemini"
+    elif openai_key:
+        primary_provider = "openai"
+    elif gemini_key:
+        primary_provider = "gemini"
+    else:
+        logger.warning("Neither GEMINI_API_KEY nor OPENAI_API_KEY found; cannot invoke AI agent.")
         return {"reply": "", "image_path": ""}
 
     is_owner_user = is_owner(sender)
-    model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+    gemini_model = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
+    openai_model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+    gemini_client = None
+
+    if gemini_key:
+        import sys
+        if "/home/edukreativ-vps/.hermes/hermes-agent" not in sys.path:
+            sys.path.insert(0, "/home/edukreativ-vps/.hermes/hermes-agent")
+        try:
+            from agent.gemini_native_adapter import GeminiNativeClient
+            gemini_client = GeminiNativeClient(
+                api_key=gemini_key,
+                base_url=os.getenv("GEMINI_BASE_URL", "https://generativelanguage.googleapis.com/v1beta")
+            )
+        except Exception as exc:
+            logger.warning("Failed to initialize GeminiNativeClient: %s", exc)
 
     if is_owner_user:
         system_prompt = (
@@ -1479,28 +1604,42 @@ def run_ai_agent(db: Session, sender: str, user_message: str) -> dict[str, Any]:
         customer_context_str = "\n".join(ctx_parts)
 
         system_prompt = (
-            "Kamu adalah AI Agent pelayan restoran Warung Ndelik yang ramah, sopan, hangat, dan komunikatif melayani pelanggan via WhatsApp.\n"
-            "Tugasmu:\n"
-            "- Menjawab pertanyaan seputar menu makanan dan minuman khas Warung Ndelik secara ramah dan menggugah selera.\n"
-            "- Jika pelanggan menanyakan menu atau ingin tahu apa saja yang dijual, gunakan fungsi customer_get_menu.\n"
-            "- Menu favorit / best seller kami antara lain: Nasi Bebek Ndelik 1/2 (Bumbu Hitam), Nasi Goreng Ceplok, Kwetiau Ndelik, dan Nasi Garang Asem.\n"
-            "- Saat pelanggan memesan:\n"
-            "  * Tanyakan atas nama siapa pemesanannya jika belum diketahui ('Boleh tahu atas nama siapa, Kak?'). Jika sudah diketahui, jangan tanyakan lagi.\n"
-            "  * Tanyakan apakah makan di tempat (di meja berapa) atau dibawa pulang / dibungkus HANYA SEKALI. Jika sudah diketahui dari percakapan sebelumnya atau memori aktif, JANGAN PERNAH mengulang pertanyaan tersebut.\n"
-            "  * Tanyakan atau pastikan metode pembayaran: QRIS otomatis (scan barcode) atau Bayar Tunai (Cash di kasir).\n"
-            "  * Panggil customer_create_order dengan mengisi customer_name, table_number, dan payment_method ('QRIS' atau 'CASH').\n"
-            "- Ketentuan Pembayaran & Kesiapan Menu Dapur:\n"
-            "  * Dapur Warung Ndelik baru mulai memproses dan menyiapkan menu setelah pembayaran lunas atau terkonfirmasi.\n"
-            "  * Jika pelanggan bertanya apakah harus bayar dulu apa nanti (misal: 'harus bayar dulu apa nanti?', 'bisa bayar belakangan?', 'bayar sekarang atau pas makan?'): jawab dengan ramah, santun, dan luwes bahwa menu baru akan disiapkan dan diproses oleh dapur setelah pembayaran lunas. Jadi jika ingin menu segera disiapkan, disarankan untuk membayar terlebih dahulu.\n"
-            "  * Jika pelanggan memilih bayar tunai (Cash di kasir): tetap layani dan perbolehkan dengan senang hati, namun sampaikan secara sopan dan natural bahwa pesanan baru akan mulai disiapkan oleh dapur setelah pelanggan tiba di restoran dan menyelesaikan pembayaran tunai di kasir.\n"
-            "  * Jika pelanggan memilih QRIS: barcode QRIS otomatis dikirimkan ke chat, dan begitu pembayaran terkonfirmasi, dapur langsung menyiapkan pesanan tanpa perlu antre di kasir.\n"
-            "- Reservasi Meja & Penyiapan Menu Sesuai Jam Permintaan:\n"
-            "  * Jika pelanggan ingin melihat meja yang tersedia, gunakan customer_check_available_tables dan sampaikan hasilnya secara ringkas.\n"
-            "  * Reservasi meja hanya boleh dikonfirmasi apabila pelanggan memiliki pesanan terkait yang sudah LUNAS dan terverifikasi. Minta nomor pesanan lunas tersebut, lalu panggil customer_create_reservation dengan payment_order_id.\n"
-            "  * Jangan pernah menyatakan meja dipesan, diamankan, atau reservasi berhasil sebelum fungsi customer_create_reservation mengembalikan konfirmasi sukses. Jika pembayaran belum lunas, jelaskan secara natural bahwa reservasi diproses setelah pembayaran terverifikasi.\n"
-            "  * Apabila pelanggan sudah membayar lunas pada saat reservasi: jelaskan secara hangat bahwa menu pesanan akan disiapkan fresh dan hangat tepat sesuai jam kedatangan/permintaan yang direservasi, sehingga saat tiba di resto hidangan sudah siap langsung dinikmati tanpa perlu menunggu lama.\n"
-            "- Jangan pernah membuka informasi rahasia omset resto, modal HPP, atau mengubah harga/menu untuk pelanggan umum.\n\n"
-            "Gaya bicara: Berbahasa Indonesia yang hangat, sopan, luwes, dan alami layaknya staf Warung Ndelik yang ramah melayani tamu. Pahami pertanyaan pelanggan dan jawab secara mengalir; jangan menggunakan template kalimat kaku atau gaya chatbot robotik. Dilarang keras menggunakan emoji maupun emotikon dalam bentuk apa pun. Gunakan daftar hanya ketika menyajikan menu atau pilihan yang butuh kerapian."
+            "Kamu adalah staf pelayan restoran Warung Ndelik yang ramah, sopan, hangat, santun, dan komunikatif melayani pelanggan via WhatsApp.\n"
+            "Restoran: Warung Ndelik (kuliner lezat dengan cita rasa khas dan suasana santai).\n"
+            "Jam Buka: Setiap hari pukul 09.00 - 21.30 WIB.\n"
+            "Fasilitas: Meja kursi & area lesehan luas nyaman, mushola, toilet bersih, parkir mobil dan motor luas.\n"
+            "Lokasi: Jalan Warung Ndelik (jika pelanggan butuh peta, arahkan ketik LOKASI untuk link Google Maps).\n\n"
+            "Menu Andalan & Favorit Pelanggan:\n"
+            "- *Bebek Bumbu Hitam Ndelik*: Porsi 1/4 ekor (Rp22.000) & Porsi 1/2 ekor (Rp38.000) - best seller, bumbu hitam pekat gurih khas Madura, daging empuk meresap.\n"
+            "- Aneka *Nasi Goreng*: *Nasi Goreng Telur* (Rp16.000), *Nasi Goreng Dadar/Ceplok* (Rp19.000), *Nasi Goreng Babat* (Rp20.000), *Nasi Goreng Ayam* (Rp16.000), *Nasi Goreng Katsu* (Rp18.000).\n"
+            "- Olahan Spesial: *Kwetiau Ndelik Goreng/Rebus* (Rp16.000), *Mie Goreng/Rebus* (Rp16.000), *Nasi Garang Asem* segar (Rp20.000), *Nasi Ayam Penyet* sambal mantap (Rp16.000), *Nasi Ayam Kremes* (Rp18.000), *Nasi Babat Gongso* manis gurih (Rp20.000), *Steak Ayam/Sapi Hot Plate* (Rp23.000/Rp28.000).\n"
+            "- Minuman Segar: *Es Teh Manis / Panas* (Rp3.000), *Es Teh Jumbo* puas (Rp5.000), *Jeruk Es / Panas* (Rp5.000), *Es Teler Creamy* (Rp12.000), *Es Falooda Ndelik* (Rp12.000), *Soda Gembira* (Rp12.000), *Kopi Hitam* (Rp5.000), *Wedang Uwuh* rempah (Rp5.000), *Wedang Jahe* hangat (Rp6.000).\n"
+            "- Snack / Cemilan Pelengkap: *Mendoan Hangat* 1 porsi isi 7 (Rp10.000), *Tahu Bakso* (Rp10.000), *Cireng Renyah* (Rp5.000), *Kentang* (Rp7.000), *Paket Snack* (Rp20.000).\n\n"
+            "Panduan Pelayanan Alami & Interaktif (Komunikasi Mengalir Seperti Pelayan Sungguhan):\n"
+            "1. Panggilan & Sikap: Panggil pelanggan dengan 'Kak' atau 'Kakak' secara sopan, ramah, dan bersahabat. Jaga obrolan terasa hangat, luwes, dan menyenangkan.\n"
+            "2. Penawaran Menu & Rekomendasi (Tampilan Rapi, Mudah Dilihat, & Jenis Menu Ditebalkan):\n"
+            "   - Saat menawarkan, merekomendasikan, atau mengonfirmasi pesanan makanan dan minuman, tampilkan secara rapi dan bersih agar pembeli sangat nyaman membacanya di WhatsApp.\n"
+            "   - WAJIB tebalkan (format *bold*) setiap nama atau jenis menu (contoh: *Bebek Bumbu Hitam Ndelik*, *Nasi Goreng Telur*, *Es Teh Jumbo*, *Mendoan Hangat*).\n"
+            "   - Jika menyebutkan beberapa pilihan menu atau minuman, susun dalam poin-poin (bullet) atau baris yang terpisah rapi dengan spasi yang nyaman; hindari menumpuk banyak menu dalam satu paragraf padat.\n"
+            "   - Tawarkan pelengkap secara luwes (upselling halus, misal tawarkan minuman segar *Es Teh Jumbo* atau cemilan *Mendoan Hangat*).\n"
+            "3. Bertahap & Nyaman: JANGAN memberondong pertanyaan sekaligus. Kumpulkan info secara mengalir:\n"
+            "   - Setelah menu dirasa pas, tanyakan apakah ingin dinikmati di tempat (meja berapa) atau dibungkus dibawa pulang.\n"
+            "   - Tanyakan nama pemesan secara santai ('Boleh tahu dengan Kakak siapa pemesanannya?'). Jika pelanggan tidak menyebutkan nama, jangan memaksa berulang kali.\n"
+            "   - Tanyakan metode pembayaran: QRIS (barcode langsung dikirim di chat) atau Tunai/Cash di kasir.\n"
+            "4. Penggunaan Fungsi (Tools):\n"
+            "   - Gunakan customer_get_menu HANYA jika pelanggan secara spesifik meminta daftar menu lengkap atau menanyakan kategori menu yang tersedia. Jangan panggil jika pelanggan langsung memesan menu yang sudah jelas.\n"
+            "   - Gunakan customer_create_order saat item pesanan sudah jelas. Fungsi ini bisa dipanggil meski meja atau nama belum terisi lengkap (sistem akan memakai preferensi bawaan).\n"
+            "   - Gunakan customer_save_name jika pelanggan menyebutkan namanya.\n"
+            "   - Gunakan customer_check_available_tables untuk memeriksa ketersediaan meja.\n"
+            "   - Gunakan customer_create_reservation jika pelanggan reservasi meja dengan pesanan yang sudah lunas.\n"
+            "5. Ketentuan Pembayaran & Kesiapan Menu Dapur:\n"
+            "   - Dapur Warung Ndelik mulai memasak dan menyiapkan hidangan setelah pembayaran lunas (QRIS) atau setelah kasir mengonfirmasi pembayaran tunai saat pelanggan tiba.\n"
+            "   - Jika pelanggan bertanya apakah harus bayar dulu atau nanti: sampaikan secara ramah dan luwes bahwa dapur baru mulai memproses pesanan setelah pembayaran lunas. Jadi agar hidangan cepat siap, disarankan membayar via QRIS lebih dulu; atau jika ingin bayar tunai di kasir, hidangan akan mulai dimasak begitu pembayaran di kasir selesai.\n"
+            "   - Jika pelanggan reservasi meja dan sudah bayar lunas: sampaikan dengan hangat bahwa makanan akan disiapkan fresh dan hangat tepat pada jam kedatangan yang direservasi, sehingga bisa langsung dinikmati tanpa menunggu.\n"
+            "6. Obrolan Santai & Pertanyaan di Luar Menu (Out of Scope):\n"
+            "   - Jika pelanggan menanyakan fasilitas, jam buka, cuaca, atau sekadar menyapa, jawab secara santun, ramah, dan singkat, lalu ajak kembali ke pesanan atau menu Warung Ndelik dengan natural.\n"
+            "   - DILARANG KERAS menolak kaku, jangan berkata 'pesan belum dikenali' atau memberikan format perintah syntax kaku layaknya robot.\n"
+            "7. Bahasa & Format: Gunakan bahasa Indonesia yang natural, hangat, santai, sopan, dan rapi. Selalu sapa alami (misal: 'Halo Kak', 'Iya Kak'), jangan pernah menulis pilihan garis miring seperti 'Selamat pagi/siang/sore'. Dilarang keras menggunakan emoji maupun emotikon apa pun."
             + customer_context_str
         )
         tools = CUSTOMER_TOOLS_SCHEMA
@@ -1510,38 +1649,40 @@ def run_ai_agent(db: Session, sender: str, user_message: str) -> dict[str, Any]:
         messages.append(dict(h))
     messages.append({"role": "user", "content": user_message})
 
-    # Call OpenAI Chat Completion with tools
-    max_tool_loops = 3
+    # Call LLM Chat Completion with tools
+    max_tool_loops = 4
     final_reply = ""
     last_image_path = ""
+    fallback_tool_message = ""
 
     for _ in range(max_tool_loops):
-        payload = {
-            "model": model,
-            "messages": messages,
-            "tools": tools,
-            "tool_choice": "auto",
-            "temperature": 0.55,
-        }
-
-        req = urllib.request.Request(
-            "https://api.openai.com/v1/chat/completions",
-            data=json.dumps(payload).encode("utf-8"),
-            headers={
-                "Authorization": f"Bearer {api_key}",
-                "Content-Type": "application/json",
-            },
-        )
-
+        msg = None
+        # 1. Try primary provider
         try:
-            with urllib.request.urlopen(req, timeout=20) as resp:
-                result = json.loads(resp.read().decode("utf-8"))
+            if primary_provider == "gemini" and gemini_client is not None:
+                msg = _call_gemini_completion(gemini_client, gemini_model, messages, tools)
+            elif primary_provider == "openai" and openai_key:
+                msg = _call_openai_completion(openai_key, openai_model, messages, tools)
         except Exception as exc:
-            logger.error("Error communicating with OpenAI API: %s", exc)
-            return {"reply": "", "image_path": ""}
+            logger.warning("Primary LLM provider '%s' failed: %s", primary_provider, exc)
 
-        choice = result["choices"][0]
-        msg = choice.get("message", {})
+        # 2. Fallback to secondary provider if primary failed
+        if msg is None:
+            secondary_provider = "openai" if primary_provider == "gemini" else "gemini"
+            try:
+                if secondary_provider == "gemini" and gemini_client is not None:
+                    logger.info("Failing over to Gemini provider...")
+                    msg = _call_gemini_completion(gemini_client, gemini_model, messages, tools)
+                elif secondary_provider == "openai" and openai_key and openai_key != "test-key":
+                    logger.info("Failing over to OpenAI provider...")
+                    msg = _call_openai_completion(openai_key, openai_model, messages, tools)
+            except Exception as exc2:
+                logger.error("Secondary LLM provider '%s' also failed: %s", secondary_provider, exc2)
+
+        if msg is None:
+            logger.error("All available LLM providers failed for turn.")
+            break
+
         messages.append(msg)
 
         tool_calls = msg.get("tool_calls", [])
@@ -1559,8 +1700,11 @@ def run_ai_agent(db: Session, sender: str, user_message: str) -> dict[str, Any]:
                 f_args = {}
 
             tool_output = _execute_tool_call(db, sender, is_owner_user, f_name, f_args)
-            if isinstance(tool_output, dict) and tool_output.get("qr_image_path"):
-                last_image_path = tool_output.get("qr_image_path")
+            if isinstance(tool_output, dict):
+                if tool_output.get("qr_image_path"):
+                    last_image_path = tool_output.get("qr_image_path")
+                if tool_output.get("message"):
+                    fallback_tool_message = str(tool_output["message"])
 
             messages.append({
                 "role": "tool",
@@ -1569,6 +1713,13 @@ def run_ai_agent(db: Session, sender: str, user_message: str) -> dict[str, Any]:
             })
 
     if not is_owner_user:
+        if not final_reply and fallback_tool_message:
+            final_reply = fallback_tool_message
+        if not final_reply:
+            final_reply = (
+                "Halo Kak, pesanan atau pertanyaan Kakak sudah kami catat dengan baik. "
+                "Ada yang ingin ditambahkan atau ada yang bisa kami bantu seputar menu Warung Ndelik?"
+            )
         final_reply = _natural_customer_reply(final_reply)
 
     if final_reply:

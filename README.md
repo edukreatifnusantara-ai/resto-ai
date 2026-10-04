@@ -13,7 +13,14 @@ MVP ini menyediakan backend lokal untuk alur resto yang dirancang:
 
 ## Batasan penting
 
-Belum ada koneksi WhatsApp, QRIS, rekening bank, payment gateway, data pelanggan nyata, pengiriman pesan eksternal, refund, atau deployment produksi. API hanya bind localhost dan seluruh endpoint data membutuhkan header `X-RESTO-API-TOKEN`; token runtime tersimpan di `.env.runtime` dan tidak masuk Git.
+Belum ada koneksi WhatsApp, QRIS, rekening bank, payment gateway, data pelanggan nyata, pengiriman pesan eksternal, refund, atau deployment produksi. API hanya bind localhost dan seluruh endpoint data membutuhkan header `X-RESTO-API-TOKEN`; token runtime tidak masuk Git.
+
+## API keys dan file environment
+
+- Simpan API key/secret lokal di file `.env` pada direktori proyek; `.env` diabaikan Git dan sebaiknya berizin `600`. Gunakan `.env.example` sebagai daftar nama variabel tanpa nilai rahasia.
+- Aplikasi membaca `.env` lebih dulu, lalu memakai `RESTO_ENV_FILE` atau `.env.runtime` sebagai sumber fallback. Di unit systemd, urutannya `.env.runtime` lalu `.env`, sehingga nilai `.env` menjadi prioritas untuk API Resto-AI. Environment yang sudah diberikan proses tetap dipertahankan.
+- Setelah nilai API key diubah, restart `resto-ai.service` agar proses Python memuat nilai baru. Saya tidak memindahkan atau membaca isi rahasia lama di `.env.runtime`; file itu tetap tersedia sebagai fallback.
+- Kredensial Baileys/voice bridge tetap di `.voice-bridge.runtime`, file terpisah yang tidak dipindahkan oleh panduan ini. Jangan kirim nilai rahasia lewat chat atau commit file rahasia.
 
 ## Menjalankan
 
@@ -92,7 +99,7 @@ Unlike internal API routes, the webhook does not use `X-RESTO-API-TOKEN`. It is 
 
 ### WhatsApp environment variables
 
-Add the following variables to the ignored `.env.runtime` file. Keep the values private and never commit them:
+Tambahkan variabel berikut ke file `.env` yang diabaikan Git. Isi nilainya hanya di server dan jangan pernah commit nilainya:
 
 ```text
 RESTO_API_TOKEN=
@@ -110,7 +117,7 @@ Append each real value locally after its `=` sign. `WHATSAPP_DRY_RUN=true` is th
 
 1. Create or open a Meta Developer application.
 2. Add the WhatsApp product and obtain a test/business phone number.
-3. Save the phone number ID, access token, app secret, and a private webhook verify token in `.env.runtime`.
+3. Save the phone number ID, access token, app secret, and a private webhook verify token in `.env`.
 4. Expose the local server through an HTTPS tunnel for testing, or use a deployed HTTPS URL. Meta cannot call a private `127.0.0.1` address directly.
 5. Configure the callback URL as `/webhooks/whatsapp`.
 6. Use the same verify token in Meta and `WHATSAPP_VERIFY_TOKEN`.
@@ -137,4 +144,11 @@ The tests cover subscription verification, bad signature rejection, duplicate ev
 
 ## Payment status
 
-The WhatsApp `BAYAR` command currently performs a clearly labeled simulated confirmation. It does not create a QRIS, call a bank, verify a transfer, or settle funds. A real Midtrans/Xendit integration still requires a separately selected provider, credentials, public HTTPS webhook, signature verification, refund policy, and reconciliation tests.
+The WhatsApp `BAYAR` command currently performs a clearly labeled simulated confirmation for the simulated `/orders/{order_id}/pay` flow. It does not call a bank, verify a transfer, or settle funds.
+
+Midtrans QRIS is implemented in code (`app/midtrans.py`): `create_qris_charge` creates a real QRIS charge when `MIDTRANS_SERVER_KEY` is set (sandbox by default, production only with `MIDTRANS_IS_PRODUCTION=true`), and `/webhooks/midtrans` processes settlement notifications. Two safeguards apply:
+
+- **Signature verification is fail-closed.** Without a configured `MIDTRANS_SERVER_KEY`, webhook payloads are rejected (HTTP 403) instead of being accepted as "simulation". Configure a sandbox key before testing webhook settlement.
+- **Simulation QR fallback.** Without a server key, `create_qris_charge` returns a clearly labeled simulation QR (`mode: "simulation"`) that is a static mock string and cannot be paid. Always announce simulation mode during demos; do not present simulation QR codes as payable.
+
+Real payment settlement still requires production credentials, a public HTTPS webhook URL, refund policy decisions, and reconciliation tests. Until then, treat all payment flows as staging/demo.

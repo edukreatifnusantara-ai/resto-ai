@@ -134,11 +134,19 @@ def verify_midtrans_signature(
     gross_amount: str,
     signature_key: str,
 ) -> bool:
-    """Verify Midtrans webhook notification signature."""
+    """Verify Midtrans webhook notification signature (fail-closed).
+
+    Returns False whenever MIDTRANS_SERVER_KEY is missing/blank so unauthenticated
+    webhook payloads can never settle an order in simulation mode.
+    """
     config = get_midtrans_config()
     server_key = config["server_key"]
     if not server_key:
-        return True  # Simulation mode
+        logger.warning(
+            "Midtrans webhook rejected: MIDTRANS_SERVER_KEY is not configured "
+            "(fail-closed); configure a sandbox/live key to verify signatures."
+        )
+        return False
 
     raw = f"{order_id}{status_code}{gross_amount}{server_key}"
     expected = hashlib.sha512(raw.encode("utf-8")).hexdigest()

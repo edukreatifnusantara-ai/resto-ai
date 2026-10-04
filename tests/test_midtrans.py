@@ -20,12 +20,35 @@ def test_create_qris_charge_simulation():
     assert res["mode"] == "simulation"
 
 
-def test_midtrans_signature_verification():
-    # In simulation mode (empty server key), signature verification passes
-    assert verify_midtrans_signature("order-1", "200", "50000", "any-sig") is True
+def test_midtrans_signature_verification(monkeypatch):
+    # With a configured server key, a correct SHA-512 signature passes...
+    import hashlib
+
+    server_key = "test-server-key"
+    monkeypatch.setenv("MIDTRANS_SERVER_KEY", server_key)
+    order_id, status_code, gross_amount = "order-1", "200", "50000"
+    expected = hashlib.sha512(
+        f"{order_id}{status_code}{gross_amount}{server_key}".encode("utf-8")
+    ).hexdigest()
+    assert verify_midtrans_signature(order_id, status_code, gross_amount, expected) is True
+
+    # ...and a tampered signature is rejected.
+    assert verify_midtrans_signature(order_id, status_code, gross_amount, "bad-sig") is False
 
 
-def test_midtrans_webhook_settlement_and_failure():
+def test_midtrans_webhook_settlement_and_failure(monkeypatch):
+    import hashlib
+
+    # Fail-closed signature verification requires a server key; tests simulate a
+    # configured Midtrans key and sign payloads with its SHA-512 signature.
+    server_key = "test-server-key"
+    monkeypatch.setenv("MIDTRANS_SERVER_KEY", server_key)
+
+    def signed_payload(payload: dict) -> dict:
+        raw = f"{payload['order_id']}{payload['status_code']}{payload['gross_amount']}{server_key}"
+        payload = dict(payload)
+        payload["signature_key"] = hashlib.sha512(raw.encode("utf-8")).hexdigest()
+        return payload
     db = SessionLocal()
     try:
         # Create a sample order in DRAFT status
@@ -50,7 +73,7 @@ def test_midtrans_webhook_settlement_and_failure():
             "transaction_status": "settlement",
             "fraud_status": "accept",
         }
-        resp = client.post("/webhooks/midtrans", json=midtrans_payload)
+        resp = client.post("/webhooks/midtrans", json=signed_payload(midtrans_payload))
         assert resp.status_code == 200
         data = resp.json()
         assert data["status"] == "ok"
@@ -76,13 +99,12 @@ def test_midtrans_webhook_settlement_and_failure():
         db.refresh(failed_order)
         failed_id = int(getattr(failed_order, "id"))
 
-        resp_failed = client.post("/webhooks/midtrans", json={
+        resp_failed = client.post("/webhooks/midtrans", json=signed_payload({
             "order_id": f"NDELIK-{failed_id}-1727000000",
             "status_code": "200",
             "gross_amount": "20000.00",
-            "signature_key": "dummy-signature",
             "transaction_status": "expire",
-        })
+        }))
         assert resp_failed.status_code == 200
         db.refresh(failed_order)
         assert str(failed_order.payment_state) == PaymentStatus.FAILED

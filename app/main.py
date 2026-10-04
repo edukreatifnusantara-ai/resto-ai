@@ -7,11 +7,10 @@ from datetime import datetime, timedelta
 from math import isfinite
 from threading import Lock
 from pathlib import Path
-from dotenv import load_dotenv
+from app.environment import load_environment
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(os.getenv("RESTO_ENV_FILE", BASE_DIR / ".env.runtime"))
-load_dotenv()
+load_environment(BASE_DIR)
 
 from fastapi import FastAPI, HTTPException, Depends, Request, Query
 from fastapi.responses import JSONResponse, PlainTextResponse, HTMLResponse, RedirectResponse
@@ -365,13 +364,13 @@ WARUNG_NDELIK_MAP_URL = "https://maps.app.goo.gl/tnFXrux6SU7nGj5x5"
 
 def _chatbot_help() -> str:
     return (
-        "*BANTUAN WARUNG NDELIK*\n\n"
-        "• Ketik *MENU* untuk memilih kategori\n"
-        "• Ketik *MENU MAKANAN*, *MENU MINUMAN*, atau *MENU SNACK*\n"
-        "• Ketik *LOKASI* untuk petunjuk arah\n"
-        "• Pesan: *PESAN <nomor_menu> <jumlah>*\n"
-        "• Cek pesanan: *STATUS <id_order>*\n"
-        "• Batalkan pesanan: *BATAL <id_order>*"
+        "Halo Kak, selamat datang di Warung Ndelik.\n\n"
+        "Ada yang bisa kami bantu? Kakak bisa langsung:\n"
+        "• Tanya menu makanan, minuman segar, atau cemilan favorit kami\n"
+        "• Pesan hidangan langsung dengan menyebutkan pesanannya di chat\n"
+        "• Ketik *LOKASI* untuk melihat alamat dan petunjuk arah Google Maps\n"
+        "• Cek status pesanan Kakak kapan saja\n\n"
+        "Silakan sampaikan pesanannya ya Kak, kami siap melayani."
     )
 
 
@@ -385,6 +384,8 @@ def _chatbot_location() -> str:
 
 def _menu_category(item: MenuItem) -> str:
     """Group the seeded menu book into compact WhatsApp-friendly sections."""
+    if item.name.lower().startswith("nasi "):
+        return "MAKANAN"
     if item.id <= 27:
         return "MAKANAN"
     if item.id <= 43:
@@ -414,11 +415,12 @@ def _chatbot_menu(db: Session, requested_category: str | None = None) -> str:
 
     if requested_category and category is None:
         return (
-            "Kategori belum dikenali.\n\n"
-            "Ketik salah satu:\n"
-            "• *MENU MAKANAN*\n"
-            "• *MENU MINUMAN*\n"
-            "• *MENU SNACK*"
+            "*PILIHAN KATEGORI MENU WARUNG NDELIK*\n\n"
+            "Silakan pilih kategori menu yang ingin dilihat:\n"
+            "• *MENU MAKANAN* (bebek bumbu hitam, aneka nasi goreng, ayam, kwetiau, dll.)\n"
+            "• *MENU MINUMAN* (es teh jumbo, es jeruk, es teler creamy, wedang jahe/uwuh)\n"
+            "• *MENU SNACK* (mendoan hangat, tahu bakso, cireng, kentang)\n\n"
+            "Kakak juga bisa langsung menyebutkan menu yang ingin dipesan."
         )
 
     if category is None:
@@ -428,9 +430,7 @@ def _chatbot_menu(db: Session, requested_category: str | None = None) -> str:
             "• *MENU MAKANAN*\n"
             "• *MENU MINUMAN*\n"
             "• *MENU SNACK*\n\n"
-            "Setelah memilih nomor menu, kirim contoh:\n"
-            "*PESAN 1 2*\n"
-            "Artinya pesan menu nomor 1 sebanyak 2 porsi.\n\n"
+            "Kakak juga bisa langsung memesan dengan menyebutkan menu yang diinginkan (contoh: 2 nasi bebek bumbu hitam dan 2 es teh jumbo).\n\n"
             "Butuh petunjuk arah? Ketik *LOKASI*."
         )
 
@@ -443,10 +443,10 @@ def _chatbot_menu(db: Session, requested_category: str | None = None) -> str:
     lines = [labels[category], ""]
     for item in section_items:
         price = f"Rp{item.price:,.0f}".replace(",", ".")
-        lines.append(f"*{item.id}.* {item.name} — {price}")
+        lines.append(f"*{item.id}.* *{item.name}* — {price}")
     lines.extend([
         "",
-        "Ketik contoh: *PESAN 1 2*",
+        "Ketik contoh: *PESAN 1 2* (atau sebutkan langsung pesanan Kakak di chat).",
         "Ketik *MENU* untuk memilih kategori lain.",
     ])
     return "\n".join(lines)
@@ -479,7 +479,20 @@ def handle_whatsapp_text(
     if upper in {"MENU", "DAFTAR MENU"}:
         return _chatbot_menu(db)
     if upper.startswith("MENU "):
-        return _chatbot_menu(db, text[5:])
+        sub_cat = text[5:].strip().upper()
+        category_aliases = {
+            "MAKANAN": "MAKANAN",
+            "MAKAN": "MAKANAN",
+            "MINUMAN": "MINUMAN",
+            "MINUM": "MINUMAN",
+            "SNACK": "SNACK",
+            "CEMILAN": "SNACK",
+            "PELENGKAP": "SNACK",
+        }
+        if sub_cat in category_aliases:
+            return _chatbot_menu(db, sub_cat)
+        # Jika bukan kategori terdaftar (misal "menu apa", "menu rekomendasi"),
+        # biarkan AI Agent merespons secara luwes dan alami.
 
     parts = text.split()
     command = parts[0].upper()
@@ -574,7 +587,12 @@ def handle_whatsapp_text(
     elif isinstance(ai_reply, str) and ai_reply:
         return ai_reply
 
-    return "Maaf, pesan belum dikenali.\n\n" + _chatbot_help()
+    # Fallback ramah jika AI tidak menghasilkan respon
+    return (
+        "Halo Kak, ada yang bisa kami bantu dari Warung Ndelik? "
+        "Kakak bisa langsung menanyakan menu favorit kami, memesan hidangan, atau melihat petunjuk lokasi resto. "
+        "Silakan sampaikan pesanannya ya Kak."
+    )
 
 
 def _claim_whatsapp_event(db: Session, message: dict[str, str]) -> tuple[WhatsAppEvent, bool]:
