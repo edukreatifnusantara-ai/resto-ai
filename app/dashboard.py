@@ -225,6 +225,26 @@ def get_top_menu_analytics() -> list:
     ]
 
 
+def get_menu_catalog(db: Session) -> list:
+    """Return the live active menu catalog for the dashboard price view."""
+    items = (
+        db.query(MenuItem)
+        .filter(MenuItem.is_active == True)
+        .order_by(MenuItem.id.asc())
+        .all()
+    )
+    return [
+        {
+            "id": int(item.id),
+            "name": item.name,
+            "description": item.description or "",
+            "price": float(item.price),
+            "is_active": bool(getattr(item, "is_active", True)),
+        }
+        for item in items
+    ]
+
+
 def get_dashboard_summary_data(db: Session) -> dict:
     master = load_master_data()
     
@@ -233,45 +253,86 @@ def get_dashboard_summary_data(db: Session) -> dict:
     live_total_sales = round(float(live_sales_scalar) if live_sales_scalar else 0.0, 2)
     live_completed_count = db.query(OrderModel).filter(OrderModel.state == OrderStatus.COMPLETED).count()
     
-    # 2. Historical 28-day calculations from Agustus.xlsx data
+    # 2. Historical 28-day calculations from Agustus.xlsx data (REKONSILIASI PENUH)
+    # Rantai angka wajib nyambung:
+    #   estimasi_omzet = pemakaian_bahan_murni / 0.42
+    #   laba_kotor     = estimasi_omzet - pemakaian_bahan_murni
+    #   beban_tetap    = payroll_28h + utilitas_28h (prorata 28/30, sisa pembulatan di hari terakhir)
+    #   laba_bersih    = laba_kotor - beban_tetap - pemakaian_non_bahan (gas, galon, tisu, dll)
     hist = master.get("historical_hpp_benchmark", {})
     daily_rows = hist.get("daily_summary", [])
-    total_hpp_28d = hist.get("total_pemakaian_bahan", 32947239.0)
-    avg_daily_hpp = hist.get("rata_rata_pemakaian_harian", 1176687.11)
-    
-    daily_fixed_cost = master.get("fixed_costs", {}).get("daily_fixed_cost_allocation", 933333.33)
-    
+    fc = master.get("fixed_costs", {})
+    monthly_payroll = float(fc.get("monthly_payroll", 26500000))
+    monthly_util = float(fc.get("monthly_electricity_and_water", 1500000))
+    n_days = max(len(daily_rows), 1)
+
+    # Split pemakaian: bahan murni (dapur+minuman) vs non-bahan operasional dari detail belanja harian
+    OPS_KEYS = ("gas", "nota", "plastik", "tisu", "sunlight", "galon", "sedotan", "kresek", "sabun", "cuci")
+    pur_by_date = {d.get("tanggal"): d for d in master.get("purchasing_summary", {}).get("daily_purchases", [])}
+
+    def split_ops_usage(tanggal: str, pemakaian_total: float):
+        rec = pur_by_date.get(tanggal) or {}
+        ops_val = 0.0
+        for det in rec.get("details", []):
+            if any(k in str(det.get("item", "")).lower() for k in OPS_KEYS):
+                ops_val += float(det.get("subtotal", 0) or 0)
+        total_belanja = float(rec.get("total_belanja", 0) or 0)
+        if ops_val > pemakaian_total:
+            ops_val = pemakaian_total
+        if total_belanja == 0:
+            return pemakaian_total, 0.0
+        ops_val = min(ops_val, total_belanja, pemakaian_total)
+        return pemakaian_total - ops_val, ops_val
+
+    # Beban tetap prorata periode (28/30 hari), pembulatan diserap hari terakhir
+    staff_28 = round(monthly_payroll * (18500.0 / 26500.0) * n_days / 30)
+    mgmt_28 = round(monthly_payroll * (8000.0 / 26500.0) * n_days / 30)
+    util_28 = round(monthly_util * n_days / 30)
+    payroll_28 = staff_28 + mgmt_28
+    tetap_total = payroll_28 + util_28
+    per_day_tetap = round(tetap_total / n_days)
+
     daily_table_data = []
     total_omzet_28d = 0
     total_net_profit_28d = 0
-    
-    for row in daily_rows:
+    total_hpp_28d = 0
+    total_ops_28d = 0
+
+    for idx, row in enumerate(daily_rows):
         tgl = row.get("tanggal", "")
-        hpp = float(row.get("pemakaian_bahan_hpp", 0))
-        eff_hpp = max(hpp, 800000)
-        est_omzet = round(eff_hpp / 0.42, 0)
+        pemakaian = max(float(row.get("pemakaian_bahan_hpp", 0) or 0), 0.0)
+        hpp, ops_used = split_ops_usage(tgl, pemakaian)
+        est_omzet = round(hpp / 0.42, 0) if hpp > 0 else 0.0
         laba_kotor = est_omzet - hpp
-        laba_bersih = laba_kotor - daily_fixed_cost
+        beban_tetap = per_day_tetap if idx < n_days - 1 else (tetap_total - per_day_tetap * (n_days - 1))
+        laba_bersih = laba_kotor - beban_tetap - ops_used
         margin_pct = round((laba_bersih / est_omzet) * 100, 1) if est_omzet > 0 else 0
-        
+
         total_omzet_28d += est_omzet
         total_net_profit_28d += laba_bersih
-        
+        total_hpp_28d += hpp
+        total_ops_28d += ops_used
+
         daily_table_data.append({
             "tanggal": tgl,
             "stok_tersedia": row.get("total_stok_tersedia", 0),
             "sisa_stok": row.get("sisa_stok_akhir", 0),
-            "pemakaian_hpp": hpp,
+            "pemakaian_hpp": round(hpp),
             "estimasi_omzet": est_omzet,
             "laba_kotor": laba_kotor,
-            "beban_tetap": round(daily_fixed_cost, 0),
+            "beban_tetap": beban_tetap,
+            "biaya_operasional": round(ops_used),
             "laba_bersih": laba_bersih,
-            "margin_persen": margin_pct
+            "margin_persen": margin_pct,
+            "status": "Tutup / Tanpa Data" if est_omzet == 0 else "Operasional"
         })
-        
-    avg_daily_omzet = round(total_omzet_28d / len(daily_table_data), 0) if daily_table_data else 2885662
-    avg_daily_profit = round(total_net_profit_28d / len(daily_table_data), 0) if daily_table_data else 775641
-    avg_margin_pct = round((total_net_profit_28d / total_omzet_28d) * 100, 1) if total_omzet_28d > 0 else 26.9
+
+    avg_daily_omzet = round(total_omzet_28d / n_days, 0) if daily_table_data else 0
+    avg_daily_profit = round(total_net_profit_28d / n_days, 0) if daily_table_data else 0
+    avg_margin_pct = round((total_net_profit_28d / total_omzet_28d) * 100, 1) if total_omzet_28d > 0 else 0
+    avg_daily_hpp = round(total_hpp_28d / n_days, 2)
+    ops_28 = total_ops_28d
+    daily_fixed_cost = round(tetap_total / n_days, 2)
 
     # Day of Week Traffic & Revenue Analytics
     from datetime import datetime as dt_mod
@@ -299,6 +360,8 @@ def get_dashboard_summary_data(db: Session) -> dict:
         except Exception:
             dt_obj = dt_mod.strptime(tgl, "%d.%m.%Y")
         d_name = days_map[dt_obj.weekday()]
+        if omzet <= 0:
+            continue  # hari tutup/tanpa data tidak dihitung dalam rata-rata per hari
         day_stats[d_name]["count"] += 1
         day_stats[d_name]["total_omzet"] += omzet
         day_stats[d_name]["total_hpp"] += hpp
@@ -429,32 +492,56 @@ def get_dashboard_summary_data(db: Session) -> dict:
     # 6. Purchasing & Expenses Summary
     purchasing = master.get("purchasing_summary", {})
     top_spend = purchasing.get("top_spending_items", [])
+    if not top_spend:
+        # Agregasi item belanja dari detail nota harian (sumber: Agustus.xlsx)
+        agg = {}
+        for dp in purchasing.get("daily_purchases", []):
+            for det in dp.get("details", []):
+                nm = str(det.get("item", "")).strip()
+                if not nm:
+                    continue
+                a = agg.setdefault(nm, {"item": nm, "category": det.get("kategori", "Belanja"), "total_spent": 0.0, "total_qty": 0.0})
+                a["total_spent"] += float(det.get("subtotal", 0) or 0)
+                a["total_qty"] += float(det.get("qty", 0) or 0)
+        top_spend = sorted(agg.values(), key=lambda x: x["total_spent"], reverse=True)
+        for a in top_spend:
+            a["avg_unit_price"] = round(a["total_spent"] / a["total_qty"], 0) if a["total_qty"] else 0
+        purchasing["top_spending_items"] = top_spend
 
-    # 7. Income Statement (Formal Accounting)
+    # 7. Income Statement (Formal Accounting) — semua angka dari satu rantai perhitungan
+    pur_break = purchasing.get("breakdown", {})
+    b_dapur = float(pur_break.get("dapur_pasar", {}).get("total", 0) or 0)
+    b_minum = float(pur_break.get("minuman", {}).get("total", 0) or 0)
+    if (b_dapur + b_minum) > 0:
+        share_dapur = b_dapur / (b_dapur + b_minum)
+    else:
+        share_dapur = 0.87
+    cogs_food = round(total_hpp_28d * share_dapur, 0)
+    cogs_bev = round(total_hpp_28d - cogs_food, 0)
+    gross_profit_28 = total_omzet_28d - total_hpp_28d
+    opex_total = tetap_total + ops_28
     income_statement = {
         "revenue": {
-            "gross_food_sales": round(total_omzet_28d * 0.72, 0),
-            "gross_beverage_sales": round(total_omzet_28d * 0.28, 0),
+            "gross_food_sales": round(total_omzet_28d * share_dapur, 0),
+            "gross_beverage_sales": round(total_omzet_28d * (1 - share_dapur), 0),
             "total_revenue": total_omzet_28d
         },
         "cogs": {
-            "food_ingredients": 26038717.0,
-            "beverage_ingredients": 3952380.0,
+            "food_ingredients": cogs_food,
+            "beverage_ingredients": cogs_bev,
             "total_cogs": total_hpp_28d,
-            "cogs_percentage": round((total_hpp_28d / total_omzet_28d) * 100, 1)
+            "cogs_percentage": round((total_hpp_28d / total_omzet_28d) * 100, 1) if total_omzet_28d else 0
         },
-        "gross_profit": total_omzet_28d - total_hpp_28d,
+        "gross_profit": gross_profit_28,
         "operating_expenses": {
-            "management_payroll": 8000000.0,
-            "staff_payroll": 18500000.0,
-            "total_payroll": 26500000.0,
-            "utilities_water_electricity": 1500000.0,
-            "gas_fuel": 2088000.0,
-            "mineral_water_gallons": 464000.0,
-            "packaging_and_tissue": 609200.0,
-            "total_operating_expenses": 28000000.0 + 3161200.0
+            "management_payroll": float(mgmt_28),
+            "staff_payroll": float(staff_28),
+            "total_payroll": float(payroll_28),
+            "utilities_water_electricity": float(util_28),
+            "gas_fuel_and_supplies": float(ops_28),
+            "total_operating_expenses": float(opex_total)
         },
-        "ebitda": (total_omzet_28d - total_hpp_28d) - (round(daily_fixed_cost * 28, 0)),
+        "ebitda": gross_profit_28 - tetap_total,
         "net_profit": total_net_profit_28d,
         "net_margin_percent": avg_margin_pct
     }
@@ -496,6 +583,7 @@ def get_dashboard_summary_data(db: Session) -> dict:
             "total_valuation": total_inventory_value,
             "items": inventory_items
         },
+        "menu_catalog": get_menu_catalog(db),
         "charts": {
             "daily_dates": [d["tanggal"] for d in daily_table_data],
             "daily_omzet": [d["estimasi_omzet"] for d in daily_table_data],
@@ -510,8 +598,8 @@ def get_dashboard_summary_data(db: Session) -> dict:
                 "orders_count": [m.get("total_orders", 0) for m in monthly_growth]
             },
             "cost_breakdown": {
-                "labels": ["Gaji Staf (10 Org)", "Gaji Manajemen (Owner & Co)", "HPP Bahan Riil (Bulanan)", "Utilitas (Listrik/Air)", "Ops Gas & Perlengkapan"],
-                "values": [18500000, 8000000, round(avg_daily_hpp * 30, 0), 1500000, 3161200]
+                "labels": ["Gaji Staf (10 Org)", "Gaji Manajemen (Owner & Co)", "HPP Bahan Baku", "Utilitas (Listrik/Air)", "Operasional Non-Bahan (Gas, Galon, Tisu)"],
+                "values": [round(staff_28), round(mgmt_28), round(total_hpp_28d), round(util_28), round(ops_28)]
             },
             "purchasing_breakdown": {
                 "labels": ["Belanja Bahan Dapur (Pasar)", "Belanja Bahan Minuman", "Operasional & Non-Bahan (Gas, Galon, Tisu, dll)"],

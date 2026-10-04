@@ -395,8 +395,8 @@
               <span id="pnl-rev-total" class="text-emerald-700">Rp 80.798.533</span>
             </div>
             <div class="pl-4 pt-2 space-y-1.5 text-slate-600">
-              <div class="flex justify-between"><span>Penjualan Makanan (72%)</span><span id="pnl-rev-food">Rp 58.174.944</span></div>
-              <div class="flex justify-between"><span>Penjualan Minuman & Aneka Snack (28%)</span><span id="pnl-rev-drink">Rp 22.623.589</span></div>
+              <div class="flex justify-between"><span>Penjualan Makanan (proporsional belanja dapur)</span><span id="pnl-rev-food">Rp 58.174.944</span></div>
+              <div class="flex justify-between"><span>Penjualan Minuman & Aneka Snack (proporsional belanja minuman)</span><span id="pnl-rev-drink">Rp 22.623.589</span></div>
             </div>
           </div>
 
@@ -407,8 +407,8 @@
               <span id="pnl-cogs-total" class="text-amber-800">Rp 32.947.239</span>
             </div>
             <div class="pl-4 pt-2 space-y-1.5 text-slate-600">
-              <div class="flex justify-between"><span>Bahan Baku Dapur (Beras, Ayam, Bebek, Minyak, Sayur)</span><span>Rp 26.038.717</span></div>
-              <div class="flex justify-between"><span>Bahan Baku Minuman (Es Batu, Kopi, Susu, Teh, Sirup)</span><span>Rp 3.952.380</span></div>
+              <div class="flex justify-between"><span>Bahan Baku Dapur (Beras, Ayam, Bebek, Minyak, Sayur)</span><span id="pnl-cogs-food">Rp 26.038.717</span></div>
+              <div class="flex justify-between"><span>Bahan Baku Minuman (Es Batu, Kopi, Susu, Teh, Sirup)</span><span id="pnl-cogs-bev">Rp 3.952.380</span></div>
               <div class="flex justify-between font-semibold text-amber-900"><span>Rasio Food Cost</span><span id="pnl-cogs-ratio">40.8% dari Omzet</span></div>
             </div>
           </div>
@@ -423,15 +423,13 @@
           <div>
             <div class="flex justify-between font-extrabold text-slate-900 border-b border-slate-300 pb-1.5 text-sm">
               <span>4. BEBAN OPERASIONAL & BIAYA TETAP (OPEX)</span>
-              <span class="text-rose-800">Rp 29.294.533</span>
+              <span id="pnl-opex-total" class="text-rose-800">Rp 29.333.933</span>
             </div>
             <div class="pl-4 pt-2 space-y-1.5 text-slate-600">
-              <div class="flex justify-between"><span>Gaji 10 Staf Karyawan (Alokasi 28 Hari)</span><span>Rp 17.266.667</span></div>
-              <div class="flex justify-between"><span>Gaji Manajemen (Owner 5jt + Co-owner 3jt, 28 Hari)</span><span>Rp 7.466.667</span></div>
-              <div class="flex justify-between"><span>Utilitas (Listrik & Air, 28 Hari)</span><span>Rp 1.400.000</span></div>
-              <div class="flex justify-between"><span>Gas Elpiji Dapur (87 Tabung)</span><span>Rp 2.088.000</span></div>
-              <div class="flex justify-between"><span>Air Galon Minum & Dapur (116 Galon)</span><span>Rp 464.000</span></div>
-              <div class="flex justify-between"><span>Plastik, Kemasan, Tisu & Perlengkapan</span><span>Rp 609.200</span></div>
+              <div class="flex justify-between"><span>Gaji 10 Staf Karyawan (Alokasi 28 Hari)</span><span id="pnl-opex-staff">Rp 17.266.667</span></div>
+              <div class="flex justify-between"><span>Gaji Manajemen (Owner 5jt + Co-owner 3jt, 28 Hari)</span><span id="pnl-opex-mgmt">Rp 7.466.667</span></div>
+              <div class="flex justify-between"><span>Utilitas (Listrik & Air, 28 Hari)</span><span id="pnl-opex-util">Rp 1.400.000</span></div>
+              <div class="flex justify-between"><span>Gas Elpiji, Air Galon, Tisu, Plastik & Perlengkapan (Pemakaian Riil)</span><span id="pnl-opex-ops">Rp 3.200.600</span></div>
             </div>
           </div>
 
@@ -460,6 +458,7 @@
                   <th class="py-2.5 px-4 text-amber-700">HPP Bahan Baku</th>
                   <th class="py-2.5 px-4 text-slate-800">Laba Kotor</th>
                   <th class="py-2.5 px-4 text-rose-700">Beban Tetap Harian</th>
+                  <th class="py-2.5 px-4 text-rose-500">Biaya Ops (Gas dll)</th>
                   <th class="py-2.5 px-4 text-indigo-800 font-bold">Laba Bersih</th>
                   <th class="py-2.5 px-4">Margin %</th>
                 </tr>
@@ -596,6 +595,29 @@
             <span class="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 font-bold">🐎 Workhorse (Penarik Volume)</span>
             <span class="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 font-bold">🧩 Puzzle (Potensi Tertidur)</span>
           </div>
+        </div>
+
+        <div class="rounded-xl border border-orange-200 bg-orange-50/40 overflow-x-auto">
+          <div class="px-5 pt-4">
+            <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+              <i data-lucide="tags" class="w-4 h-4 text-orange-600"></i> Katalog Harga Menu Aktif
+            </h3>
+            <p class="text-[11px] text-slate-500 mt-1 mb-3">Harga jual tersinkron dari database menu Resto-AI.</p>
+          </div>
+          <table class="w-full text-left border-collapse text-xs">
+            <thead class="bg-white text-slate-700 font-bold border-y border-orange-200">
+              <tr>
+                <th class="py-2.5 px-4 w-12 text-center">No.</th>
+                <th class="py-2.5 px-4">Nama Menu</th>
+                <th class="py-2.5 px-4">Keterangan</th>
+                <th class="py-2.5 px-4 text-right">Harga Jual</th>
+                <th class="py-2.5 px-4 text-center">Status</th>
+              </tr>
+            </thead>
+            <tbody id="menu-price-catalog-body" class="divide-y divide-orange-100 text-slate-700 bg-white">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -1069,6 +1091,7 @@
       const roster = data.roster || [];
       const records = data.daily_records || [];
       const topMenus = data.top_menus || [];
+      const menuCatalog = data.menu_catalog || [];
       const purchasing = data.purchasing || {};
       const inventory = data.inventory || {};
       const income = data.income_statement || {};
@@ -1140,12 +1163,20 @@
 
       // 2. Income Statement (P&L Tab)
       if (income.revenue) {
+        const opex = income.operating_expenses || {};
         document.getElementById('pnl-rev-total').innerText = formatRp(income.revenue.total_revenue);
         document.getElementById('pnl-rev-food').innerText = formatRp(income.revenue.gross_food_sales);
         document.getElementById('pnl-rev-drink').innerText = formatRp(income.revenue.gross_beverage_sales);
         document.getElementById('pnl-cogs-total').innerText = formatRp(income.cogs.total_cogs);
+        document.getElementById('pnl-cogs-food').innerText = formatRp(income.cogs.food_ingredients);
+        document.getElementById('pnl-cogs-bev').innerText = formatRp(income.cogs.beverage_ingredients);
         document.getElementById('pnl-cogs-ratio').innerText = income.cogs.cogs_percentage + '% dari Omzet';
         document.getElementById('pnl-gross-profit').innerText = formatRp(income.gross_profit) + ' (' + (100 - income.cogs.cogs_percentage).toFixed(1) + '%)';
+        if (document.getElementById('pnl-opex-total')) document.getElementById('pnl-opex-total').innerText = formatRp(opex.total_operating_expenses || 0);
+        if (document.getElementById('pnl-opex-staff')) document.getElementById('pnl-opex-staff').innerText = formatRp(opex.staff_payroll || 0);
+        if (document.getElementById('pnl-opex-mgmt')) document.getElementById('pnl-opex-mgmt').innerText = formatRp(opex.management_payroll || 0);
+        if (document.getElementById('pnl-opex-util')) document.getElementById('pnl-opex-util').innerText = formatRp(opex.utilities_water_electricity || 0);
+        if (document.getElementById('pnl-opex-ops')) document.getElementById('pnl-opex-ops').innerText = formatRp(opex.gas_fuel_and_supplies || 0);
         document.getElementById('pnl-net-profit').innerHTML = formatRp(income.net_profit) + '<br><span class="text-xs text-emerald-700 font-bold">Margin Bersih: ' + income.net_margin_percent + '%</span>';
       }
 
@@ -1153,13 +1184,16 @@
       const pnlTbody = document.getElementById('pnl-table-body');
       pnlTbody.innerHTML = '';
       records.forEach(r => {
+        const isClosed = !r.estimasi_omzet;
+        const dash = '<span class="text-slate-300">–</span>';
         pnlTbody.innerHTML += `
-          <tr class="hover:bg-slate-50 transition">
+          <tr class="hover:bg-slate-50 transition ${isClosed ? 'bg-slate-50/60' : ''}">
             <td class="py-2.5 px-4 font-bold text-slate-900">${r.tanggal}</td>
-            <td class="py-2.5 px-4 font-medium text-emerald-700">${formatRp(r.estimasi_omzet)}</td>
+            <td class="py-2.5 px-4 font-medium text-emerald-700">${isClosed ? '<span class="text-slate-400 italic">Tutup</span>' : formatRp(r.estimasi_omzet)}</td>
             <td class="py-2.5 px-4 font-medium text-amber-700">${formatRp(r.pemakaian_hpp)}</td>
-            <td class="py-2.5 px-4 font-medium">${formatRp(r.laba_kotor)}</td>
+            <td class="py-2.5 px-4 font-medium">${isClosed ? dash : formatRp(r.laba_kotor)}</td>
             <td class="py-2.5 px-4 text-slate-500">${formatRp(r.beban_tetap)}</td>
+            <td class="py-2.5 px-4 text-rose-500">${isClosed ? dash : formatRp(r.biaya_operasional || 0)}</td>
             <td class="py-2.5 px-4 font-bold text-indigo-700">${formatRp(r.laba_bersih)}</td>
             <td class="py-2.5 px-4 font-semibold">${r.margin_persen}%</td>
           </tr>
@@ -1171,18 +1205,20 @@
       belanjaTbody.innerHTML = '';
       const dailyPurchases = purchasing.daily_purchases || [];
       dailyPurchases.forEach((dp, idx) => {
+        const isClosed = !dp.total_belanja;
+        const totalCell = isClosed
+          ? '<span class="text-slate-400 italic">Tutup / tanpa data</span>'
+          : `<span class="font-extrabold text-indigo-950">${formatRp(dp.total_belanja)}</span>`;
         belanjaTbody.innerHTML += `
-          <tr class="hover:bg-slate-50 transition">
+          <tr class="hover:bg-slate-50 transition ${isClosed ? 'bg-slate-50/60' : ''}">
             <td class="py-2.5 px-4 font-bold text-slate-900">${dp.tanggal}</td>
-            <td class="py-2.5 px-4 font-medium text-amber-800">${formatRp(dp.belanja_dapur)}</td>
-            <td class="py-2.5 px-4 font-medium text-blue-800">${formatRp(dp.belanja_minuman)}</td>
-            <td class="py-2.5 px-4 font-medium text-rose-800">${formatRp(dp.belanja_operasional)}</td>
-            <td class="py-2.5 px-4 font-extrabold text-indigo-950">${formatRp(dp.total_belanja)}</td>
-            <td class="py-2.5 px-4 text-center font-semibold text-slate-700">${dp.items_count} item</td>
+            <td class="py-2.5 px-4 font-medium text-amber-800">${isClosed ? '<span class="text-slate-300">–</span>' : formatRp(dp.belanja_dapur)}</td>
+            <td class="py-2.5 px-4 font-medium text-blue-800">${isClosed ? '<span class="text-slate-300">–</span>' : formatRp(dp.belanja_minuman)}</td>
+            <td class="py-2.5 px-4 font-medium text-rose-800">${isClosed ? '<span class="text-slate-300">–</span>' : formatRp(dp.belanja_operasional)}</td>
+            <td class="py-2.5 px-4 text-center">${totalCell}</td>
+            <td class="py-2.5 px-4 text-center font-semibold text-slate-700">${isClosed ? '–' : dp.items_count + ' item'}</td>
             <td class="py-2.5 px-4 text-center">
-              <button onclick="openModal(${idx})" class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded text-[11px] font-bold transition">
-                📄 Rincian Nota
-              </button>
+              ${isClosed ? '<span class="text-[11px] text-slate-400 italic">Tidak ada nota</span>' : `<button onclick="openModal(${idx})" class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded text-[11px] font-bold transition">📄 Rincian Nota</button>`}
             </td>
           </tr>
         `;
@@ -1227,6 +1263,23 @@
           </tr>
         `;
       });
+
+      // Live menu price catalog
+      const menuCatalogTbody = document.getElementById('menu-price-catalog-body');
+      if (menuCatalogTbody) {
+        menuCatalogTbody.innerHTML = '';
+        menuCatalog.forEach((item, idx) => {
+          menuCatalogTbody.innerHTML += `
+            <tr class="hover:bg-orange-50/60 transition">
+              <td class="py-2.5 px-4 text-center font-bold text-slate-500">${idx + 1}</td>
+              <td class="py-2.5 px-4 font-bold text-slate-900">${item.name}</td>
+              <td class="py-2.5 px-4 text-slate-500">${item.description || '—'}</td>
+              <td class="py-2.5 px-4 text-right font-extrabold text-orange-700">${formatRp(item.price)}</td>
+              <td class="py-2.5 px-4 text-center"><span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold">Aktif</span></td>
+            </tr>
+          `;
+        });
+      }
 
       // 5. Inventory Tab Table
       renderInventoryTable(inventory.items || []);
